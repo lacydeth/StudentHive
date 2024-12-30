@@ -1,13 +1,13 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Login from './features/Login/Login'; 
-import Navbar from './features/Navbar/Navbar';
 import LandingPage from './features/Index/Index'
 import Register from './features/Register/Register'
+import Navbar from './components/Navbar/Navbar';
 
 export const routes = {
   "homePage": { path: "/", title: "Home" },
   "loginPage": { path: "/login", title: "Login" }, 
-  "registerPage": {path: "/register", title: "register"}
+  "registerPage": {path: "/register", title: "Register"}
 }
 
 const App = () => {

@@ -1,7 +1,6 @@
 // Register.tsx
-import React from 'react';
 
-const Register: React.FC = () => {
+const Register = () => {
   return (
     <section className="bg-gray-50 dark:bg-gray-900 min-h-screen flex justify-center items-center">
       <div className="w-full max-w-md bg-white rounded-lg shadow-md dark:bg-gray-800 dark:border-gray-700 p-8">

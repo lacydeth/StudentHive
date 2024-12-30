@@ -1,28 +1,29 @@
+@import url('https://fonts.googleapis.com/css2?family=Overpass:ital,wght@0,100..900;1,100..900&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-:root {
-    scroll-behavior: smooth;
-    --Black: #00000000;
-    --SmoothGreen: #99BC85;
-    --DarkGreen: #556D48;
-    --BackgroundColor: #FFFFFF;
-}
-
 *{
-    box-sizing: border-box;
     margin: 0;
     padding: 0;
+    box-sizing: border-box;
     font-size: 1rem;
+    font-family: "Overpass", serif;
 }
-
+:root {
+    --black: #00000000;
+    --white: #FFFFFF;
+    --smoothGreen: #99BC85;
+    --darkGreen: #556D48;
+}
+html {
+    scroll-behavior: smooth;
+}
 body{
-    background-color: var(--BackgroundColor);
-
+    background-color: var(--white);
 }
-
-.main-container{
+.container{
     display: flex;
     justify-content: center;
     align-items: center;
