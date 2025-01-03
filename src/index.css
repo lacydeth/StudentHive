@@ -1,8 +1,5 @@
 @import url('https://fonts.googleapis.com/css2?family=Overpass:ital,wght@0,100..900;1,100..900&display=swap');
 
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
 
 *{
     margin: 0;
@@ -12,13 +9,14 @@
     font-family: "Overpass", serif;
 }
 :root {
-    --black: #00000000;
+    --black: #000000;
     --white: #FFFFFF;
     --smoothGreen: #99BC85;
     --darkGreen: #556D48;
 }
-html {
+html, body {
     scroll-behavior: smooth;
+    overflow: hidden;
 }
 body{
     background-color: var(--white);

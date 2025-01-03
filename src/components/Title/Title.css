@@ -1,0 +1,17 @@
+.title-component {
+    width: 400px;
+    text-align: center;
+    color: var(--darkGreen);
+    font-size: 18px;
+    font-weight: 700;
+    text-transform: uppercase;
+    margin-bottom: 30px;
+}
+
+.title-component h2 {
+    font-size: 22px;
+    color: var(--black);
+    font-weight: 500;
+    margin-top: 5px;
+    text-transform: none;
+}
