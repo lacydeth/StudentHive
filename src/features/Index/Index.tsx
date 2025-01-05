@@ -19,7 +19,7 @@ const IndexPage = () => {
             </select>
           </div>
           <button className="search-btn">
-            Keresés
+            keresés
             <img src="./loupe.png" alt="Kép egy nagyítóról."></img>
           </button>
         </div>
@@ -33,9 +33,38 @@ const IndexPage = () => {
         <div className='title-comp'>
           <p>Funkcióink</p>
           <h2>Modern álláskeresés</h2>
-      </div>
+        </div>
         <div className="benefits-content">
-
+          <div className="benefit-cards">
+            <div className="benefit-card">
+              <img src="./public-administration.png" alt="Adminisztráció"></img>
+              <div className="benefit-title">
+                <h2>Egyszerű adminisztráció</h2>
+                <p>Minden folyamat egy helyen: könnyen kezelhető rendszer a munkaügyi adminisztrációhoz.</p>
+              </div>
+            </div>
+            <div className="benefit-card">
+              <img src="./timetable.png" alt="Adminisztráció"></img>
+              <div className="benefit-title">
+                <h2>Rugalmas időbeosztás</h2>
+                <p>Időpontok és műszakok egyszerű tervezése és módosítása valós időben.</p>
+              </div>
+            </div>
+            <div className="benefit-card">
+              <img src="./budget.png" alt="Adminisztráció"></img>
+              <div className="benefit-title">
+                <h2>Átlátható pénzügyek</h2>
+                <p>Részletes statisztikák és kimutatások a bérek és kiadások nyomon követésére.</p>
+              </div>
+            </div>
+            <div className="benefit-card">
+              <img src="./contract.png" alt="Szerződés"></img>
+              <div className="benefit-title">
+                <h2>Szerződéskötés</h2>
+                <p>Gyors és egyszerű: automatikus szerződéskötés és módosítás néhány kattintással.</p>
+              </div>
+            </div>
+          </div>
         </div>
         <div className="custom-shape">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 320">

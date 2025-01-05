@@ -4,6 +4,7 @@ import './Register.css';
 import Title from '../../components/Title/Title';
 import { routes } from '../../App';
 import { Link } from 'react-router-dom';
+import Footer from '../../components/Footer/Footer';
 
 const Register = () => {
   const [firstName, setFirstName] = useState('');

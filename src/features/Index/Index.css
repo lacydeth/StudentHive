@@ -4,7 +4,7 @@
     flex-direction: column;
     text-align: center;
   }
-  .welcome-section {
+.welcome-section {
     margin-top: 50px;
     background: #F4F4F4;
     height: 70vh;
@@ -13,7 +13,7 @@
     justify-content: center;
     align-items: center;
 }
-  .welcome-section .title h1 {
+.welcome-section .title h1 {
     color: var(--smoothGreen);
     font-size: 33px;
     text-transform: uppercase;
@@ -73,9 +73,31 @@
     position: relative;
     margin-top: -60px;
 }
+.benefits-content .benefit-cards {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 35px;
+    margin-top: 50px;
+    margin-bottom: 100px;
+}
+.benefit-cards .benefit-card {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    gap: 15px;
+    border-radius: 8px;
+    border-bottom: 3px solid var(--smoothGreen);
+    background: #dfdfdf18;
+    width: 300px;
+    height: 200px;
+    box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
+}
 .title-comp {
     position: absolute;
-    top: 30px;
+    top: 40px;
     left: 50%;
     width: 300px;
     transform: translateX(-50%);
@@ -84,7 +106,6 @@
     font-size: 16px;
     font-weight: 600;
     text-transform: uppercase;
-    margin-bottom: 30px;
 }
 
 .title-comp h2 {
@@ -93,4 +114,81 @@
     font-weight: 500;
     margin-top: 5px;
     text-transform: none;
+}
+/* -- media query -- */
+
+@media screen and (min-width: 1000px) {
+    .welcome-section {
+        flex-direction: row;
+        gap: 200px;
+        height: 100vh;
+    }
+    .welcome-section .title h1 {
+        font-size: 60px;
+        letter-spacing: 12px;
+    }
+    .welcome-section .title h3 {
+        font-size: 22px;
+    }
+    .welcome-section .search h1 {
+        font-size: 30px;
+        margin-bottom: 15px;
+    }
+    .welcome-section .search {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-end;
+        gap: 15px;
+    }
+    .welcome-section .search .job-search {
+        max-width: 300px;
+    }
+    .welcome-section .search .job-search .search-select {
+        padding: 10px 20px;
+        width: 300px;
+        height: 65px;
+    }
+    .welcome-section .search .search-btn {
+        padding: 20px 110px;
+      }
+    .welcome-section .search .search-btn img {
+        margin-left: 10px;
+    }
+    .benefits-section {
+        height: 60vh;
+    }
+    .benefits-content .benefit-cards {
+        flex-direction: row;
+        gap: 60px;
+    }
+    .benefit-cards .benefit-card {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-direction: column;
+        gap: 15px;
+        border-radius: 8px;
+        border-bottom: 3px solid var(--smoothGreen);
+        background: #dfdfdf18;
+        width: 300px;
+        height: 200px;
+        box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
+    }
+    .title-comp {
+        position: absolute;
+        top: 30px;
+        width: 400px;
+    }
+    .title-comp p {
+        font-size: 22px;
+    }
+    .title-comp h2 {
+        font-size: 34px;
+    }
+}
+@media screen and (max-width: 820px) {
+
+}
+@media screen and (max-width: 650px) {
+
 }
