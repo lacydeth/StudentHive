@@ -3,8 +3,8 @@ import axios from 'axios';
 import './Register.css';
 import Title from '../../components/Title/Title';
 import { routes } from '../../App';
-import { Link } from 'react-router-dom';
-import Footer from '../../components/Footer/Footer';
+import { Link, useNavigate } from 'react-router-dom';
+import Navbar from '../../components/Navbar/Navbar';
 
 const Register = () => {
   const [firstName, setFirstName] = useState('');
@@ -13,23 +13,27 @@ const Register = () => {
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [error, setError] = useState<string | null>(null);
+  const navigate = useNavigate();
 
   const handleRegister = async () => {
     if (password !== confirmPassword) {
       setError('Passwords do not match.');
       return;
     }
-
+  
     try {
-      const response = await axios.post('https://localhost:7074/api/auth/register', {
+      const response = await axios.post('https://localhost:7067/api/auth/register', {
         firstName,
         lastName,
         email,
         password,
       });
-
+  
       console.log('Registration successful:', response.data);
-      setError(null); // Clear any previous error
+      localStorage.setItem('authToken', response.data.token);
+      navigate('/login');
+      setError(null);
+
     } catch (error: any) {
       if (error.response && error.response.data) {
         const { code, description } = error.response.data;
@@ -42,6 +46,7 @@ const Register = () => {
 
   return (
     <div className="register-container">
+      <Navbar/>
       <div className="register-content">
         <Title subTitle="Regisztráció" title="Regisztrálj új StudentHive fiókot!" />
         {error && <p style={{ color: 'red' }}>{error}</p>}

@@ -4,6 +4,7 @@ import './Login.css';
 import Title from '../../components/Title/Title';
 import { Link } from 'react-router-dom';
 import { routes } from '../../App';
+import Navbar from '../../components/Navbar/Navbar';
 
 const Login = () => {
   const [email, setEmail] = useState('');
@@ -16,7 +17,7 @@ const Login = () => {
     try {
       const passwordTrimmed = password.trim();
       console.log('Logging in with:', email, passwordTrimmed); // Log email and password
-      const response = await axios.post('https://localhost:7074/api/auth/login', {
+      const response = await axios.post('https://localhost:7067/api/auth/login', {
           email,
           password: passwordTrimmed,
       });
@@ -38,6 +39,7 @@ const Login = () => {
 
   return (
     <div className="login-container">
+      <Navbar/>
       <div className="login-content">
         <Title subTitle="Bejelentkezés" title="Lépj be a StudentHive fiókodba!" />
         {error && <p style={{ color: 'red' }}>{error}</p>}

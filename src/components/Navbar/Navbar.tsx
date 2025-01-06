@@ -1,25 +1,41 @@
 import "./Navbar.css";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { routes } from "../../App";
 
 const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-
+  const [isSticky, setIsSticky] = useState(false);
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
   };
 
+  useEffect(() => {
+    const handleScroll = () => {
+      if (window.scrollY > 50) {
+        setIsSticky(true);
+      } else {
+        setIsSticky(false);
+      }
+    };
+  
+    window.addEventListener('scroll', handleScroll);
+  
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+    };
+  }, []);
+  
   const closeMenu = () => {
     setIsMenuOpen(false);
   };
 
   return (
-    <div className={`navbar ${isMenuOpen ? "show" : ""}`}>
+    <div className={`navbar ${isMenuOpen ? "show" : ""}${isSticky? 'sticky' : ''}`}>
       <div className="content">
         <div className="logo">
           <Link to={routes.homePage.path} className="btn" onClick={closeMenu}>
-            StudentHive
+            <img src="./website-logo.png" alt="Weboldal logója."></img>
           </Link>
         </div>
         <ul className="menu-list">
