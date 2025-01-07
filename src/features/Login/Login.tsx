@@ -13,19 +13,29 @@ const Login = () => {
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-
+  
     try {
       const passwordTrimmed = password.trim();
-      console.log('Logging in with:', email, passwordTrimmed); // Log email and password
+      console.log('Logging in with:', email, passwordTrimmed);
       const response = await axios.post('https://localhost:7067/api/auth/login', {
-          email,
-          password: passwordTrimmed,
+        email,
+        password: passwordTrimmed,
       });
-
-      // Handle successful login
-      localStorage.setItem('token', response.data.token);
-      console.log('Login successful:', response.data);
-      window.location.href = '/test';
+  
+      // Extract token and role from the response
+      const { token, role } = response.data;
+  
+      // Store token in localStorage
+      localStorage.setItem('token', token);
+  
+      // Redirect based on role
+      if (role === 'Admin') {
+        window.location.href = routes.adminPage.path;
+      } else if (role === 'User') {
+        window.location.href = routes.protectedPage.path;
+      } else {
+        console.error('Unknown role');
+      }
     } catch (error: any) {
       if (error.response && error.response.data) {
         const { message } = error.response.data;
@@ -39,7 +49,7 @@ const Login = () => {
 
   return (
     <div className="login-container">
-      <Navbar/>
+      <Navbar />
       <div className="login-content">
         <Title subTitle="Bejelentkezés" title="Lépj be a StudentHive fiókodba!" />
         {error && <p style={{ color: 'red' }}>{error}</p>}

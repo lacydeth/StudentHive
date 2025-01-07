@@ -196,8 +196,6 @@
         height: 200px;
         box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
     }
-}
-@media screen and (min-width: 820px) {
     .about-section {
         flex-direction: row;
     }
@@ -217,6 +215,8 @@
         margin: 10px 0;
         max-width: 600px;
     }
+}
+@media screen and (min-width: 820px) {
 }
 @media screen and (min-width: 650px) {
 

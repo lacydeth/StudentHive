@@ -6,12 +6,14 @@ import AOS from "aos";
 import 'aos/dist/aos.css';
 import { useEffect } from 'react';
 import ProtectedPage from './features/ProtectedPage/ProtectedPage';
+import AdminDashboard from './features/AdminDashboard/AdminDashboard';
 
 export const routes = {
   homePage: { path: '/', title: 'Home' },
   loginPage: { path: '/login', title: 'Login' },
   registerPage: { path: '/register', title: 'Register' },
-  protectedPage: { path: '/test', title: 'Teszt' }
+  protectedPage: { path: '/user', title: 'User' },
+  adminPage: { path: '/admin', title: 'Admin'}
 };
 
 const App = () => {
@@ -25,6 +27,7 @@ const App = () => {
         <Route path={routes.loginPage.path} element={<Login />} />
         <Route path={routes.registerPage.path} element={<Register />} />
         <Route path={routes.protectedPage.path} element={<ProtectedPage />} />
+        <Route path={routes.adminPage.path} element={<AdminDashboard/>} />
       </Routes>
     </Router>
   );
