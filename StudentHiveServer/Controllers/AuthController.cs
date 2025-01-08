@@ -45,10 +45,10 @@ namespace StudentHiveServer.Controllers
         [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody] LoginRequest request)
         {
-            const string query = "SELECT Id, PasswordHash FROM Users WHERE Email = @Email";
+            const string query = "SELECT Id, PasswordHash, RoleId FROM Users WHERE Email = @Email";
             var parameters = new MySqlParameter[]
             {
-            new MySqlParameter("@Email", request.Email)
+        new MySqlParameter("@Email", request.Email)
             };
 
             var result = await _dbHelper.ExecuteQueryAsync(query, parameters);
@@ -58,12 +58,14 @@ namespace StudentHiveServer.Controllers
             var row = result.Rows[0];
             var userId = Convert.ToInt32(row["Id"]);
             var passwordHash = row["PasswordHash"].ToString();
+            var roleId = Convert.ToInt32(row["RoleId"]);
 
             if (!BCrypt.Net.BCrypt.Verify(request.Password, passwordHash))
                 return Unauthorized(new { message = "Invalid credentials" });
 
             var token = GenerateJwtToken(userId);
-            return Ok(new { token });
+            return Ok(new { token, role = "Admin" });
+
         }
 
         private string GenerateJwtToken(int userId)
