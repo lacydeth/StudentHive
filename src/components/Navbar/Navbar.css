@@ -32,7 +32,7 @@
 .navbar i {
     font-size: 22px;
 }
-.login-btn {
+.navbar .login-btn {
     background-color: var(--darkGreen);
     padding: 6px 17px;
     border-radius: 15px;

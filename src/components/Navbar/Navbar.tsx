@@ -49,7 +49,7 @@ const Navbar = () => {
           </li>
           <li>
             <Link to={routes.registerPage.path} className="btn" onClick={closeMenu}>
-              Rólunk
+              Munkák
             </Link>
           </li>
           <li>
