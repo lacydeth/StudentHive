@@ -1,7 +1,10 @@
+import { handleLogout } from "../../utils/authUtils"
 
 const UserDashboard = () => {
   return (
-    <div>UserDashboard</div>
+    <div>UserDashboard
+      <button onClick={handleLogout}>kijelentkezés</button>
+    </div>
   )
 }
 

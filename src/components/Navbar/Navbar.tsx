@@ -2,10 +2,19 @@ import "./Navbar.css";
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { routes } from "../../App";
+import { getRoleFromToken } from "../../utils/authUtils";
 
 const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isSticky, setIsSticky] = useState(false);
+  const [userRole, setUserRole] = useState<string | null>(null);
+
+  useEffect(() => {
+    // Fetch the user role from the token
+    const role = getRoleFromToken();
+    setUserRole(role);
+  }, []);
+
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
   };
@@ -18,24 +27,24 @@ const Navbar = () => {
         setIsSticky(false);
       }
     };
-  
-    window.addEventListener('scroll', handleScroll);
-  
+
+    window.addEventListener("scroll", handleScroll);
+
     return () => {
-      window.removeEventListener('scroll', handleScroll);
+      window.removeEventListener("scroll", handleScroll);
     };
   }, []);
-  
+
   const closeMenu = () => {
     setIsMenuOpen(false);
   };
 
   return (
-    <div className={`navbar ${isMenuOpen ? "show" : ""}${isSticky? 'sticky' : ''}`}>
+    <div className={`navbar ${isMenuOpen ? "show" : ""}${isSticky ? "sticky" : ""}`}>
       <div className="content">
         <div className="logo">
           <Link to={routes.homePage.path} className="btn" onClick={closeMenu}>
-            <img src="./website-logo.png" alt="Weboldal logója."></img>
+            <img src="./website-logo.png" alt="Weboldal logója." />
           </Link>
         </div>
         <ul className="menu-list">
@@ -52,16 +61,31 @@ const Navbar = () => {
               Munkák
             </Link>
           </li>
-          <li>
-            <Link to={routes.registerPage.path} className="btn" onClick={closeMenu}>
-              Regisztráció
-            </Link>
-          </li>
-          <li>
-            <Link to={routes.loginPage.path} className="btn login-btn" onClick={closeMenu}>
-              Bejelentkezés
-            </Link>
-          </li>
+
+          {userRole ? (
+            <li>
+              <Link
+                to={userRole === "User" ? "/user" : "/admin"}
+                className="btn highlighted"
+                onClick={closeMenu}
+              >
+                Profil
+              </Link>
+            </li>
+          ) : (
+            <>
+              <li>
+                <Link to={routes.registerPage.path} className="btn" onClick={closeMenu}>
+                  Regisztráció
+                </Link>
+              </li>
+              <li>
+                <Link to={routes.loginPage.path} className="btn highlighted" onClick={closeMenu}>
+                  Bejelentkezés
+                </Link>
+              </li>
+            </>
+          )}
         </ul>
         <div
           className={`icon menu-btn ${isMenuOpen ? "hide" : ""}`}

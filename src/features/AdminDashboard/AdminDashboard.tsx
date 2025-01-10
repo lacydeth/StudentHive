@@ -1,7 +1,11 @@
+import { handleLogout } from "../../utils/authUtils"
 
 const AdminDashboard = () => {
+  
   return (
-    <div>AdminDashboard</div>
+    <div>AdminDashboard
+      <button onClick={handleLogout}>kijelentkezés</button>
+    </div>
   )
 }
 

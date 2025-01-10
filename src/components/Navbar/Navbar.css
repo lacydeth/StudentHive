@@ -26,13 +26,13 @@
     justify-content: space-around;
 }
 .navbar .logo .btn img{
-    width: 30%;
+    width: 20%;
     margin-right: 400px;
 }
 .navbar i {
     font-size: 22px;
 }
-.navbar .login-btn {
+.navbar .highlighted {
     background-color: var(--darkGreen);
     padding: 6px 17px;
     border-radius: 15px;
