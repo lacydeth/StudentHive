@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import axios from 'axios';
-import './Login.css';
+import styles from './Login.module.css';
 import Title from '../../components/Title/Title';
 import { Link } from 'react-router-dom';
 import { routes } from '../../App';
@@ -10,6 +10,7 @@ const Login = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState<string | null>(null);
+  const [stayLoggedIn, setStayLoggedIn] = useState(false);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -20,6 +21,7 @@ const Login = () => {
       const response = await axios.post('https://localhost:7067/api/auth/login', {
         email,
         password: passwordTrimmed,
+        stayLoggedIn,
       });
   
       // Extract token and role from the response
@@ -48,16 +50,16 @@ const Login = () => {
   };
 
   return (
-    <div className="login-container">
+    <div className={styles.loginContainer}>
       <Navbar />
-      <div className="login-content">
+      <div className={styles.loginContent}>
         <Title subTitle="Bejelentkezés" title="Lépj be a StudentHive fiókodba!" />
         {error && <p style={{ color: 'red' }}>{error}</p>}
         <form
-          className="login-form"
+          className={styles.loginForm}
           onSubmit={handleLogin}
         >
-          <div className="input-box">
+          <div className={styles.inputBox}>
             <input
               type="email"
               placeholder="email"
@@ -67,7 +69,7 @@ const Login = () => {
             />
             <img src="./mail.png" alt="email icon" />
           </div>
-          <div className="input-box">
+          <div className={styles.inputBox}>
             <input
               type="password"
               placeholder="jelszó"
@@ -77,13 +79,22 @@ const Login = () => {
             />
             <img src="./key.png" alt="password icon" />
           </div>
-          <button type="submit" className="login-btn">
+          <div className={styles.checkbox}>
+              <input
+                type="checkbox"
+                checked={stayLoggedIn}
+                onChange={(e) => setStayLoggedIn(e.target.checked)}
+              />
+              <span>Maradjak bejelentkezve</span>
+          </div>
+
+          <button type="submit" className={styles.loginBtn}>
             bejelentkezés
           </button>
         </form>
         <p>
           Még nincs profilod?{' '}
-          <Link className="have-profile" to={routes.registerPage.path}>
+          <Link className={styles.haveProfile} to={routes.registerPage.path}>
             Regisztrálj!
           </Link>
         </p>

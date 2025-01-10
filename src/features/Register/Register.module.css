@@ -1,23 +1,26 @@
-body {
+.registerContainer {
     background: #F4F4F4;
-}
-.login-content {
+  }
+  
+  .registerContent {
     display: flex;
     align-items: center;
     justify-content: center;
-    flex-direction: column;
     width: 100%;
-    height: 100vh;  
+    min-height: 100vh;
     text-align: center;
-}
-.login-form {
+    flex-direction: column;
+  }
+  
+  .registerForm {
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
     gap: 25px;
-}
-.login-form .login-btn {
+  }
+  
+  .registerBtn {
     background: var(--smoothGreen);
     color: var(--white);
     border-radius: 8px;
@@ -27,29 +30,35 @@ body {
     border: 0;
     outline: 0;
     margin-bottom: 15px;
-}
-.input-box {
+  }
+  
+  .inputBox {
     position: relative;
     width: 280px;
-}
-.input-box input {
-    border:none;
+  }
+  
+  .inputBox input {
+    border: none;
     padding: 15px 20px;
-    background-color:#fff; 
-    display:block; 
+    background-color: #fff;
+    display: block;
     width: 100%;
     border-radius: 8px;
-}
-.input-box input:focus {
+  }
+  
+  .inputBox input:focus {
     outline: 2px solid #99BC85;
-}
-.input-box img {
-    position: absolute; 
-    top: 13px; 
+  }
+  
+  .inputBox img {
+    position: absolute;
+    top: 13px;
     right: 15px;
-}
-.have-profile {
+  }
+  
+  .haveProfile {
     color: var(--black);
     text-decoration-thickness: 2px;
     text-decoration-color: var(--smoothGreen);
-}
+  }
+  

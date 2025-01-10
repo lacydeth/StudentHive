@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import axios from 'axios';
-import './Register.css';
+import styles from './Register.module.css';
 import Title from '../../components/Title/Title';
 import { routes } from '../../App';
 import { Link, useNavigate } from 'react-router-dom';
@@ -45,19 +45,19 @@ const Register = () => {
   };
 
   return (
-    <div className="register-container">
-      <Navbar/>
-      <div className="register-content">
+    <div className={styles.registerContainer}>
+      <Navbar />
+      <div className={styles.registerContent}>
         <Title subTitle="Regisztráció" title="Regisztrálj új StudentHive fiókot!" />
         {error && <p style={{ color: 'red' }}>{error}</p>}
         <form
-          className="register-form"
+          className={styles.registerForm}
           onSubmit={(e) => {
             e.preventDefault();
             handleRegister();
           }}
         >
-          <div className="input-box">
+          <div className={styles.inputBox}>
             <input
               type="text"
               placeholder="vezetéknév"
@@ -67,7 +67,7 @@ const Register = () => {
             />
             <img src="./id-card.png" alt="last name icon" />
           </div>
-          <div className="input-box">
+          <div className={styles.inputBox}>
             <input
               type="text"
               placeholder="keresztnév"
@@ -77,7 +77,7 @@ const Register = () => {
             />
             <img src="./id-card.png" alt="first name icon" />
           </div>
-          <div className="input-box">
+          <div className={styles.inputBox}>
             <input
               type="email"
               placeholder="email"
@@ -87,7 +87,7 @@ const Register = () => {
             />
             <img src="./mail.png" alt="email icon" />
           </div>
-          <div className="input-box">
+          <div className={styles.inputBox}>
             <input
               type="password"
               placeholder="jelszó"
@@ -97,7 +97,7 @@ const Register = () => {
             />
             <img src="./key.png" alt="password icon" />
           </div>
-          <div className="input-box">
+          <div className={styles.inputBox}>
             <input
               type="password"
               placeholder="jelszó mégegyszer"
@@ -107,13 +107,13 @@ const Register = () => {
             />
             <img src="./key.png" alt="confirm password icon" />
           </div>
-          <button type="submit" className="register-btn">
+          <button type="submit" className={styles.registerBtn}>
             regisztráció
           </button>
         </form>
         <p>
           Már van profilod?{' '}
-          <Link className="have-profile" to={routes.loginPage.path}>
+          <Link className={styles.haveProfile} to={routes.loginPage.path}>
             Lépj be!
           </Link>
         </p>
