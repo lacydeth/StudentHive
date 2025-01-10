@@ -46,10 +46,7 @@ namespace StudentHiveServer.Controllers
         public async Task<IActionResult> Login([FromBody] LoginRequest request)
         {
             const string query = "SELECT Id, PasswordHash, RoleId FROM Users WHERE Email = @Email";
-            var parameters = new MySqlParameter[]
-            {
-                new MySqlParameter("@Email", request.Email)
-            };
+            var parameters = new MySqlParameter[] { new MySqlParameter("@Email", request.Email) };
 
             var result = await _dbHelper.ExecuteQueryAsync(query, parameters);
             if (result.Rows.Count == 0)
@@ -63,17 +60,17 @@ namespace StudentHiveServer.Controllers
             if (!BCrypt.Net.BCrypt.Verify(request.Password, passwordHash))
                 return Unauthorized(new { message = "Hibás felhasználónév vagy jelszó!" });
 
-            var token = GenerateJwtToken(userId, roleId == 1 ? "Admin" : "User");
+            var token = GenerateJwtToken(userId, roleId == 1 ? "Admin" : "User", request.StayLoggedIn);
             return Ok(new { token, role = roleId == 1 ? "Admin" : "User" });
-
         }
+
         [HttpPost("logout")]
         public IActionResult Logout()
         {
             return Ok(new { message = "Sikeres kijelentkezés!" });
         }
 
-        private string GenerateJwtToken(int userId, string role)
+        private string GenerateJwtToken(int userId, string role, bool isStayLoggedIn)
         {
             var claims = new[]
             {
@@ -84,22 +81,25 @@ namespace StudentHiveServer.Controllers
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("e96e265f7322b748c3516dfba2f3e7da1337640d0e5d9cf873c13e13db30cc85"));
             var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
+            var tokenExpiration = isStayLoggedIn ? DateTime.UtcNow.AddYears(2) : DateTime.UtcNow.AddDays(1);
+
             var token = new JwtSecurityToken(
                 issuer: "StudentHive",
                 audience: "StudentHiveUsers",
                 claims: claims,
-                expires: DateTime.UtcNow.AddDays(7),
+                expires: tokenExpiration,
                 signingCredentials: creds);
 
             return new JwtSecurityTokenHandler().WriteToken(token);
         }
 
-
         public class LoginRequest
         {
             public string Email { get; set; }
             public string Password { get; set; }
+            public bool StayLoggedIn { get; set; }
         }
+
         public class RegisterRequest
         {
             public string FirstName { get; set; }
