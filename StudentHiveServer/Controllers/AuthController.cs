@@ -34,11 +34,11 @@ namespace StudentHiveServer.Controllers
             try
             {
                 await _dbHelper.ExecuteNonQueryAsync(query, parameters);
-                return Ok(new { message = "Registration successful" });
+                return Ok(new { message = "Sikeres regisztráció!" });
             }
             catch (MySqlException ex) when (ex.Number == 1062)
             {
-                return Conflict(new { message = "Email already exists" });
+                return Conflict(new { message = "Ez az emailcím már foglalt!" });
             }
         }
 
@@ -48,12 +48,12 @@ namespace StudentHiveServer.Controllers
             const string query = "SELECT Id, PasswordHash, RoleId FROM Users WHERE Email = @Email";
             var parameters = new MySqlParameter[]
             {
-        new MySqlParameter("@Email", request.Email)
+                new MySqlParameter("@Email", request.Email)
             };
 
             var result = await _dbHelper.ExecuteQueryAsync(query, parameters);
             if (result.Rows.Count == 0)
-                return Unauthorized(new { message = "Invalid credentials" });
+                return Unauthorized(new { message = "Hibás felhasználónév vagy jelszó!" });
 
             var row = result.Rows[0];
             var userId = Convert.ToInt32(row["Id"]);
@@ -61,18 +61,24 @@ namespace StudentHiveServer.Controllers
             var roleId = Convert.ToInt32(row["RoleId"]);
 
             if (!BCrypt.Net.BCrypt.Verify(request.Password, passwordHash))
-                return Unauthorized(new { message = "Invalid credentials" });
+                return Unauthorized(new { message = "Hibás felhasználónév vagy jelszó!" });
 
-            var token = GenerateJwtToken(userId);
-            return Ok(new { token, role = "Admin" });
+            var token = GenerateJwtToken(userId, roleId == 1 ? "Admin" : "User");
+            return Ok(new { token, role = roleId == 1 ? "Admin" : "User" });
 
         }
+        [HttpPost("logout")]
+        public IActionResult Logout()
+        {
+            return Ok(new { message = "Sikeres kijelentkezés!" });
+        }
 
-        private string GenerateJwtToken(int userId)
+        private string GenerateJwtToken(int userId, string role)
         {
             var claims = new[]
             {
-            new Claim(ClaimTypes.NameIdentifier, userId.ToString()),
+                new Claim(ClaimTypes.NameIdentifier, userId.ToString()),
+                new Claim(ClaimTypes.Role, role)
             };
 
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("e96e265f7322b748c3516dfba2f3e7da1337640d0e5d9cf873c13e13db30cc85"));
@@ -87,18 +93,19 @@ namespace StudentHiveServer.Controllers
 
             return new JwtSecurityTokenHandler().WriteToken(token);
         }
-    }
 
-    public class LoginRequest
-    {
-        public string Email { get; set; }
-        public string Password { get; set; }
-    }
-    public class RegisterRequest
-    {
-        public string FirstName { get; set; }
-        public string LastName { get; set; }
-        public string Email { get; set; }
-        public string Password { get; set; }
+
+        public class LoginRequest
+        {
+            public string Email { get; set; }
+            public string Password { get; set; }
+        }
+        public class RegisterRequest
+        {
+            public string FirstName { get; set; }
+            public string LastName { get; set; }
+            public string Email { get; set; }
+            public string Password { get; set; }
+        }
     }
 }
