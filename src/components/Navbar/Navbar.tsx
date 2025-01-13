@@ -65,7 +65,7 @@ const Navbar = () => {
           {userRole ? (
             <li>
               <Link
-                to={userRole === "User" ? "/user" : "/admin"}
+                to={userRole === "User" ? "/user" : userRole === "Admin" ? "/admin" : "/organization"}
                 className="btn highlighted"
                 onClick={closeMenu}
               >

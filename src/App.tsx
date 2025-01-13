@@ -9,6 +9,7 @@ import AdminDashboard from './features/AdminDashboard/AdminDashboard';
 import ProtectedRoute from './components/ProtectedRoute/ProtectedRoute';
 import Unauthorized from './pages/Unauthorized/Unauthorized';
 import IndexPage from './features/Index/Index';
+import OrganizationDashboard from './features/OrganizationDashboard/OrganizationDashboard';
 
 export const routes = {
   homePage: { path: '/', title: 'Home' },
@@ -16,6 +17,7 @@ export const routes = {
   registerPage: { path: '/register', title: 'Register' },
   protectedPage: { path: '/user', title: 'User' },
   adminPage: { path: '/admin', title: 'Admin'},
+  orgPage: { path: '/organization', title: 'Organization'},
   unauthorized: { path: '/unauthorized', title: 'Unauthorized'}
 };
 
@@ -48,6 +50,13 @@ const App = () => {
             </ProtectedRoute>
           }
         />
+        <Route 
+          path={routes.orgPage.path}
+          element={
+            <ProtectedRoute allowedRoles={["Organization"]}>
+              <OrganizationDashboard/>
+            </ProtectedRoute>
+          }/>
       </Routes>
     </Router>
   );

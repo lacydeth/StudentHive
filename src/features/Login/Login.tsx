@@ -35,8 +35,8 @@ const Login = () => {
         window.location.href = routes.adminPage.path;
       } else if (role === 'User') {
         window.location.href = routes.protectedPage.path;
-      } else {
-        console.error('Unknown role');
+      } else if (role === 'Organization') {
+        window.location.href = routes.orgPage.path;
       }
     } catch (error: any) {
       if (error.response && error.response.data) {
