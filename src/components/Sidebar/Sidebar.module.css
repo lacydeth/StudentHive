@@ -8,7 +8,7 @@
     transform: translateX(0);
 
 }
-sidebarContainer {
+.sidebarContainer {
     i {
         position: fixed;
         top: 10px;
