@@ -9,7 +9,7 @@ type SidebarProps = {
   }
 const Sidebar = (props: SidebarProps) => {
   return (
-    <div>
+    <div className={styles.sidebarContainer}>
       {/* Sidebar toggle button */}
       <i
         className={`ri-${props.isOpen ? "close-line" : "menu-3-line"}`}

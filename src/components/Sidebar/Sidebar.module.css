@@ -8,13 +8,15 @@
     transform: translateX(0);
 
 }
-i {
-    position: fixed;
-    top: 10px;
-    left: 10px;
-    z-index: 30;
-    cursor: pointer;
-    font-size: 22px;
+sidebarContainer {
+    i {
+        position: fixed;
+        top: 10px;
+        left: 10px;
+        z-index: 30;
+        cursor: pointer;
+        font-size: 22px;
+    }
 }
 
 .sidebar.closed {
