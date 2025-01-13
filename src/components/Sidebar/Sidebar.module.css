@@ -1,0 +1,145 @@
+.sidebar {
+    width: 300px;
+    min-height: 100vh;
+    background: #fff;
+    transition: transform 0.3s ease;
+    position: fixed;
+    z-index: 10;
+    transform: translateX(0);
+
+}
+i {
+    position: fixed;
+    top: 10px;
+    left: 10px;
+    z-index: 30;
+    cursor: pointer;
+    font-size: 22px;
+}
+
+.sidebar.closed {
+    transform: translateX(-100%);
+}
+
+.content {
+    .title {
+        height: 20vh;
+        margin-left: 15px;
+        padding: 35px 15px;
+        font-weight: 700;
+        color: var(--smoothGreen);
+        h1 {
+            font-size: 1.5rem;
+        }
+    }
+    .menuList {
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        min-height: 75vh;
+        margin-left: 15px;
+
+        button {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 10px 15px;
+            width: 250px;
+            border: 0;
+            border-radius: 8px;
+            outline: 0;
+            background: var(--smoothGreen);
+            color: #fff;
+            margin-top: 10px;
+            transition: all 0.5s ease;
+
+            img {
+                width: 24px;
+                opacity: 0.7;
+            }
+        }
+
+        button:hover {
+            cursor: pointer;
+            color: #727272;
+        }
+
+        .link {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin: 10px 0;
+            padding: 10px 15px;
+            width: 250px;
+            text-decoration: none;
+            color: #727272;
+            transition: all 0.5s ease;
+            border-radius: 8px;
+
+            img {
+                width: 28px;
+                opacity: 0.9;
+            }
+        }
+
+        .link:hover {
+            background: var(--smoothGreen);
+            color: #fff;
+        }
+    }
+}
+
+@media (max-width: 768px) {
+    i {
+        font-size: 32px;
+    }
+    .sidebar {
+        min-width: 200px;
+    }
+
+    .content {
+        .title {
+            h1 {
+                font-size: 1.2rem;
+            }
+        }
+
+        .menuList {
+            .link {
+                width: 80%;
+            }
+
+            button {
+                width: 80%;
+            }
+        }
+    }
+}
+
+@media (max-width: 480px) {
+    .sidebar {
+        width: 100%;
+        min-height: 100vh;
+        position: fixed;
+        top: 0;
+        left: 0;
+        transform: translateX(-100%);
+        z-index: 20;
+    }
+
+    .sidebar.open {
+        transform: translateX(0);
+    }
+
+    .content {
+        .menuList {
+            .link {
+                padding: 10px 20px;
+            }
+
+            button {
+                padding: 10px 20px;
+            }
+        }
+    }
+}

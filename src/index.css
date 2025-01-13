@@ -12,9 +12,11 @@
     --white: #FFFFFF;
     --smoothGreen: #99BC85;
     --darkGreen: #556D48;
+    --bodyGray: #F4F4F4;
 }
 html, body {
     scroll-behavior: smooth;
     height: 100%;
     width: 100%;
+    background: var(--bodyGray);
 }

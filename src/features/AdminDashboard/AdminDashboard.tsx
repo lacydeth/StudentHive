@@ -1,12 +1,26 @@
-import { handleLogout } from "../../utils/authUtils"
+import { useState } from "react";
+import Sidebar from "../../components/Sidebar/Sidebar";
+import styles from "./AdminDashboard.module.css";
 
 const AdminDashboard = () => {
-  
-  return (
-    <div>AdminDashboard
-      <button onClick={handleLogout}>kijelentkezés</button>
-    </div>
-  )
-}
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
-export default AdminDashboard
+  const handleToggleSidebar = () => {
+    setIsSidebarOpen(!isSidebarOpen);
+  };
+
+  return (
+    <div className={styles.container}>
+      <Sidebar isOpen={isSidebarOpen} toggleSidebar={handleToggleSidebar} />
+      <div
+        className={`${styles.content} ${
+          isSidebarOpen ? styles.sidebarOpen : styles.sidebarClosed
+        }`}
+      >
+        <h1>Hello!</h1>
+      </div>
+    </div>
+  );
+};
+
+export default AdminDashboard;
