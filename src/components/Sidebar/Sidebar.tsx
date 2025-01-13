@@ -2,15 +2,28 @@ import { Link } from "react-router-dom";
 import styles from "./Sidebar.module.css";
 import { routes } from "../../App";
 import { handleLogout } from "../../utils/authUtils";
+import { useEffect } from "react";
 
 type SidebarProps = {
     isOpen: boolean;
     toggleSidebar: () => void;
   }
 const Sidebar = (props: SidebarProps) => {
+  useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth >= 1000 && !props.isOpen) {
+        props.toggleSidebar();
+      } else if (window.innerWidth < 1000 && props.isOpen) {
+        props.toggleSidebar();
+      }
+    };
+
+  window.addEventListener("resize", handleResize);
+
+  return () => window.removeEventListener("resize", handleResize);
+  }, [props.isOpen, props.toggleSidebar]);
   return (
     <div className={styles.sidebarContainer}>
-      {/* Sidebar toggle button */}
       <i
         className={`ri-${props.isOpen ? "close-line" : "menu-3-line"}`}
         onClick={props.toggleSidebar}
@@ -31,13 +44,13 @@ const Sidebar = (props: SidebarProps) => {
                 </Link>
               </div>
               <div className={styles.menuItem}>
-                <Link className={styles.link} to={routes.adminPage.path}>
+                <Link className={styles.link} to={routes.newOrgPage.path}>
                   <img src="./more.png" alt="Add Cooperative" />
                   Szövetkezet felvétele
                 </Link>
               </div>
               <div className={styles.menuItem}>
-                <Link className={styles.link} to={routes.adminPage.path}>
+                <Link className={styles.link} to={routes.existingOrgPage.path}>
                   <img src="./people.png" alt="Existing Cooperatives" />
                   Meglévő szövetkezetek
                 </Link>
