@@ -16,7 +16,6 @@ export const getRoleFromToken = (): string | null => {
 
   try {
     const decoded: DecodedToken = jwtDecode<DecodedToken>(token);
-    console.log("Dekódolt token:", decoded);
     
     return decoded["http://schemas.microsoft.com/ws/2008/06/identity/claims/role"] || null;
   } catch (error) {

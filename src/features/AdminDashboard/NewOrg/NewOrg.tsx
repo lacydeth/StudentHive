@@ -5,13 +5,15 @@ import Sidebar from "../../../components/Sidebar/Sidebar";
 import Title from "../../../components/Title/Title";
 
 const NewOrg = () => {
+  const [message, setMessage] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
+
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
 
   const [orgName, setOrgName] = useState("");
   const [email, setEmail] = useState("");
   const [phoneNumber, setPhoneNumber] = useState("");
   const [address, setAddress] = useState("");
-  const [error, setError] = useState<string | null>(null);
 
   const handleToggleSidebar = () => {
     setIsSidebarOpen(!isSidebarOpen);
@@ -24,15 +26,14 @@ const NewOrg = () => {
     }
 
     try {
-      const response = await axios.post("https://localhost:7067/api/organization", {
+      const response = await axios.post("https://localhost:7067/api/admin/new-organization", {
         orgName,
         email,
         phoneNumber,
         address,
+        
       });
-
-      console.log("Organization created successfully:", response.data);
-      setError(null);
+      setMessage(response.data.message);
       setOrgName("");
       setEmail("");
       setPhoneNumber("");
@@ -67,6 +68,7 @@ const NewOrg = () => {
             title="Add meg a szövetkezet alapvető adatait!"
           />
           {error && <p style={{ color: "red" }}>{error}</p>}
+          {message && <p style={{ color: "green" }}>{message}</p>}
           <form
             className={styles.newOrgForm}
             onSubmit={(e) => {
