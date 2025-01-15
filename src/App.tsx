@@ -25,12 +25,21 @@ export const routes = {
   homePage: { path: '/', title: 'Home' },
   loginPage: { path: '/login', title: 'Login' },
   registerPage: { path: '/register', title: 'Register' },
-  protectedPage: { path: '/user', title: 'User' },
-  adminPage: { path: '/admin', title: 'Admin'},
-  orgPage: { path: '/organization', title: 'Organization'},
-  unauthorized: { path: '/unauthorized', title: 'Unauthorized'}
+  unauthorized: { path: '/unauthorized', title: 'Unauthorized' },
+  protectedPage: { path: '/user', title: 'User Dashboard' },
+  adminPage: { path: '/admin', title: 'Admin Dashboard' },
+  newOrgPage: { path: '/admin/new-org', title: 'Add New Organization' },
+  existingOrgPage: { path: '/admin/existing-org', title: 'Existing Organizations' },
+  orgPage: { path: '/organization', title: 'Organization Dashboard' },
+  orgAddAgent: { path: '/organization/add-agents', title: 'Add Agents' },
+  orgCurrentAgent: { path: '/organization/current-agents', title: 'Current Agents' },
+  orgSettings: { path: '/organization/settings', title: 'Organization Settings' },
+  agentPage: { path: '/agent', title: 'Agent Dashboard' },
+  studentShifts: { path: '/agent/student-shifts', title: 'Student Shifts' },
+  studentsList: { path: '/agent/students-list', title: 'Students List' },
+  studentApply: { path: '/agent/student-apply', title: 'Student Apply' },
+  agentSettings: { path: '/agent/settings', title: 'Agent Settings' },
 };
-
 const App = () => {
   useEffect(() => {
     AOS.init({})
@@ -110,7 +119,7 @@ const App = () => {
           }
         />
          <Route
-          path={routes.StudentShifts.path}
+          path={routes.studentShifts.path}
           element={
             <ProtectedRoute allowedRoles={["Organization"]}>
               //Agent kell legyen a role tesztelésből átállitom
@@ -119,7 +128,7 @@ const App = () => {
           }
         />
          <Route
-          path={routes.StudentsList.path}
+          path={routes.studentsList.path}
           element={
             <ProtectedRoute allowedRoles={["Organization"]}>
               //Agent kell legyen a role tesztelésből átállitom
@@ -128,7 +137,7 @@ const App = () => {
           }
         />
          <Route
-          path={routes.AgentSettings.path}
+          path={routes.agentSettings.path}
           element={
             <ProtectedRoute allowedRoles={["Organization"]}>
               //Agent kell legyen a role tesztelésből átállitom
@@ -137,7 +146,7 @@ const App = () => {
           }
         />
          <Route
-          path={routes.AgentPage.path}
+          path={routes.agentPage.path}
           element={
             <ProtectedRoute allowedRoles={["Organization"]}>
               //Agent kell legyen a role tesztelésből átállitom
@@ -146,7 +155,7 @@ const App = () => {
           }
         />
          <Route
-          path={routes.StudentApply.path}
+          path={routes.studentApply.path}
           element={
             <ProtectedRoute allowedRoles={["Organization"]}>
               //Agent kell legyen a role tesztelésből átállitom
