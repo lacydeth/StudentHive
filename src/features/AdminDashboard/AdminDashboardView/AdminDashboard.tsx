@@ -1,13 +1,15 @@
 import { useState } from "react";
 import Sidebar from "../../../components/Sidebar/Sidebar";
 import styles from "./AdminDashboard.module.css";
+import DashboardTitle from "../../../components/DashboardTitle/DashboardTitle";
 
 const AdminDashboard = () => {
+
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
 
   const handleToggleSidebar = () => {
     setIsSidebarOpen(!isSidebarOpen);
-  };
+  }
 
   return (
     <div className={styles.container}>
@@ -17,7 +19,10 @@ const AdminDashboard = () => {
           isSidebarOpen ? styles.sidebarOpen : styles.sidebarClosed
         }`}
       >
-        <h1>Hello!</h1>
+        <DashboardTitle title="Admin kezelőpult" icon="./dashboard.png" subTitle="Admin kezelőpult"/>
+        <div className={styles.newOrgContent}>
+
+        </div>
       </div>
     </div>
   );

@@ -3,6 +3,7 @@ import axios from "axios";
 import styles from "./NewOrg.module.css";
 import Sidebar from "../../../components/Sidebar/Sidebar";
 import Title from "../../../components/Title/Title";
+import DashboardTitle from "../../../components/DashboardTitle/DashboardTitle";
 
 const NewOrg = () => {
   const [message, setMessage] = useState<string | null>(null);
@@ -56,12 +57,7 @@ const NewOrg = () => {
           isSidebarOpen ? styles.sidebarOpen : styles.sidebarClosed
         }`}
       >
-        <div className={styles.current}>
-          <h1>Szövetkezet felvétele</h1>
-          <h3>
-            <img src="./more.png" alt="breadcrumb icon" /> / Szövetkezet felvétele
-          </h3>
-        </div>
+        <DashboardTitle title="Szövetkezet felvétele" icon="./more.png" subTitle="Szövetkezet felvétele"/>
         <div className={styles.newOrgContent}>
           <Title
             subTitle="Szövetkezet felvétele"
