@@ -2,6 +2,7 @@
 using MySql.Data.MySqlClient;
 using StudentHiveServer.Utils;
 using System;
+using System.Data;
 
 namespace StudentHiveServer.Controllers
 {
@@ -16,13 +17,41 @@ namespace StudentHiveServer.Controllers
             _dbHelper = new DatabaseHelper(configuration.GetConnectionString("DefaultConnection"));
         }
 
+        // GET: list all organizations
+        [HttpGet("organizations")]
+        public async Task<IActionResult> GetOrganizations()
+        {
+            const string query = "SELECT Id, Name, Address, ContactEmail, ContactPhone, CreatedAt FROM Organizations";
+
+            try
+            {
+                var dataTable = await _dbHelper.ExecuteQueryAsync(query);
+                var organizations = dataTable.AsEnumerable().Select(row => new
+                {
+                    Id = row.Field<int>("Id"),
+                    Name = row.Field<string>("Name"),
+                    Address = row.Field<string>("Address"),
+                    ContactEmail = row.Field<string>("ContactEmail"),
+                    ContactPhone = row.Field<string>("ContactPhone"),
+                    CreatedAt = row.Field<DateTime>("CreatedAt").ToString("yyyy-MM-dd")
+                }).ToList();
+
+                return Ok(organizations);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "Hiba az adatok betöltése során!", details = ex.Message });
+            }
+        }
+
+        // POST: create new organization
         [HttpPost("new-organization")]
         public async Task<IActionResult> CreateNewOrganization([FromBody] NewOrganizationRequest request)
         {
             if (string.IsNullOrEmpty(request.OrgName) || string.IsNullOrEmpty(request.Email) ||
                 string.IsNullOrEmpty(request.PhoneNumber) || string.IsNullOrEmpty(request.Address))
             {
-                return BadRequest(new { message = "All fields are required." });
+                return BadRequest(new { message = "Minden mező kitöltése szükséges!" });
             }
 
             var plainPassword = GenerateRandomPassword();
