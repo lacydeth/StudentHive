@@ -20,18 +20,11 @@
 .sidebarClosed {
     margin-left: 0;
 }
-.ag-theme-alpine {
-    width: 100%; /* Ensure the grid takes full width */
-    height: 400px; /* Set a fixed height or use 'auto' depending on content */
-    overflow-x: auto; /* Enable horizontal scrolling */
-    overflow-y: auto; /* Enable vertical scrolling if needed */
-    min-width: 600px; /* Prevent the grid from becoming too small */
-  }
-  
-  @media (max-width: 768px) {
-    .ag-theme-alpine {
-      width: 100%;
-      font-size: 12px; /* Adjust font size on smaller screens */
-    }
-  }
-  
+.actionBtn {
+  border: none;
+  cursor: pointer;
+  background: none;
+}
+.actionBtn img {
+  width: 22px;
+}
