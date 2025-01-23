@@ -3,6 +3,8 @@ using MySql.Data.MySqlClient;
 using StudentHiveServer.Utils;
 using System;
 using System.Data;
+using System.Net.Mail;
+using System.Net;
 
 namespace StudentHiveServer.Controllers
 {
@@ -43,8 +45,47 @@ namespace StudentHiveServer.Controllers
                 return StatusCode(500, new { message = "Hiba az adatok betöltése során!", details = ex.Message });
             }
         }
+        // PUT: change organziation password from admin panel
+        [HttpPut("organization/{organizationId}/password")]
+        public async Task<IActionResult> ChangeOrganizationPassword(int organizationId, [FromBody] ChangePasswordRequest request)
+        {
+            if (string.IsNullOrEmpty(request.NewPassword))
+            {
+                return BadRequest(new { message = "A jelszó nem lehet üres!" });
+            }
 
-        // POST: create new organization
+            try
+            {
+                const string query = "SELECT Id FROM Users WHERE Id = @OrganizationId";
+                var parameters = new[] { new MySqlParameter("@OrganizationId", organizationId) };
+                var result = await _dbHelper.ExecuteQueryAsync(query, parameters);
+
+                if (result.Rows.Count == 0)
+                {
+                    return NotFound(new { message = "Szervezet nem található!" });
+                }
+
+                var userId = Convert.ToInt32(result.Rows[0]["Id"]);
+
+                var hashedPassword = BCrypt.Net.BCrypt.HashPassword(request.NewPassword);
+
+                const string updatePasswordQuery = "UPDATE Users SET PasswordHash = @PasswordHash WHERE Id = @UserId";
+                var updateParameters = new[]
+                {
+                    new MySqlParameter("@PasswordHash", hashedPassword),
+                    new MySqlParameter("@UserId", userId)
+                };
+
+                await _dbHelper.ExecuteNonQueryAsync(updatePasswordQuery, updateParameters);
+
+                return Ok(new { message = "Jelszó sikeresen módosítva!" });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "Hiba történt a jelszó módosítása közben.", details = ex.Message });
+            }
+        }
+
         [HttpPost("new-organization")]
         public async Task<IActionResult> CreateNewOrganization([FromBody] NewOrganizationRequest request)
         {
@@ -58,7 +99,6 @@ namespace StudentHiveServer.Controllers
             var hashedPassword = BCrypt.Net.BCrypt.HashPassword(plainPassword);
 
             const string insertUserQuery = @"INSERT INTO Users (FirstName, LastName, Email, PasswordHash, RoleId) VALUES (@FirstName, @LastName, @Email, @PasswordHash, @RoleId)";
-
             var userParameters = new MySqlParameter[]
             {
                 new MySqlParameter("@FirstName", "Organization"),
@@ -80,7 +120,6 @@ namespace StudentHiveServer.Controllers
                 var userId = Convert.ToInt32(userIdResult.Rows[0]["Id"]);
 
                 const string insertOrganizationQuery = @"INSERT INTO Organizations (Id, Name, Address, ContactEmail, ContactPhone) VALUES (@UserId, @OrgName, @Address, @ContactEmail, @ContactPhone)";
-
                 var orgParameters = new MySqlParameter[]
                 {
                     new MySqlParameter("@UserId", userId),
@@ -94,6 +133,8 @@ namespace StudentHiveServer.Controllers
 
                 const string updateUserQuery = "UPDATE Users SET OrganizationId = @UserId WHERE Id = @UserId";
                 await _dbHelper.ExecuteNonQueryAsync(updateUserQuery, new[] { new MySqlParameter("@UserId", userId) });
+
+                SendEmail(request.Email, plainPassword, request.OrgName);
 
                 Console.WriteLine($"New Organization Created: {request.OrgName}");
                 Console.WriteLine($"Admin Login Email: {request.Email}");
@@ -111,6 +152,48 @@ namespace StudentHiveServer.Controllers
             }
         }
 
+        // PUT: update organization details 
+        [HttpPut("organization/{organizationId}")]
+        public async Task<IActionResult> UpdateOrganizationDetails(int organizationId, [FromBody] UpdateOrganizationRequest request)
+        {
+            if (string.IsNullOrEmpty(request.Name) || string.IsNullOrEmpty(request.Address) ||
+                string.IsNullOrEmpty(request.ContactEmail) || string.IsNullOrEmpty(request.ContactPhone))
+            {
+                return BadRequest(new { message = "Minden mező kitöltése szükséges!" });
+            }
+
+            try
+            {
+                const string selectQuery = "SELECT Id FROM Organizations WHERE Id = @OrganizationId";
+                var parameters = new[] { new MySqlParameter("@OrganizationId", organizationId) };
+                var result = await _dbHelper.ExecuteQueryAsync(selectQuery, parameters);
+
+                if (result.Rows.Count == 0)
+                {
+                    return NotFound(new { message = "Szervezet nem található!" });
+                }
+                const string updateQuery = @"UPDATE Organizations
+                                             SET Name = @Name, Address = @Address, ContactEmail = @ContactEmail, ContactPhone = @ContactPhone
+                                             WHERE Id = @OrganizationId";
+
+                var updateParameters = new[]
+                {
+                    new MySqlParameter("@Name", request.Name),
+                    new MySqlParameter("@Address", request.Address),
+                    new MySqlParameter("@ContactEmail", request.ContactEmail),
+                    new MySqlParameter("@ContactPhone", request.ContactPhone),
+                    new MySqlParameter("@OrganizationId", organizationId)
+                };
+
+                await _dbHelper.ExecuteNonQueryAsync(updateQuery, updateParameters);
+
+                return Ok(new { message = "Szervezet adatai sikeresen frissítve!" });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "Hiba történt a szervezet adatainak frissítése közben!", details = ex.Message });
+            }
+        }
 
         private static string GenerateRandomPassword(int length = 10)
         {
@@ -123,13 +206,53 @@ namespace StudentHiveServer.Controllers
             }
             return new string(password);
         }
+        private void SendEmail(string toEmail, string plainPassword, string name)
+        {
+            try
+            {
+                using (var client = new SmtpClient())
+                {
+                    client.Host = "smtp.gmail.com";
+                    client.Port = 587;
+                    client.DeliveryMethod = SmtpDeliveryMethod.Network;
+                    client.UseDefaultCredentials = false;
+                    client.EnableSsl = true;
+                    client.Credentials = new NetworkCredential("info.studenthive@gmail.com", "nuccijdmnyurqzel");
+                    using (var message = new MailMessage(
+                        from: new MailAddress("info.studenthive@gmail.com", "StudentHive"),
+                        to: new MailAddress(toEmail, name)
+                        ))
+                    {
 
+                        message.Subject = "Köszöntjük a StudentHive diákmunka fórumon!";
+                        message.Body = $"Sikeresen létrehoztuk önnek az iskolaszövetkezet profilját. \n Bejelentkezési adatok: \n Email: {toEmail} \n Jelszó: {plainPassword} \n Kérjük bejelentkezés után változtassa meg jelszavát!";
+
+                        client.Send(message);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error sending email: {ex.Message}");
+            }
+        }
         public class NewOrganizationRequest
         {
             public string OrgName { get; set; }
             public string Email { get; set; }
             public string PhoneNumber { get; set; }
             public string Address { get; set; }
+        }
+        public class ChangePasswordRequest
+        {
+            public string NewPassword { get; set; }
+        }
+        public class UpdateOrganizationRequest
+        {
+            public string Name { get; set; }
+            public string Address { get; set; }
+            public string ContactEmail { get; set; }
+            public string ContactPhone { get; set; }
         }
     }
 }
