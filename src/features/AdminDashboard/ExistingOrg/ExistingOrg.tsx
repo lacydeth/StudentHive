@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, useMemo, useCallback } from "react";
+import { useEffect, useRef, useState, useMemo } from "react";
 import Sidebar from "../../../components/Sidebar/Sidebar";
 import styles from "./ExistingOrg.module.css";
 import Title from "../../../components/Title/Title";
@@ -7,15 +7,20 @@ import axios from "axios";
 import { AgGridReact } from "ag-grid-react";
 import "ag-grid-community/styles/ag-grid.css";
 import "ag-grid-community/styles/ag-theme-alpine.css";
-import { ClientSideRowModelModule, ModuleRegistry, SizeColumnsToFitGridStrategy } from "ag-grid-community";
+import { ClientSideRowModelModule, ModuleRegistry } from "ag-grid-community";
 import "./Table.css"
+import OrgViewModal from "../../../components/Modals/OrgViewModal";
+import OrgPasswordModal from "../../../components/Modals/OrgPasswordModal";
+import Dialog from "../../../components/Dialog/Dialog";
 
 ModuleRegistry.registerModules([ClientSideRowModelModule]);
 
 const ExistingOrg = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+  const [dialogContent, setDialogContent] = useState<React.ReactNode>(null)
   const [rowData, setRowData] = useState<any[]>([]);
   const gridRef = useRef<AgGridReact<any>>(null);
+  const dialogRef = useRef<HTMLDialogElement>(null);
 
   const handleToggleSidebar = () => {
     setIsSidebarOpen(!isSidebarOpen);
@@ -36,35 +41,41 @@ const ExistingOrg = () => {
     fetchOrganizations();
   }, []);
 
-  const actionCellRenderer = (params: any) => (
-    <div style={{ display: "flex", gap: "15px" }}>
-      {/* View Button */}
-      <button
-        onClick={() => handleViewClick(params.data)}
-        className={styles.actionBtn}
-      >
-        <img src="./view.png" alt="View" />
-      </button>
-      {/* Key Button */}
-      <button
-        onClick={() => handleKeyClick(params.data)}
-        className={styles.actionBtn}
-      >
-        <img src="./key.png" alt="Key"  />
-      </button>
-    </div>
-  );
-  
+  const actionCellRenderer = (params: any) => {
+    const organization = params.data;
+    return (
+      <div style={{ display: "flex", gap: "15px" }}>
+        {/* View Button */}
+        <button
+          onClick={() => {
+            toggleDialog();
+            setDialogContent(<OrgViewModal organization={organization} />);
+          }}
+          className={styles.actionBtn}
+        >
+          <img src="./view.png" alt="View" />
+        </button>
+        {/* Key Button */}
+        <button
+          onClick={() => {
+            toggleDialog();
+            setDialogContent(<OrgPasswordModal organizationId={organization.id} />);
+          }}
+          className={styles.actionBtn}
+        >
+          <img src="./key.png" alt="Key" />
+        </button>
+      </div>
+    );
+  };
 
-  const handleViewClick = (organization: any) => {
-    console.log("View details for:", organization);
+  const toggleDialog = () => {
+    if(!dialogRef.current) {
+      return;
+    }
+    return dialogRef.current.hasAttribute("open") ? dialogRef.current.close() : dialogRef.current.showModal()
   };
   
-  const handleKeyClick = (organization: any) => {
-    console.log("Handle key action for:", organization);
-  };
-  
-
   const columnDefs = useMemo(() => [
       { field: "id", headerName: "Azonosító", flex: 0.5, minWidth: 100 },
       { field: "name", headerName: "Név", flex: 1, minWidth: 150 },
@@ -81,35 +92,7 @@ const ExistingOrg = () => {
     ],[]
   );
 
-  const autoSizeStrategy = useMemo<SizeColumnsToFitGridStrategy>(
-    () => ({
-      type: "fitGridWidth",
-      defaultMinWidth: 100,
-      columnLimits: [{ colId: "address", minWidth: 200 }],
-    }),
-    []
-  );
 
-  const onGridReady = useCallback(() => {
-    gridRef.current!.api.sizeColumnsToFit({
-      defaultMinWidth: 100,
-      columnLimits: [{ key: "address", minWidth: 200 }],
-    });
-  }, []);
-
-  const handleResize = useCallback(() => {
-    if (gridRef.current) {
-      gridRef.current.api.sizeColumnsToFit({
-        defaultMinWidth: 100,
-        columnLimits: [{ key: "address", minWidth: 200 }],
-      });
-    }
-  }, []);
-
-  useEffect(() => {
-    window.addEventListener("resize", handleResize);
-    return () => window.removeEventListener("resize", handleResize);
-  }, [handleResize]);
 
   return (
     <div className={styles.container}>
@@ -135,13 +118,14 @@ const ExistingOrg = () => {
                 rowData={rowData}
                 columnDefs={columnDefs}
                 domLayout="autoHeight"
-                autoSizeStrategy={autoSizeStrategy}
                 pagination={true}
                 paginationPageSize={10}
-                onGridReady={onGridReady}
               />
           </div>
         </div>
+        <Dialog toggleDialog={toggleDialog} ref={dialogRef}>
+          {dialogContent}
+        </Dialog>
       </div>
     </div>
   );
