@@ -38,9 +38,15 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 
 // Add Authorization services
 builder.Services.AddAuthorization();
+builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
-
+if (app.Environment.IsDevelopment())
+{
+    app.UseSwagger();
+    app.UseSwaggerUI();
+}
+app.UseHttpsRedirection();
 // Configure the HTTP request pipeline.
 app.UseCors("AllowReactApp"); // Apply the CORS policy
 
