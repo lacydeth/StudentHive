@@ -20,6 +20,7 @@ import AgentDashboard from './features/AgentDashboard/AgentDashboard/AgentDashbo
 import StudentApply from './features/AgentDashboard/StudentApply.tsx/StudentApply';
 import NewOrg from './features/AdminDashboard/NewOrg/NewOrg';
 import ExistingOrg from './features/AdminDashboard/ExistingOrg/ExistingOrg';
+import AdminSettings from './features/AdminDashboard/AdminSettings/AdminSettings';
 
 export const routes = {
   homePage: { path: '/', title: 'Home' },
@@ -39,6 +40,7 @@ export const routes = {
   studentsList: { path: '/students-list', title: 'Students List' },
   studentApply: { path: '/student-apply', title: 'Student Apply' },
   agentSettings: { path: '/agent-settings', title: 'Agent Settings' },
+  adminSettings: { path: '/admin-settings', title: 'Admin Settings'}, 
 };
 const App = () => {
   useEffect(() => {
@@ -83,6 +85,14 @@ const App = () => {
           element={
             <ProtectedRoute allowedRoles={["Admin"]}>
               <ExistingOrg />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path={routes.adminSettings.path}
+          element={
+            <ProtectedRoute allowedRoles={["Admin"]}>
+              <AdminSettings />
             </ProtectedRoute>
           }
         />

@@ -1,0 +1,42 @@
+.newOrgForm {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 25px;
+}
+.formWrapper {
+    display: flex;
+    gap: 15px;
+    flex-direction: column;
+}
+.formColumn {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+  
+.inputBox {
+    position: relative;
+    width: 280px;
+}
+  
+.inputBox input {
+    border: none;
+    padding: 15px 20px;
+    background-color: #fff;
+    display: block;
+    width: 100%;
+    border-radius: 8px;
+}
+  
+.inputBox input:focus {
+    outline: 2px solid #99BC85;
+}
+  
+.inputBox img {
+    width: 24px;
+    position: absolute;
+    top: 13px;
+    right: 15px;
+}

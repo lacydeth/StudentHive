@@ -1,4 +1,5 @@
 import React, { forwardRef } from "react";
+import styles from "./Dialog.module.css"
 
 type DialogProps = {
   children: React.ReactNode;
@@ -8,7 +9,7 @@ type DialogProps = {
 const Dialog = forwardRef<HTMLDialogElement, DialogProps>(
   ({ children, toggleDialog }, ref) => {
     return (
-      <dialog
+      <dialog className={styles.dialog}
         onClick={(e) => {
           if (e.currentTarget === e.target) {
             toggleDialog();
@@ -16,10 +17,8 @@ const Dialog = forwardRef<HTMLDialogElement, DialogProps>(
         }}
         ref={ref}
       >
-        <div>
-          <button onClick={toggleDialog}>
-            Close
-          </button>
+        <div className={styles.content}>
+          <i className="ri-close-line" onClick={toggleDialog}></i>
           {children}
         </div>
       </dialog>

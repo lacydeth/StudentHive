@@ -1,6 +1,6 @@
 import { useState } from "react";
 import axios from "axios";
-
+import styles from "./Modals.module.css"
 type OrgViewModalProps = {
   organization: {
     id: string;
@@ -44,58 +44,70 @@ const OrgViewModal = ({ organization }: OrgViewModalProps) => {
   };
 
   return (
-    <div>
-      <h2>Organization Details</h2>
-      <form onSubmit={handleSubmit}>
-        <div>
-          <label>ID:</label>
-          <input type="text" value={organization.id} readOnly />
+    <div className={styles.container}>
+      <h2 className={styles.title}>Szervezet adatai</h2>
+      <form
+        className={styles.orgForm}
+        onSubmit={handleSubmit}
+      >
+        <div className={styles.formWrapper}>
+            <div className={styles.inputBox}>
+              <input
+                type="text"
+                placeholder="Szervezet neve"
+                value={organization.id}
+                required readOnly
+              />
+              <img src="./id-card.png" alt="id card icon" />
+            </div>
+            <div className={styles.inputBox}>
+              <input
+                type="text"
+                placeholder="Szervezet neve"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                required
+              />
+              <img src="./office-building.png" alt="organization name icon" />
+            </div>
+            <div className={styles.inputBox}>
+              <input
+                type="text"
+                placeholder="Szervezet címe"
+                value={address}
+                onChange={(e) => setAddress(e.target.value)}
+                required
+              />
+              <img src="./location.png" alt="address icon" />
+            </div>
+            <div className={styles.inputBox}>
+              <input
+                type="email"
+                placeholder="Email"
+                value={contactEmail}
+                onChange={(e) => setContactEmail(e.target.value)}
+                required
+              />
+              <img src="./mail.png" alt="email icon" />
+            </div>
+            <div className={styles.inputBox}>
+              <input
+                type="tel"
+                placeholder="Telefonszám"
+                value={contactPhone}
+                onChange={(e) => setContactPhone(e.target.value)}
+                required
+              />
+              <img src="./telephone.png" alt="phone icon" />
+            </div>
         </div>
-        <div>
-          <label>Name:</label>
-          <input
-            type="text"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-          />
-        </div>
-        <div>
-          <label>Address:</label>
-          <input
-            type="text"
-            value={address}
-            onChange={(e) => setAddress(e.target.value)}
-          />
-        </div>
-        <div>
-          <label>Email:</label>
-          <input
-            type="email"
-            value={contactEmail}
-            onChange={(e) => setContactEmail(e.target.value)}
-          />
-        </div>
-        <div>
-          <label>Phone:</label>
-          <input
-            type="text"
-            value={contactPhone}
-            onChange={(e) => setContactPhone(e.target.value)}
-          />
-        </div>
-        <div>
-          <label>Created At:</label>
-          <input
-            type="text"
-            value={new Date(organization.createdAt).toLocaleString()}
-            readOnly
-          />
-        </div>
-        <div>
+        <div className={styles.footer}>
           {error && <p style={{ color: "red" }}>{error}</p>}
           {success && <p style={{ color: "green" }}>{success}</p>}
+          <button type="submit">
+            adatok frissítése
+          </button>
         </div>
-        <button type="submit">Frissítés</button>
       </form>
     </div>
   );

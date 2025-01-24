@@ -1,9 +1,9 @@
 import { useState } from "react";
 import Sidebar from "../../../components/Sidebar/Sidebar";
-import styles from "./AdminDashboard.module.css";
+import styles from "./AdminSettings.module.css";
 import DashboardTitle from "../../../components/DashboardTitle/DashboardTitle";
 
-const AdminDashboard = () => {
+const AdminSettings = () => {
 
   const [isSidebarOpen, setIsSidebarOpen] = useState(window.innerWidth >= 1000);
 
@@ -19,8 +19,8 @@ const AdminDashboard = () => {
           isSidebarOpen ? styles.sidebarOpen : styles.sidebarClosed
         }`}
       >
-        <DashboardTitle title="Admin kezelőpult" icon="./dashboard.png" subTitle="Admin kezelőpult"/>
-        <div className={styles.newOrgContent}>
+        <DashboardTitle title="Profil beállítások" icon="./settings.png" subTitle="Profil beállítások"/>
+        <div className={styles.settingsContent}>
 
         </div>
       </div>
@@ -28,4 +28,4 @@ const AdminDashboard = () => {
   );
 };
 
-export default AdminDashboard;
+export default AdminSettings;

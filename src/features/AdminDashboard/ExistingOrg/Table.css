@@ -15,3 +15,10 @@
 .ag-theme-alpine .ag-row:nth-child(even) {
     background: var(--bodyGray);
 }
+.ag-cell-focus,.ag-cell-no-focus{
+    border:none !important;
+    outline: none !important;
+}
+.ag-row {
+    cursor: pointer;
+}

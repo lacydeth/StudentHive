@@ -16,7 +16,7 @@ import Dialog from "../../../components/Dialog/Dialog";
 ModuleRegistry.registerModules([ClientSideRowModelModule]);
 
 const ExistingOrg = () => {
-  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(window.innerWidth >= 1000);
   const [dialogContent, setDialogContent] = useState<React.ReactNode>(null)
   const [rowData, setRowData] = useState<any[]>([]);
   const gridRef = useRef<AgGridReact<any>>(null);
@@ -119,7 +119,7 @@ const ExistingOrg = () => {
                 columnDefs={columnDefs}
                 domLayout="autoHeight"
                 pagination={true}
-                paginationPageSize={10}
+                paginationPageSize={10} suppressCellFocus={false}
               />
           </div>
         </div>

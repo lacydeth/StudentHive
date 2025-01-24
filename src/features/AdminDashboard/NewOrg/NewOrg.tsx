@@ -9,7 +9,7 @@ const NewOrg = () => {
   const [message, setMessage] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
-  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(window.innerWidth >= 1000);
 
   const [orgName, setOrgName] = useState("");
   const [email, setEmail] = useState("");
