@@ -1,7 +1,7 @@
 import { Link } from "react-router-dom"
 import Navbar from "../../components/Navbar/Navbar"
 import styles from "../Unauthorized/Unauthorized.module.css"
-import { routes } from "../../App"
+import { routes } from "../../utils/routes"
 
 const Unauthorized = () => {
   return (

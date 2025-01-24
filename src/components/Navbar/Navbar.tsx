@@ -1,8 +1,8 @@
 import "./Navbar.css";
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { routes } from "../../App";
 import { getRoleFromToken } from "../../utils/authUtils";
+import { routes } from "../../utils/routes";
 
 const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);

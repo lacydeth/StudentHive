@@ -1,7 +1,7 @@
 import { Link } from "react-router-dom";
 import styles from "./Sidebar.module.css";
-import { routes } from "../../App";
 import { handleLogout } from "../../utils/authUtils";
+import { routes } from "../../utils/routes";
 
 type SidebarProps = {
     isOpen: boolean;

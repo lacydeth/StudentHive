@@ -2,9 +2,9 @@ import { useState } from 'react';
 import axios from 'axios';
 import styles from './Register.module.css';
 import Title from '../../components/Title/Title';
-import { routes } from '../../App';
 import { Link, useNavigate } from 'react-router-dom';
 import Navbar from '../../components/Navbar/Navbar';
+import { routes } from '../../utils/routes';
 
 const Register = () => {
   const [firstName, setFirstName] = useState('');
