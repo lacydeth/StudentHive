@@ -20,6 +20,8 @@ import AgentDashboard from './features/AgentDashboard/AgentDashboard/AgentDashbo
 import StudentApply from './features/AgentDashboard/StudentApply.tsx/StudentApply';
 import NewOrg from './features/AdminDashboard/NewOrg/NewOrg';
 import ExistingOrg from './features/AdminDashboard/ExistingOrg/ExistingOrg';
+import NewJob from './features/OrganizationDashboard/NewJob/NewJob';
+
 import AdminSettings from './features/AdminDashboard/AdminSettings/AdminSettings';
 
 export const routes = {
@@ -34,6 +36,8 @@ export const routes = {
   orgPage: { path: '/organization', title: 'Organization Dashboard' },
   orgAddAgent: { path: '/add-agents', title: 'Add Agents' },
   orgCurrentAgent: { path: '/current-agents', title: 'Current Agents' },
+  addNewJob: { path: '/new-job', title: 'New Job'},
+  currentJobs: { path: '/current-jobs', title: 'Current Jobs' },
   orgSettings: { path: '/organization-settings', title: 'Organization Settings' },
   agentPage: { path: '/agent', title: 'Agent Dashboard' },
   studentShifts: { path: '/student-shifts', title: 'Student Shifts' },
@@ -121,7 +125,31 @@ const App = () => {
           }
         />
          <Route
+          path={routes.orgCurrentAgent.path}
+          element={
+            <ProtectedRoute allowedRoles={["Organization"]}>
+              <CurrentAgents/>
+            </ProtectedRoute>
+          }
+        />
+         <Route
           path={routes.orgSettings.path}
+          element={
+            <ProtectedRoute allowedRoles={["Organization"]}>
+              <SettingsAgents/>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path={routes.addNewJob.path}
+          element={
+            <ProtectedRoute allowedRoles={["Organization"]}>
+              <NewJob/>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path={routes.currentJobs.path}
           element={
             <ProtectedRoute allowedRoles={["Organization"]}>
               <SettingsAgents/>
@@ -140,7 +168,7 @@ const App = () => {
          <Route
           path={routes.studentsList.path}
           element={
-            <ProtectedRoute allowedRoles={["Organization"]}>
+            <ProtectedRoute allowedRoles={["Agent"]}>
               //Agent kell legyen a role tesztelésből átállitom
               <StudentsList/>
             </ProtectedRoute>
