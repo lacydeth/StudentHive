@@ -36,13 +36,27 @@ const SidebarOrg = (props: SidebarProps) => {
                   Közvetítő felvétele
                 </Link>
               </div>
+              
+
               <div className={styles.menuItem}>
                 <Link className={styles.link} to={routes.orgCurrentAgent.path}>
                   <img src="./people.png" alt="Existing Cooperatives" />
-                  Meglévő szövetkezetek
+                  Meglévő Közvetítők
                 </Link>
               </div>
             </div>
+            <div className={styles.menuItem}>
+                <Link className={styles.link} to={routes.addNewJob.path}>
+                  <img src="./more.png" alt="Add Cooperative" />
+                  Munka létrehozása
+                </Link>
+              </div>
+              <div className={styles.menuItem}>
+                <Link className={styles.link} to={routes.currentJobs.path}>
+                  <img src="./job.png" alt="Add Cooperative" />
+                  Jelenlegi Munkák
+                </Link>
+              </div>
 
             <div className={styles.bottom}>
               <div className={styles.menuItem}>
