@@ -1,10 +1,11 @@
 import { useState } from "react";
 import axios from "axios";
-import SidebarOrg from "../../../components/SidebarOrg/SidebarOrg";
 import styles from "./AddAgents.module.css";
 import Title from "../../../components/Title/Title";
 import { useNavigate } from "react-router-dom";
 import { jwtDecode } from "jwt-decode";
+import Sidebar from "../../../components/Sidebar/Sidebar";
+import { orgMenuLinks } from "../../../utils/routes";
 
 interface DecodedToken {
   "http://schemas.microsoft.com/ws/2008/06/identity/claims/role"?: string;
@@ -83,7 +84,7 @@ const AddAgents = () => {
 
   return (
     <div className={styles.container}>
-      <SidebarOrg isOpen={isSidebarOpen} toggleSidebar={handleToggleSidebar} />
+      <Sidebar isOpen={isSidebarOpen} toggleSidebar={handleToggleSidebar} topLinks={orgMenuLinks} />
       <div
         className={`${styles.content} ${
           isSidebarOpen ? styles.sidebarOpen : styles.sidebarClosed

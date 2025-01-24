@@ -10,6 +10,7 @@ import "ag-grid-community/styles/ag-theme-alpine.css";
 import { ClientSideRowModelModule, ModuleRegistry } from "ag-grid-community";
 import "./Table.css";
 import Dialog from "../../../components/Dialog/Dialog";
+import { orgMenuLinks } from "../../../utils/routes";
 
 ModuleRegistry.registerModules([ClientSideRowModelModule]);
 
@@ -82,7 +83,7 @@ const CurrentJobs = () => {
 
   return (
     <div className={styles.container}>
-      <Sidebar isOpen={isSidebarOpen} toggleSidebar={handleToggleSidebar} />
+      <Sidebar isOpen={isSidebarOpen} toggleSidebar={handleToggleSidebar} topLinks={orgMenuLinks} />
       <div
         className={`${styles.content} ${
           isSidebarOpen ? styles.sidebarOpen : styles.sidebarClosed

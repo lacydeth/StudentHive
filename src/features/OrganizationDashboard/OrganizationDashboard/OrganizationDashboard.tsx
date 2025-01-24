@@ -1,9 +1,10 @@
 import { useState } from "react";
 import styles from "./OrganizationDashboard.module.css";
-import SidebarOrg from "../../../components/SidebarOrg/SidebarOrg";
+import Sidebar from "../../../components/Sidebar/Sidebar";
+import { orgMenuLinks } from "../../../utils/routes";
 
 const OrganizationDashboard = () => {
-  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(window.innerWidth >= 1000);
 
   const handleToggleSidebar = () => {
     setIsSidebarOpen(!isSidebarOpen);
@@ -11,7 +12,7 @@ const OrganizationDashboard = () => {
 
   return (
     <div className={styles.container}>
-      <SidebarOrg isOpen={isSidebarOpen} toggleSidebar={handleToggleSidebar} />
+      <Sidebar isOpen={isSidebarOpen} toggleSidebar={handleToggleSidebar} topLinks={orgMenuLinks} />
       <div
         className={`${styles.content} ${
           isSidebarOpen ? styles.sidebarOpen : styles.sidebarClosed

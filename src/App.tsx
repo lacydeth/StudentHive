@@ -12,7 +12,7 @@ import IndexPage from './features/Index/Index';
 import OrganizationDashboard from './features/OrganizationDashboard/OrganizationDashboard/OrganizationDashboard';
 import AddAgents from './features/OrganizationDashboard/AddAgents/AddAgents';
 import CurrentAgents from './features/OrganizationDashboard/CurrentAgents/CurrentAgents';
-import SettingsAgents from './features/OrganizationDashboard/SettingsAgents/SettingsAgents';
+import SettingsAgents from './features/OrganizationDashboard/OrganizationSettings/OrganizationSettings';
 import StuddentShift from './features/AgentDashboard/StudentShift/StudentShift';
 import StudentsList from './features/AgentDashboard/StudentsList/StudentsList';
 import AgentSettings from './features/AgentDashboard/AgentSettings/AgentSettings';

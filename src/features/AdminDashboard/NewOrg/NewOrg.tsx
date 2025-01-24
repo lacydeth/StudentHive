@@ -4,6 +4,7 @@ import styles from "./NewOrg.module.css";
 import Sidebar from "../../../components/Sidebar/Sidebar";
 import Title from "../../../components/Title/Title";
 import DashboardTitle from "../../../components/DashboardTitle/DashboardTitle";
+import { routes } from "../../../utils/routes";
 
 const NewOrg = () => {
   const [message, setMessage] = useState<string | null>(null);
@@ -48,10 +49,15 @@ const NewOrg = () => {
       }
     }
   };
-
+  const adminTopLinks = [
+    { path: routes.adminPage.path, icon: "./dashboard.png", label: "Kezelőpult" },
+    { path: routes.newOrgPage.path, icon: "./more.png", label: "Szövetkezet felvétele" },
+    { path: routes.existingOrgPage.path, icon: "./people.png", label: "Meglévő szövetkezetek" },
+    { path: routes.adminSettings.path, icon: "./settings.png", label: "Beállítások" },
+  ];
   return (
     <div className={styles.container}>
-      <Sidebar isOpen={isSidebarOpen} toggleSidebar={handleToggleSidebar} />
+    <Sidebar isOpen={isSidebarOpen} toggleSidebar={handleToggleSidebar} topLinks={adminTopLinks} />
       <div
         className={`${styles.content} ${
           isSidebarOpen ? styles.sidebarOpen : styles.sidebarClosed
