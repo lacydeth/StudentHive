@@ -23,6 +23,7 @@ import ExistingOrg from './features/AdminDashboard/ExistingOrg/ExistingOrg';
 import NewJob from './features/OrganizationDashboard/NewJob/NewJob';
 
 import AdminSettings from './features/AdminDashboard/AdminSettings/AdminSettings';
+import CurrentJobs from './features/OrganizationDashboard/CurrentJobs/CurrentJobs';
 
 export const routes = {
   homePage: { path: '/', title: 'Home' },
@@ -152,7 +153,7 @@ const App = () => {
           path={routes.currentJobs.path}
           element={
             <ProtectedRoute allowedRoles={["Organization"]}>
-              <SettingsAgents/>
+              <CurrentJobs/>
             </ProtectedRoute>
           }
         />
