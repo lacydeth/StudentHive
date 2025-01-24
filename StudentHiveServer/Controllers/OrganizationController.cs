@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using MySql.Data.MySqlClient;
 using StudentHiveServer.Utils;
+using System.Data;
 using System.Net;
 using System.Security.Claims;
 using System.Text.Json;
@@ -103,6 +104,33 @@ namespace StudentHiveServer.Controllers
                 return StatusCode(500, new { message = "Hiba történt az adatok feldolgozása során.", error = ex.Message });
             }
         }
+
+        [HttpGet("jobs")]
+        public async Task<IActionResult> GetJobs()
+        {
+            const string query = "SELECT Id, Title, Category, Location, HourlyRate, CreatedAt FROM jobs";
+
+            try
+            {
+                var dataTable = await _dbHelper.ExecuteQueryAsync(query);
+                var jobs = dataTable.AsEnumerable().Select(row => new
+                {
+                    Id = row.Field<int>("Id"),
+                    Title = row.Field<string>("Title"),
+                    Category = row.Field<string>("Category"),
+                    Location = row.Field<string>("Location"),
+                    HourlyRate = row.Field<decimal>("HourlyRate"),
+                    CreatedAt = row.Field<DateTime>("CreatedAt").ToString("yyyy-MM-dd")
+                }).ToList();
+
+                return Ok(jobs);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "Hiba az adatok betöltése során!", details = ex.Message });
+            }
+        }
+
 
 
         private static string GenerateRandomPassword(int length = 10)
