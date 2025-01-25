@@ -27,12 +27,18 @@ const CurrentJobs = () => {
 
   const fetchJobs = async () => {
     try {
-      const response = await axios.get("https://localhost:7067/api/organization/jobs");
+      const token = localStorage.getItem("token"); 
+      const response = await axios.get("https://localhost:7067/api/organization/jobs", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
       setRowData(response.data);
     } catch (error) {
       console.error("Error fetching jobs data:", error);
     }
   };
+  
 
   useEffect(() => {
     fetchJobs();
