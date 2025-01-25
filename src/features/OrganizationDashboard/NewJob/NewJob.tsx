@@ -78,7 +78,7 @@ const NewJob = () => {
 
       console.log("New job created!:", response.data);
       setError(null);
-      navigate("/new-job");
+      navigate("/current-jobs");
     } catch (error: any) {
       if (error.response?.data?.message) {
         setError(error.response.data.message);

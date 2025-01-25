@@ -39,27 +39,27 @@ const CurrentJobs = () => {
     }
   };
   
-
+  const deleteJob = async (jobId: number) => {
+    try {
+      const token = localStorage.getItem("token");
+      await axios.delete(`https://localhost:7067/api/organization/delete-job/${jobId}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      // Sikeres törlés után frissítjük az adatokat
+      fetchJobs();
+      alert("A munka sikeresen törölve!");
+    } catch (error) {
+      console.error("Error deleting job:", error);
+      alert("Hiba történt a munka törlése során.");
+    }
+  };
+  
   useEffect(() => {
     fetchJobs();
   }, []);
-
-  const actionCellRenderer = (params: any) => {
-    const job = params.data;
-    return (
-      <div style={{ display: "flex", gap: "15px" }}>
-        <button
-          onClick={() => {
-            toggleDialog();
-          }}
-          className={styles.actionBtn}
-        >
-          <img src="./view.png" alt="View" />
-        </button>
-      </div>
-    );
-  };
-
+  
   const toggleDialog = () => {
     if (!dialogRef.current) {
       return;
@@ -69,6 +69,36 @@ const CurrentJobs = () => {
       : dialogRef.current.showModal();
   };
 
+  const actionCellRenderer = (params: any) => {
+    const job = params.data; // Az aktuális rekord adatai
+    return (
+      <div style={{ display: "flex", gap: "10px" }}>
+        {/* Megtekintés gomb */}
+        <button
+          onClick={() => {
+            toggleDialog();
+          }}
+          className={styles.actionBtn}
+        >
+          <img src="./view.png" alt="View" />
+        </button>
+  
+        {/* Törlés gomb */}
+        <button
+          onClick={() => {
+            if (window.confirm("Biztosan törölni szeretnéd ezt a munkát?")) {
+              deleteJob(job.id);
+            }
+          }}
+          className={`${styles.actionBtn} ${styles.deleteBtn}`}
+        >
+          <img src="./delete.png" alt="Delete" />
+        </button>
+      </div>
+    );
+  };
+  
+  // Column definitions (módosítás nélkül)
   const columnDefs = useMemo(
     () => [
       { field: "id", headerName: "Azonosító", flex: 0.5, minWidth: 100 },
@@ -80,12 +110,13 @@ const CurrentJobs = () => {
       {
         headerName: "Műveletek",
         field: "actions",
-        cellRenderer: actionCellRenderer,
+        cellRenderer: actionCellRenderer, // Az egyedi cella-megjelenítő
         width: 150,
       },
     ],
     []
   );
+  
 
   return (
     <div className={styles.container}>
