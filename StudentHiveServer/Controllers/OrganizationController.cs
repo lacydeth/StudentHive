@@ -162,6 +162,44 @@ namespace StudentHiveServer.Controllers
             }
         }
 
+        [HttpDelete("delete-job/{jobId}")]
+        public async Task<IActionResult> DeleteJob(int jobId)
+        {
+            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
+            if (userIdClaim == null)
+            {
+                return Unauthorized(new { message = "User is not authenticated." });
+            }
+
+            var loggedInUserId = userIdClaim.Value;
+
+            try
+            {
+                // Check if the job belongs to the logged-in user's organization
+                const string checkQuery = "SELECT OrganizationId FROM Jobs WHERE Id = @JobId";
+                var checkParameters = new[] { new MySqlParameter("@JobId", jobId) };
+
+                var jobTable = await _dbHelper.ExecuteQueryAsync(checkQuery, checkParameters);
+
+                if (jobTable.Rows.Count == 0)
+                {
+                    return NotFound(new { message = "Job not found." });
+                }
+
+                // Delete the job
+                const string deleteQuery = "DELETE FROM Jobs WHERE Id = @JobId";
+                var deleteParameters = new[] { new MySqlParameter("@JobId", jobId) };
+
+                await _dbHelper.ExecuteNonQueryAsync(deleteQuery, deleteParameters);
+
+                return Ok(new { message = "Job deleted successfully." });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "Error occurred while deleting the job.", details = ex.Message });
+            }
+        }
+
 
 
 
