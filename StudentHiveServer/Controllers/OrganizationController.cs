@@ -108,11 +108,42 @@ namespace StudentHiveServer.Controllers
         [HttpGet("jobs")]
         public async Task<IActionResult> GetJobs()
         {
-            const string query = "SELECT Id, Title, Category, Location, HourlyRate, CreatedAt FROM jobs";
+            // Get the logged-in user's ID from the token
+            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
+            if (userIdClaim == null)
+            {
+                return Unauthorized(new { message = "User is not authenticated." });
+            }
+
+            var loggedInUserId = userIdClaim.Value;
 
             try
             {
-                var dataTable = await _dbHelper.ExecuteQueryAsync(query);
+                // Step 1: Get the OrganizationId for the logged-in user
+                const string getOrganizationQuery = "SELECT OrganizationId FROM Users WHERE Id = @UserId";
+                var organizationParameters = new[]
+                {
+            new MySqlParameter("@UserId", loggedInUserId)
+        };
+
+                var organizationTable = await _dbHelper.ExecuteQueryAsync(getOrganizationQuery, organizationParameters);
+                if (organizationTable.Rows.Count == 0)
+                {
+                    return Unauthorized(new { message = "User does not belong to any organization." });
+                }
+
+                var organizationId = organizationTable.Rows[0].Field<int>("OrganizationId");
+
+                // Step 2: Fetch jobs for the organization
+                const string query = "SELECT Id, Title, Category, Location, HourlyRate, CreatedAt FROM jobs WHERE OrganizationId = @OrganizationId";
+                var jobParameters = new[]
+                {
+            new MySqlParameter("@OrganizationId", organizationId)
+        };
+
+                var dataTable = await _dbHelper.ExecuteQueryAsync(query, jobParameters);
+
+                // Map the jobs to a list
                 var jobs = dataTable.AsEnumerable().Select(row => new
                 {
                     Id = row.Field<int>("Id"),
@@ -130,6 +161,9 @@ namespace StudentHiveServer.Controllers
                 return StatusCode(500, new { message = "Hiba az adatok betöltése során!", details = ex.Message });
             }
         }
+
+
+
 
 
 
