@@ -79,22 +79,24 @@ namespace StudentHiveServer.Controllers
 
             try
             {
-                // Adatok beszúrása
-                const string query = @"INSERT INTO jobs (OrganizationId, Title, Category, Location, Description, HourlyRate, ImagePath)
-                               VALUES (@OrganizationId, @Title, @Category, @Location, @Description, @HourlyRate, @ImagePath)";
+                // Az AgentId mindig null
+                int? agentId = null;  // Mindig null az AgentId
+
+                const string query = @"INSERT INTO jobs (OrganizationId, Title, Category, Location, Description, HourlyRate, ImagePath, AgentId)
+                               VALUES (@OrganizationId, @Title, @Category, @Location, @Description, @HourlyRate, @ImagePath, @AgentId)";
 
                 var parameters = new[]
                 {
-                    new MySqlParameter("@OrganizationId", loggedInUserId),
-                    new MySqlParameter("@Title", request.Title),
-                    new MySqlParameter("@Category", request.Category),
-                    new MySqlParameter("@Location", request.Location),
-                    new MySqlParameter("@Description", request.Description),
-                    new MySqlParameter("@HourlyRate", request.HourlyRate),
-                    new MySqlParameter("@ImagePath", request.ImagePath)
-                };
+            new MySqlParameter("@OrganizationId", loggedInUserId),
+            new MySqlParameter("@Title", request.Title),
+            new MySqlParameter("@Category", request.Category),
+            new MySqlParameter("@Location", request.Location),
+            new MySqlParameter("@Description", request.Description),
+            new MySqlParameter("@HourlyRate", request.HourlyRate),
+            new MySqlParameter("@ImagePath", request.ImagePath),
+            new MySqlParameter("@AgentId", (object)agentId ?? DBNull.Value)  // Null mindig
+        };
 
-                // Lekérdezés futtatása
                 await _dbHelper.ExecuteNonQueryAsync(query, parameters);
 
                 return Ok(new { message = "A munka sikeresen létrehozva!" });
@@ -121,8 +123,7 @@ namespace StudentHiveServer.Controllers
             {
                 // Step 1: Get the OrganizationId for the logged-in user
                 const string getOrganizationQuery = "SELECT OrganizationId FROM Users WHERE Id = @UserId";
-                var organizationParameters = new[]
-                {
+                var organizationParameters = new[] {
             new MySqlParameter("@UserId", loggedInUserId)
         };
 
@@ -134,12 +135,27 @@ namespace StudentHiveServer.Controllers
 
                 var organizationId = organizationTable.Rows[0].Field<int>("OrganizationId");
 
-                // Step 2: Fetch jobs for the organization
-                const string query = "SELECT Id, Title, Category, Location, HourlyRate, CreatedAt FROM jobs WHERE OrganizationId = @OrganizationId";
-                var jobParameters = new[]
-                {
-                    new MySqlParameter("@OrganizationId", organizationId)
-                };
+                // Step 2: Fetch jobs for the organization, including agent details
+                const string query = @"
+            SELECT 
+                j.Id, 
+                j.Title, 
+                j.Category, 
+                j.Location, 
+                j.HourlyRate, 
+                j.AgentId, 
+                j.CreatedAt, 
+                u.FirstName AS AgentFirstName, 
+                u.LastName AS AgentLastName, 
+                o.Name AS OrganizationName 
+            FROM Jobs j
+            JOIN Users u ON j.AgentId = u.Id 
+            JOIN Organizations o ON j.OrganizationId = o.Id 
+            WHERE j.OrganizationId = @OrganizationId";
+
+                var jobParameters = new[] {
+            new MySqlParameter("@OrganizationId", organizationId)
+        };
 
                 var dataTable = await _dbHelper.ExecuteQueryAsync(query, jobParameters);
 
@@ -150,7 +166,10 @@ namespace StudentHiveServer.Controllers
                     Title = row.Field<string>("Title"),
                     Category = row.Field<string>("Category"),
                     Location = row.Field<string>("Location"),
-                    HourlyRate = row.Field<decimal>("HourlyRate"),
+                    HourlyRate = row.Field<int>("HourlyRate"),
+                    AgentFirstName = row.Field<string>("AgentFirstName"),
+                    AgentLastName = row.Field<string>("AgentLastName"),
+                    OrganizationName = row.Field<string>("OrganizationName"),
                     CreatedAt = row.Field<DateTime>("CreatedAt").ToString("yyyy-MM-dd")
                 }).ToList();
 
@@ -161,6 +180,9 @@ namespace StudentHiveServer.Controllers
                 return StatusCode(500, new { message = "Hiba az adatok betöltése során!", details = ex.Message });
             }
         }
+
+
+
 
         [HttpGet("agents")]
         public async Task<IActionResult> GetAgents()
@@ -298,6 +320,7 @@ namespace StudentHiveServer.Controllers
         public class JobRequest
         {
             public int OrganizationId { get; set; }
+            public int AgentId { get; set; } = 0;
             public string Title { get; set; }
             public string Category { get; set; }
             public string Location { get; set; }
