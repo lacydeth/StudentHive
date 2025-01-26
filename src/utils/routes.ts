@@ -23,10 +23,10 @@ export const routes = {
 
 export const orgMenuLinks = [
     { path: routes.orgPage.path, icon: "./dashboard.png", label: "Kezelőpult" },
-    { path: routes.orgAddAgent.path, icon: "./more.png", label: "Közvetítő felvétele" },
-    { path: routes.orgCurrentAgent.path, icon: "./people.png", label: "Meglévő Közvetítők" },
+    { path: routes.orgAddAgent.path, icon: "./realtor.png", label: "Közvetítő felvétele" },
+    { path: routes.orgCurrentAgent.path, icon: "./people.png", label: "Meglévő közvetítők" },
     { path: routes.addNewJob.path, icon: "./more.png", label: "Munka létrehozása" },
-    { path: routes.currentJobs.path, icon: "./job.png", label: "Jelenlegi Munkák" },
+    { path: routes.currentJobs.path, icon: "./job.png", label: "Létrehozott munkák" },
     { path: routes.orgSettings.path, icon: "./settings.png", label: "Beállítások" }
 ];  
 export const adminTopLinks = [

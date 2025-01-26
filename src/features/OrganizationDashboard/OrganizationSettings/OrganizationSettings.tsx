@@ -1,3 +1,4 @@
+import DashboardTitle from "../../../components/DashboardTitle/DashboardTitle";
 import Sidebar from "../../../components/Sidebar/Sidebar";
 import { orgMenuLinks } from "../../../utils/routes";
 import styles from "./OrganizationSettings.module.css"
@@ -19,7 +20,10 @@ const SettingsAgents = () => {
           isSidebarOpen ? styles.sidebarOpen : styles.sidebarClosed
         }`}
       >
-        <h1>Hello!</h1>
+        <DashboardTitle title="Iskolaszövetkezet beállítások" icon="./settings.png" subTitle="Iskolaszövetkezet beállítások"/>
+        <div className={styles.settingsContent}>
+
+        </div>
       </div>
     </div>
   );

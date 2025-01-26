@@ -6,6 +6,7 @@ import { useNavigate } from "react-router-dom";
 import { jwtDecode } from "jwt-decode";
 import { orgMenuLinks } from "../../../utils/routes";
 import Sidebar from "../../../components/Sidebar/Sidebar";
+import DashboardTitle from "../../../components/DashboardTitle/DashboardTitle";
 
 interface DecodedToken {
   "http://schemas.microsoft.com/ws/2008/06/identity/claims/role"?: string;
@@ -24,7 +25,7 @@ const NewJob = () => {
   const [hourlyrate, setHourlyRate] = useState("");
   const [imagepath, setImagePath] = useState("");
   const [error, setError] = useState<string | null>(null);
-  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(window.innerWidth >= 1000);
   const navigate = useNavigate();
 
   const handleToggleSidebar = () => {
@@ -96,81 +97,88 @@ const NewJob = () => {
           isSidebarOpen ? styles.sidebarOpen : styles.sidebarClosed
         }`}
       >
-        <Title subTitle="Add Job" title="Created a new job!" />
-        {error && <p style={{ color: "red" }}>{error}</p>}
-        <form
-          className={styles.form}
-          onSubmit={(e) => {
-            e.preventDefault();
-            handleRegister();
-          }}
-        >
-          <div className={styles.inputBox}>
-            <input
-              type="text"
-              placeholder="Munka Neve"
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
-              required
-            />
-            <img src="./id-card.png" alt="last name icon" />
-          </div>
-          <div className={styles.inputBox}>
-            <input
-              type="text"
-              placeholder="Kategória"
-              value={category}
-              onChange={(e) => setCategory(e.target.value)}
-              required
-            />
-            <img src="./id-card.png" alt="first name icon" />
-          </div>
-          <div className={styles.inputBox}>
-            <input
-              type="text"
-              placeholder="Munkavégzés helye"
-              value={location}
-              onChange={(e) => setLocation(e.target.value)}
-              required
-            />
-            <img src="./mail.png" alt="email icon" />
-          </div>
-          <div className={styles.inputBox}>
-            <input
-              type="text"
-              placeholder="Leírás"
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-              required
-            />
-            <img src="./mail.png" alt="email icon" />
-          </div>
-          <div className={styles.inputBox}>
-            <input
-              type="text"
-              placeholder="Órabér"
-              value={hourlyrate}
-              onChange={(e) => setHourlyRate(e.target.value)}
-              required
-            />
-            <img src="./mail.png" alt="email icon" />
-          </div>
-          <div className={styles.inputBox}>
-            <input
-              type="text"
-              placeholder="kép url"
-              value={imagepath}
-              onChange={(e) => setImagePath(e.target.value)}
-              required
-            />
-            <img src="./mail.png" alt="email icon" />
-          </div>
-
-          <div className={styles.inputBox}></div>
-          <button type="submit" className={styles.registerBtn}>
-            Register Agent
-          </button>
-        </form>
+        <DashboardTitle title="Munka létrehozása" icon="./more.png" subTitle="Munka létrehozása"/>
+        <div className={styles.newJobContent}>
+          <Title subTitle="Munka létrehozása" title="Adj hozzá új munkát pár adat megadásával!" />
+          {error && <p style={{ color: "red" }}>{error}</p>}
+          <form
+            className={styles.newJobForm}
+            onSubmit={(e) => {
+              e.preventDefault();
+              handleRegister();
+            }}
+          >
+            <div className={styles.formWrapper}>
+              <div className={styles.column}>
+                <div className={styles.inputBox}>
+                  <input
+                    type="text"
+                    placeholder="Munka neve"
+                    value={title}
+                    onChange={(e) => setTitle(e.target.value)}
+                    required
+                  />
+                  <img src="./id-card.png" alt="last name icon" />
+                </div>
+                <div className={styles.inputBox}>
+                  <input
+                    type="text"
+                    placeholder="Kategória"
+                    value={category}
+                    onChange={(e) => setCategory(e.target.value)}
+                    required
+                  />
+                  <img src="./id-card.png" alt="first name icon" />
+                </div>
+                <div className={styles.inputBox}>
+                  <input
+                    type="text"
+                    placeholder="Munkavégzés helye"
+                    value={location}
+                    onChange={(e) => setLocation(e.target.value)}
+                    required
+                    />
+                  <img src="./mail.png" alt="email icon" />
+                </div>
+              </div>
+              <div className={styles.column}>
+                <div className={styles.inputBox}>
+                  <input
+                    type="text"
+                    placeholder="Leírás"
+                    value={description}
+                    onChange={(e) => setDescription(e.target.value)}
+                    required
+                  />
+                  <img src="./mail.png" alt="email icon" />
+                </div>
+                <div className={styles.inputBox}>
+                  <input
+                    type="text"
+                    placeholder="Órabér"
+                    value={hourlyrate}
+                    onChange={(e) => setHourlyRate(e.target.value)}
+                    required
+                  />
+                  <img src="./mail.png" alt="email icon" />
+                </div>
+                <div className={styles.inputBox}>
+                  <input
+                    type="text"
+                    placeholder="kép url"
+                    value={imagepath}
+                    onChange={(e) => setImagePath(e.target.value)}
+                    required
+                  />
+                  <img src="./mail.png" alt="email icon" />
+                </div>
+              </div>
+            </div>
+            <button type="submit" className={styles.registerBtn}>
+              közvetítő hozzáadása
+            </button>
+          </form>
+        </div>
       </div>
     </div>
   );

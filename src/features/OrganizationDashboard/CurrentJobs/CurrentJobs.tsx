@@ -111,7 +111,7 @@ const CurrentJobs = () => {
         minWidth: 120,
         valueGetter: (params: any) => {
           const date = new Date(params.data.createdAt);
-          return date.toLocaleDateString(); // Formázás magyar dátumra
+          return date.toLocaleDateString();
         },
       },
       {
@@ -133,13 +133,13 @@ const CurrentJobs = () => {
         }`}
       >
         <DashboardTitle
-          title="Meglévő munkák"
+          title="Létrehozott munkák"
           icon="./briefcase.png"
-          subTitle="Aktuális munkák"
+          subTitle="Létrehozott munkák"
         />
         <div className={styles.currentJobsContent}>
           <Title
-            subTitle="Meglévő munkák"
+            subTitle="Létrehozott munkák"
             title="Tekintsd meg és kezeld az aktuális munkákat!"
           />
           <div

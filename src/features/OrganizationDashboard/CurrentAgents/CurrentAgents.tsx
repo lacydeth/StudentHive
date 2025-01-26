@@ -51,7 +51,6 @@ const CurrentAgents = () => {
           Authorization: `Bearer ${token}`,
         },
       });
-      // Sikeres törlés után frissítjük az adatokat
       fetchAgents();
       alert("A közvetytő sikeresen törölve!");
     } catch (error) {
@@ -81,9 +80,8 @@ const CurrentAgents = () => {
       : dialogRef.current.showModal();
   };
 
-  // Módosított actionCellRenderer: hozzáadtam a törlés logikát
   function actionCellRenderer(params: any) {
-    const user = params.data; // Az aktuális rekord adatai
+    const user = params.data; 
 
     return (
       <div style={{ display: "flex", gap: "10px" }}>
@@ -91,7 +89,7 @@ const CurrentAgents = () => {
         <button
           onClick={() => {
             if (window.confirm("Biztosan törölni szeretnéd ezt az ügynököt?")) {
-              deleteAgent(user.id); // Meghívjuk a deleteAgent függvényt
+              deleteAgent(user.id);
             }
           }}
           className={`${styles.actionBtn} ${styles.deleteBtn}`}
@@ -110,7 +108,7 @@ const CurrentAgents = () => {
     {
       headerName: "Műveletek",
       field: "actions",
-      cellRenderer: actionCellRenderer, // A cellRenderer regisztrálása
+      cellRenderer: actionCellRenderer, 
       width: 150,
     },
   ], []);
@@ -122,14 +120,14 @@ const CurrentAgents = () => {
         className={`${styles.content} ${isSidebarOpen ? styles.sidebarOpen : styles.sidebarClosed}`}
       >
         <DashboardTitle
-          title="Meglévő Közvetítők"
-          icon="./briefcase.png"
-          subTitle="Aktuális Közvetítők"
+          title="Meglévő közvetítők"
+          icon="./people.png"
+          subTitle="Meglévő közvetítők"
         />
         <div className={styles.currentJobsContent}>
           <Title
             subTitle="Meglévő Közvetítők"
-            title="Tekintsd meg és kezeld az aktuális Közvetítőket!"
+            title="Tekintsd meg és kezeld az aktuális közvetítőket!"
           />
           <div
             className="ag-theme-alpine"

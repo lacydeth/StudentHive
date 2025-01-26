@@ -6,6 +6,7 @@ import { useNavigate } from "react-router-dom";
 import { jwtDecode } from "jwt-decode";
 import Sidebar from "../../../components/Sidebar/Sidebar";
 import { orgMenuLinks } from "../../../utils/routes";
+import DashboardTitle from "../../../components/DashboardTitle/DashboardTitle";
 
 interface DecodedToken {
   "http://schemas.microsoft.com/ws/2008/06/identity/claims/role"?: string;
@@ -21,7 +22,7 @@ const AddAgents = () => {
   const [lastName, setLastName] = useState("");
   const [newAgentEmail, setNewAgentEmail] = useState("");
   const [error, setError] = useState<string | null>(null);
-  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(window.innerWidth >= 1000);
   const navigate = useNavigate();
 
   const handleToggleSidebar = () => {
@@ -55,7 +56,6 @@ const AddAgents = () => {
         return;
       }
 
-      // Send the request with the logged-in user's ID (extracted from the JWT) and the new agent's details
       const response = await axios.post(
         "https://localhost:7067/api/organization/new-agent",
         {
@@ -65,7 +65,7 @@ const AddAgents = () => {
         },
         {
           headers: {
-            Authorization: `Bearer ${token}`, // Send the token to authenticate the request
+            Authorization: `Bearer ${token}`,
           },
         }
       );
@@ -90,51 +90,54 @@ const AddAgents = () => {
           isSidebarOpen ? styles.sidebarOpen : styles.sidebarClosed
         }`}
       >
-        <Title subTitle="Add Agent" title="Register a New Agent!" />
-        {error && <p style={{ color: "red" }}>{error}</p>}
-        <form
-          className={styles.form}
-          onSubmit={(e) => {
-            e.preventDefault();
-            handleRegister();
-          }}
-        >
-          <div className={styles.inputBox}>
-            <input
-              type="text"
-              placeholder="Last Name"
-              value={lastName}
-              onChange={(e) => setLastName(e.target.value)}
-              required
-            />
-            <img src="./id-card.png" alt="last name icon" />
-          </div>
-          <div className={styles.inputBox}>
-            <input
-              type="text"
-              placeholder="First Name"
-              value={firstName}
-              onChange={(e) => setFirstName(e.target.value)}
-              required
-            />
-            <img src="./id-card.png" alt="first name icon" />
-          </div>
-          <div className={styles.inputBox}>
-            <input
-              type="email"
-              placeholder="New Agent Email"
-              value={newAgentEmail}
-              onChange={(e) => setNewAgentEmail(e.target.value)}
-              required
-            />
-            <img src="./mail.png" alt="email icon" />
-          </div>
+        <DashboardTitle title="Közvetítő felvétele" icon="./realtor.png" subTitle="Közvetítő felvétele"/>
+        <div className={styles.addAgentsContent}>
+          <Title subTitle="Közvetítő felvétele" title="Adj hozzá új közvetítőt az alapadatok megadásával!" />
+          {error && <p style={{ color: "red" }}>{error}</p>}
+          <form
+            className={styles.addAgentsForm}
+            onSubmit={(e) => {
+              e.preventDefault();
+              handleRegister();
+            }}
+          >
+            <div className={styles.inputBox}>
+              <input
+                type="text"
+                placeholder="Vezetéknév"
+                value={lastName}
+                onChange={(e) => setLastName(e.target.value)}
+                required
+              />
+              <img src="./id-card.png" alt="last name icon" />
+            </div>
+            <div className={styles.inputBox}>
+              <input
+                type="text"
+                placeholder="Keresztnév"
+                value={firstName}
+                onChange={(e) => setFirstName(e.target.value)}
+                required
+              />
+              <img src="./id-card.png" alt="first name icon" />
+            </div>
+            <div className={styles.inputBox}>
+              <input
+                type="email"
+                placeholder="Közvetítő email címe"
+                value={newAgentEmail}
+                onChange={(e) => setNewAgentEmail(e.target.value)}
+                required
+              />
+              <img src="./mail.png" alt="email icon" />
+            </div>
 
-          <div className={styles.inputBox}></div>
-          <button type="submit" className={styles.registerBtn}>
-            Register Agent
-          </button>
-        </form>
+            <div className={styles.inputBox}></div>
+            <button type="submit" className={styles.registerBtn}>
+              közvetítő felvétele
+            </button>
+          </form>
+        </div>
       </div>
     </div>
   );
