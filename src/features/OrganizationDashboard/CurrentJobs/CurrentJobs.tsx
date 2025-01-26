@@ -27,7 +27,7 @@ const CurrentJobs = () => {
 
   const fetchJobs = async () => {
     try {
-      const token = localStorage.getItem("token"); 
+      const token = localStorage.getItem("token");
       const response = await axios.get("https://localhost:7067/api/organization/jobs", {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -35,10 +35,10 @@ const CurrentJobs = () => {
       });
       setRowData(response.data);
     } catch (error) {
-      console.error("Error fetching jobs data:", error);
+      console.error("Error fetching jobs:", error);
     }
   };
-  
+
   const deleteJob = async (jobId: number) => {
     try {
       const token = localStorage.getItem("token");
@@ -47,7 +47,6 @@ const CurrentJobs = () => {
           Authorization: `Bearer ${token}`,
         },
       });
-      // Sikeres törlés után frissítjük az adatokat
       fetchJobs();
       alert("A munka sikeresen törölve!");
     } catch (error) {
@@ -55,11 +54,11 @@ const CurrentJobs = () => {
       alert("Hiba történt a munka törlése során.");
     }
   };
-  
+
   useEffect(() => {
     fetchJobs();
   }, []);
-  
+
   const toggleDialog = () => {
     if (!dialogRef.current) {
       return;
@@ -70,7 +69,7 @@ const CurrentJobs = () => {
   };
 
   const actionCellRenderer = (params: any) => {
-    const job = params.data; // Az aktuális rekord adatai
+    const job = params.data;
     return (
       <div style={{ display: "flex", gap: "10px" }}>
         {/* Megtekintés gomb */}
@@ -82,7 +81,7 @@ const CurrentJobs = () => {
         >
           <img src="./view.png" alt="View" />
         </button>
-  
+
         {/* Törlés gomb */}
         <button
           onClick={() => {
@@ -97,8 +96,7 @@ const CurrentJobs = () => {
       </div>
     );
   };
-  
-  // Column definitions (módosítás nélkül)
+
   const columnDefs = useMemo(
     () => [
       { field: "id", headerName: "Azonosító", flex: 0.5, minWidth: 100 },
@@ -106,17 +104,25 @@ const CurrentJobs = () => {
       { field: "category", headerName: "Kategória", flex: 1, minWidth: 120 },
       { field: "location", headerName: "Helyszín", flex: 1.5, minWidth: 150 },
       { field: "hourlyRate", headerName: "Órabér", flex: 1, minWidth: 120 },
-      { field: "createdAt", headerName: "Létrehozás", flex: 1, minWidth: 120 },
+      {
+        field: "createdAt",
+        headerName: "Létrehozás",
+        flex: 1,
+        minWidth: 120,
+        valueGetter: (params: any) => {
+          const date = new Date(params.data.createdAt);
+          return date.toLocaleDateString(); // Formázás magyar dátumra
+        },
+      },
       {
         headerName: "Műveletek",
         field: "actions",
-        cellRenderer: actionCellRenderer, // Az egyedi cella-megjelenítő
+        cellRenderer: actionCellRenderer,
         width: 150,
       },
     ],
     []
   );
-  
 
   return (
     <div className={styles.container}>

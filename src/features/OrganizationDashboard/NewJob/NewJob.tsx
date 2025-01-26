@@ -50,15 +50,15 @@ const NewJob = () => {
       setError("User is not authenticated.");
       return;
     }
-
+  
     try {
       const token = localStorage.getItem("token");
       if (!token) {
         setError("No authentication token found.");
         return;
       }
-
-      // Send the request with the logged-in user's ID (extracted from the JWT) and the new agent's details
+  
+      // Az AgentId mindig 0-ra állítva, ha nem adtad meg
       const response = await axios.post(
         "https://localhost:7067/api/organization/new-job",
         {
@@ -67,7 +67,7 @@ const NewJob = () => {
           location,
           description,
           hourlyrate,
-          imagepath
+          imagepath,
         },
         {
           headers: {
@@ -75,7 +75,7 @@ const NewJob = () => {
           },
         }
       );
-
+  
       console.log("New job created!:", response.data);
       setError(null);
       navigate("/current-jobs");
@@ -86,6 +86,7 @@ const NewJob = () => {
       }
     }
   };
+  
 
   return (
     <div className={styles.container}>
