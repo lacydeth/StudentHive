@@ -138,8 +138,8 @@ namespace StudentHiveServer.Controllers
                 const string query = "SELECT Id, Title, Category, Location, HourlyRate, CreatedAt FROM jobs WHERE OrganizationId = @OrganizationId";
                 var jobParameters = new[]
                 {
-            new MySqlParameter("@OrganizationId", organizationId)
-        };
+                    new MySqlParameter("@OrganizationId", organizationId)
+                };
 
                 var dataTable = await _dbHelper.ExecuteQueryAsync(query, jobParameters);
 
@@ -161,6 +161,82 @@ namespace StudentHiveServer.Controllers
                 return StatusCode(500, new { message = "Hiba az adatok betöltése során!", details = ex.Message });
             }
         }
+
+        [HttpGet("agents")]
+        public async Task<IActionResult> GetAgents()
+        {
+            // 1. Az autentikált felhasználó azonosítójának lekérdezése a JWT tokenből
+            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
+            if (userIdClaim == null)
+            {
+                return Unauthorized(new { message = "User is not authenticated." });
+            }
+
+            var loggedInUserId = userIdClaim.Value;
+
+            try
+            {
+                // 2. Az aktuális felhasználó OrganizationId-jának lekérdezése
+                const string getOrganizationQuery = "SELECT OrganizationId FROM Users WHERE Id = @UserId";
+                var organizationParameters = new[]
+                {
+                    new MySqlParameter("@UserId", loggedInUserId)
+                };
+
+                var organizationTable = await _dbHelper.ExecuteQueryAsync(getOrganizationQuery, organizationParameters);
+                if (organizationTable.Rows.Count == 0)
+                {
+                    return Unauthorized(new { message = "User does not belong to any organization." });
+                }
+
+                var organizationId = organizationTable.Rows[0].Field<int>("OrganizationId");
+
+                // 3. Az adott szervezet ügynökeinek lekérdezése
+                const string query = @"SELECT Id, FirstName, LastName, Email FROM Users WHERE OrganizationId = @OrganizationId AND RoleId=3"; ;
+                var jobParameters = new[]
+                {
+            new MySqlParameter("@OrganizationId", organizationId)
+        };
+
+                var dataTable = await _dbHelper.ExecuteQueryAsync(query, jobParameters);
+
+                // 4. Az ügynökök listájának leképezése
+                var agents = dataTable.AsEnumerable().Select(row => new
+                {
+                    Id = row.Field<int>("Id"),
+                    FirstName = row.Field<string>("FirstName"),
+                    LastName = row.Field<string>("LastName"),
+                    Email = row.Field<string>("Email"),
+                }).ToList();
+
+                return Ok(agents);
+            }
+            catch (Exception ex)
+            {
+                // Hibakezelés
+                return StatusCode(500, new { message = "Error fetching data", details = ex.Message });
+            }
+        }
+
+        [HttpDelete("delete-agent/{Id}")]
+        public async Task<IActionResult> DeleteAgent(int Id)
+        {
+            try
+            {
+                // Delete the job
+                const string deleteQuery = "DELETE FROM users WHERE Id = @Id";
+                var deleteParameters = new[] { new MySqlParameter("@Id", Id) };
+
+                await _dbHelper.ExecuteNonQueryAsync(deleteQuery, deleteParameters);
+
+                return Ok(new { message = "Agent deleted successfully." });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "Error occurred while deleting the Agent.", details = ex.Message });
+            }
+        }
+
 
         [HttpDelete("delete-job/{jobId}")]
         public async Task<IActionResult> DeleteJob(int jobId)
@@ -199,11 +275,6 @@ namespace StudentHiveServer.Controllers
                 return StatusCode(500, new { message = "Error occurred while deleting the job.", details = ex.Message });
             }
         }
-
-
-
-
-
 
         private static string GenerateRandomPassword(int length = 10)
         {
