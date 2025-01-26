@@ -20,3 +20,61 @@
 .sidebarClosed {
     margin-left: 0;
 }
+.dashboardContent {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    min-height: 80vh;
+    text-align: center;
+    flex-direction: column;
+}
+.dashboardWrapper {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 35px;
+    flex-direction: column;
+}
+.cardContainer {
+    display: flex;
+    gap: 10px;
+}
+.infoCard {
+    min-width: 180px;
+    padding: 15px;
+    background: var(--smoothGreen);
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    align-items: center;
+    justify-content: center;
+    border-radius: 8px;
+    h3 {
+        color: #fff;
+        font-weight: 400;
+        font-size: 14px;
+    }
+    p {
+        font-weight: 700;
+        color: var(--darkGreen);
+    }
+}
+@media screen and (min-width:820px) {
+    .dashboardWrapper {
+        flex-direction: row;
+        gap: 135px;
+    }
+    .cardContainer {
+        flex-direction: column;
+    }
+    .infoCard {
+        min-height: 150px;
+        h3 {
+            font-size: 18px;
+        }
+        p {
+            font-size: 22px;
+        }
+    }
+}
