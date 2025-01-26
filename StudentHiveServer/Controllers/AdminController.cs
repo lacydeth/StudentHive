@@ -18,6 +18,56 @@ namespace StudentHiveServer.Controllers
         {
             _dbHelper = new DatabaseHelper(configuration.GetConnectionString("DefaultConnection"));
         }
+        // GET: All registered users by month (user role)
+        [HttpGet("users-by-month")]
+        public async Task<IActionResult> GetUsersByMonth()
+        {
+            const string query = @"SELECT YEAR(CreatedAt) AS Year,MONTH(CreatedAt) AS Month, COUNT(*) AS UserCount FROM Users
+                                WHERE RoleId = 4
+                                GROUP BY YEAR(CreatedAt), MONTH(CreatedAt)
+                                ORDER BY Year, Month";
+
+            try
+            {
+                var dataTable = await _dbHelper.ExecuteQueryAsync(query);
+                var userCountsByMonth = dataTable.AsEnumerable().Select(row => new
+                {
+                    Year = row.Field<int>("Year"),
+                    Month = row.Field<int>("Month"),
+                    UserCount = row.Field<long>("UserCount")
+                }).ToList();
+
+                return Ok(userCountsByMonth);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "Hiba történt a felhasználók lekérdezése közben.", details = ex.Message });
+            }
+        }
+
+        // GET: Total number of registered organizations and users
+        [HttpGet("total-organizations-and-users")]
+        public async Task<IActionResult> GetTotalOrganizationsAndUsers()
+        {
+            const string query = @"SELECT (SELECT COUNT(*) FROM Organizations) AS TotalOrganizations, 
+                                (SELECT COUNT(*) FROM Users WHERE RoleId = 4) AS TotalUsers";
+
+            try
+            {
+                var result = await _dbHelper.ExecuteQueryAsync(query);
+                var data = result.AsEnumerable().Select(row => new
+                {
+                    TotalOrganizations = row.Field<long>("TotalOrganizations"),
+                    TotalUsers = row.Field<long>("TotalUsers")
+                }).FirstOrDefault();
+
+                return Ok(data);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "Hiba történt a szervezetek és felhasználók lekérdezése közben.", details = ex.Message });
+            }
+        }
 
         // GET: list all organizations
         [HttpGet("organizations")]
