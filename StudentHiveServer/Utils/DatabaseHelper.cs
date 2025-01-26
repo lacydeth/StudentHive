@@ -11,6 +11,19 @@
         {
             _connectionString = connectionString;
         }
+        public async Task<T> ExecuteScalarAsync<T>(string query, MySqlParameter[] parameters)
+        {
+            using (var connection = new MySqlConnection(_connectionString))
+            {
+                await connection.OpenAsync();
+                using (var command = new MySqlCommand(query, connection))
+                {
+                    command.Parameters.AddRange(parameters);
+                    var result = await command.ExecuteScalarAsync();
+                    return (T)Convert.ChangeType(result, typeof(T));
+                }
+            }
+        }
 
         public async Task<DataTable> ExecuteQueryAsync(string query, MySqlParameter[] parameters = null)
         {
@@ -37,5 +50,4 @@
             return await command.ExecuteNonQueryAsync();
         }
     }
-
 }
