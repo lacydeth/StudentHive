@@ -20,7 +20,9 @@ const AdminDashboard = () => {
         }`}
       >
         <DashboardTitle title="Admin kezelőpult" icon="./dashboard.png" subTitle="Admin kezelőpult" />
-        <div className={styles.newOrgContent}></div>
+        <div className={styles.dashboardContent}>
+
+        </div>
       </div>
     </div>
   );

@@ -24,6 +24,18 @@ export const getRoleFromToken = (): string | null => {
   }
 };
 
+export const getUserIdFromToken = (): string | null => {
+  const token = localStorage.getItem("token");
+  if (!token) return null;
+
+  try {
+    const decoded: DecodedToken = jwtDecode<DecodedToken>(token);
+    return decoded["http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier"] || null;
+  } catch (error) {
+    console.error("Hiba a token dekódolás során:", error);
+    return null;
+  }
+};
 export const handleLogout = async () => {
   try {
     const response = await axios.post("https://localhost:7067/api/auth/logout");
