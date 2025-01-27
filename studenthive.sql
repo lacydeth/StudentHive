@@ -52,7 +52,7 @@ CREATE TABLE `Users` (
 CREATE TABLE `Jobs` (
   `Id` INT PRIMARY KEY AUTO_INCREMENT,
   `OrganizationId` INT NOT NULL,
-  `CategoryId` VARCHAR(255) NOT NULL,
+  `CategoryId` INT NOT NULL,
   `AgentId` INT,
   `DescriptionId` INT,
   `Title` VARCHAR(255) NOT NULL,
