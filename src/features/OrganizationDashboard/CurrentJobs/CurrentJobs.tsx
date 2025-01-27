@@ -33,11 +33,21 @@ const CurrentJobs = () => {
           Authorization: `Bearer ${token}`,
         },
       });
-      setRowData(response.data);
+      
+      setRowData(response.data.map((job: any) => ({
+        ...job,
+        categoryName: job.categoryName, // Kategória neve
+        agentId: null, // AgentId mindig null
+        ourOffer: job.ourOffer, // Description OurOffer
+        mainTasks: job.mainTaks, // Description MainTasks
+        jobRequirements: job.jobRequirements, // Description JobRequirements
+        advantages: job.advantages, // Description Advantages
+      })));
     } catch (error) {
       console.error("Error fetching jobs:", error);
     }
   };
+  
 
   const deleteJob = async (jobId: number) => {
     try {
@@ -101,19 +111,15 @@ const CurrentJobs = () => {
     () => [
       { field: "id", headerName: "Azonosító", flex: 0.5, minWidth: 100 },
       { field: "title", headerName: "Cím", flex: 1.5, minWidth: 150 },
-      { field: "category", headerName: "Kategória", flex: 1, minWidth: 120 },
-      { field: "location", headerName: "Helyszín", flex: 1.5, minWidth: 150 },
+      { field: "categoryName", headerName: "Kategória", flex: 1, minWidth: 120 }, // CategoryName jelenik meg
+      { field: "city", headerName: "Helyszín", flex: 1.5, minWidth: 150 },
+      { field: "address", headerName: "Cím", flex: 1, minWidth: 150 },
       { field: "hourlyRate", headerName: "Órabér", flex: 1, minWidth: 120 },
-      {
-        field: "createdAt",
-        headerName: "Létrehozás",
-        flex: 1,
-        minWidth: 120,
-        valueGetter: (params: any) => {
-          const date = new Date(params.data.createdAt);
-          return date.toLocaleDateString();
-        },
-      },
+      { field: "isActive", headerName: "Aktív", flex: 1, minWidth: 120, valueGetter: (params: any) => (params.data.isActive ? "Igen" : "Nem") },
+      { field: "ourOffer", headerName: "Ajánlatunk", flex: 1.5, minWidth: 150 }, // Description mezők
+      { field: "mainTasks", headerName: "Fő Feladatok", flex: 1.5, minWidth: 150 },
+      { field: "jobRequirements", headerName: "Munkaköri Követelmények", flex: 2, minWidth: 180 },
+      { field: "advantages", headerName: "Előnyök", flex: 1.5, minWidth: 150 },
       {
         headerName: "Műveletek",
         field: "actions",
@@ -123,6 +129,7 @@ const CurrentJobs = () => {
     ],
     []
   );
+  
 
   return (
     <div className={styles.container}>

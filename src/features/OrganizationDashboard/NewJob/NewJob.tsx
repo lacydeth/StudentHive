@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import axios from "axios";
 import styles from "./NewJob.module.css";
 import Title from "../../../components/Title/Title";
@@ -20,6 +20,14 @@ interface DecodedToken {
 const NewJob = () => {
   const [title, setTitle] = useState("");
   const [hourlyrate, setHourlyRate] = useState("");
+  const [categories, setCategories] = useState([]);
+  const [selectedCategory, setSelectedCategory] = useState("");
+  const [ourOffer, setOurOffer] = useState("");
+  const [city, setCity] = useState("");
+  const [address, setAddress] = useState("");
+  const [mainTasks, setMainTasks] = useState("");
+  const [jobRequirements, setJobRequirements] = useState("");
+  const [advantages, setAdvantages] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [isSidebarOpen, setIsSidebarOpen] = useState(window.innerWidth >= 1000);
   const [isFaq1Open, setIsFaq1Open] = useState(false);
@@ -29,6 +37,19 @@ const NewJob = () => {
   const handleToggleSidebar = () => {
     setIsSidebarOpen(!isSidebarOpen);
   };
+
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const response = await axios.get("https://localhost:7067/api/organization/categories");
+        setCategories(response.data);
+      } catch (error) {
+        console.error("Failed to fetch categories:", error);
+        setError("Hiba történt a kategóriák betöltése közben.");
+      }
+    };
+    fetchCategories();
+  }, []);
 
   const getUserIdFromToken = (): string | null => {
     const token = localStorage.getItem("token");
@@ -59,7 +80,17 @@ const NewJob = () => {
 
       const response = await axios.post(
         "https://localhost:7067/api/organization/new-job",
-        { title, hourlyrate },
+        {
+          title,
+          hourlyrate,
+          categoryId: selectedCategory,
+          city,
+          address,
+          ourOffer,
+          mainTasks,
+          jobRequirements,
+          advantages
+        },
         {
           headers: { Authorization: `Bearer ${token}` },
         }
@@ -77,13 +108,13 @@ const NewJob = () => {
     }
   };
 
+
   return (
     <div className={styles.container}>
       <Sidebar isOpen={isSidebarOpen} toggleSidebar={handleToggleSidebar} topLinks={orgMenuLinks} />
       <div
-        className={`${styles.content} ${
-          isSidebarOpen ? styles.sidebarOpen : styles.sidebarClosed
-        }`}
+        className={`${styles.content} ${isSidebarOpen ? styles.sidebarOpen : styles.sidebarClosed
+          }`}
       >
         <DashboardTitle title="Munka létrehozása" icon="./more.png" subTitle="Munka létrehozása" />
         <div className={styles.newJobContent}>
@@ -109,10 +140,22 @@ const NewJob = () => {
                   <img src="./id-card.png" alt="last name icon" />
                 </div>
                 <div className={styles.inputBox}>
-                  <select>
-                    <option selected disabled>Válassz munkakört...</option>
+                  <select
+                    value={selectedCategory}
+                    onChange={(e) => setSelectedCategory(e.target.value)}
+                    required
+                  >
+                    <option value="" disabled>
+                      Válassz kategóriát...
+                    </option>
+                    {categories.map((category: { id: number; categoryName: string }) => (
+                      <option key={category.id} value={category.id}>
+                        {category.categoryName}
+                      </option>
+                    ))}
                   </select>
                 </div>
+
               </div>
               <div className={styles.row}>
                 {/* FAQ 1 */}
@@ -130,6 +173,8 @@ const NewJob = () => {
                         <input
                           type="text"
                           placeholder="Város"
+                          value={city}
+                          onChange={(e) => setCity(e.target.value)}
                           required
                         />
                         <img src="./mail.png" alt="city icon" />
@@ -138,6 +183,8 @@ const NewJob = () => {
                         <input
                           type="text"
                           placeholder="Cím"
+                          value={address}
+                          onChange={(e) => setAddress(e.target.value)}
                           required
                         />
                         <img src="./mail.png" alt="address icon" />
@@ -160,35 +207,40 @@ const NewJob = () => {
                       <div className={styles.inputBox}>
                         <input
                           type="text"
-                          placeholder="Kapcsolattartó neve"
+                          placeholder="Mit adunk?"
+                          value={ourOffer}
+                          onChange={(e) => setOurOffer(e.target.value)}
                           required
                         />
-                        <img src="./mail.png" alt="contact icon" />
                       </div>
                       <div className={styles.inputBox}>
                         <input
                           type="text"
-                          placeholder="Kapcsolattartó elérhetősége"
+                          placeholder="Főbb feladatok"
+                          value={mainTasks}
+                          onChange={(e) => setMainTasks(e.target.value)}
                           required
                         />
-                        <img src="./mail.png" alt="contact info icon" />
                       </div>
                       <div className={styles.inputBox}>
                         <input
                           type="text"
-                          placeholder="Kapcsolattartó neve"
+                          placeholder="Munka követelménye"
+                          value={jobRequirements}
+                          onChange={(e) => setJobRequirements(e.target.value)}
                           required
                         />
-                        <img src="./mail.png" alt="contact icon" />
                       </div>
                       <div className={styles.inputBox}>
                         <input
                           type="text"
-                          placeholder="Kapcsolattartó neve"
+                          placeholder="Előnyt jelent"
+                          value={advantages}
+                          onChange={(e) => setAdvantages(e.target.value)}
                           required
                         />
-                        <img src="./mail.png" alt="contact icon" />
                       </div>
+
                     </div>
                   )}
                 </div>
