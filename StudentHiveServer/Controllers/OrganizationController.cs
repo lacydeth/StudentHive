@@ -64,6 +64,7 @@ namespace StudentHiveServer.Controllers
         [HttpPost("new-job")]
         public async Task<IActionResult> AddJob([FromBody] JobRequest request)
         {
+            // Get user id from the JWT token (Claim)
             var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier); // JWT Claim for user ID
             if (userIdClaim == null)
             {
@@ -72,117 +73,191 @@ namespace StudentHiveServer.Controllers
 
             var loggedInUserId = userIdClaim.Value;
 
-            if (request == null || string.IsNullOrEmpty(request.Title) || string.IsNullOrEmpty(request.Category) || string.IsNullOrEmpty(request.Location))
+            // Validate input fields
+            if (request == null || string.IsNullOrEmpty(request.Title) ||
+                string.IsNullOrEmpty(request.City) || string.IsNullOrEmpty(request.Address) ||
+                string.IsNullOrEmpty(request.OurOffer) || string.IsNullOrEmpty(request.MainTasks) ||
+                string.IsNullOrEmpty(request.JobRequirements) || string.IsNullOrEmpty(request.Advantages))
             {
-                return BadRequest(new { message = "Minden mező kitöltése kötelező!" });
+                return BadRequest(new { message = "Minden mező kitöltése kötelező!" }); // "All fields are required!"
             }
 
+            // Begin a transaction to ensure data consistency
             try
             {
-                // Az AgentId mindig null
-                int? agentId = null;  // Mindig null az AgentId
+                // Insert into Description table
+                const string descriptionQuery = @"
+            INSERT INTO Description (OurOffer, MainTaks, JobRequirements, Advantages)
+            VALUES (@OurOffer, @MainTaks, @JobRequirements, @Advantages);
+            SELECT LAST_INSERT_ID();"; // This will return the last inserted ID
 
-                const string query = @"INSERT INTO jobs (OrganizationId, Title, Category, Location, Description, HourlyRate, ImagePath, AgentId)
-                               VALUES (@OrganizationId, @Title, @Category, @Location, @Description, @HourlyRate, @ImagePath, @AgentId)";
-
-                var parameters = new[]
+                var descriptionParameters = new[]
                 {
-            new MySqlParameter("@OrganizationId", loggedInUserId),
-            new MySqlParameter("@Title", request.Title),
-            new MySqlParameter("@Category", request.Category),
-            new MySqlParameter("@Location", request.Location),
-            new MySqlParameter("@Description", request.Description),
-            new MySqlParameter("@HourlyRate", request.HourlyRate),
-            new MySqlParameter("@ImagePath", request.ImagePath),
-            new MySqlParameter("@AgentId", (object)agentId ?? DBNull.Value)  // Null mindig
+            new MySqlParameter("@OurOffer", request.OurOffer),
+            new MySqlParameter("@MainTaks", request.MainTasks),
+            new MySqlParameter("@JobRequirements", request.JobRequirements),
+            new MySqlParameter("@Advantages", request.Advantages)
         };
 
-                await _dbHelper.ExecuteNonQueryAsync(query, parameters);
+                // Use ExecuteScalarAsync to get the inserted Description ID
+                var descriptionId = await _dbHelper.ExecuteScalarAsync<int>(descriptionQuery, descriptionParameters);
 
-                return Ok(new { message = "A munka sikeresen létrehozva!" });
+                // Check if the description ID is valid
+                if (descriptionId <= 0)
+                {
+                    throw new Exception("Description insert failed, no valid ID returned.");
+                }
+
+                // Insert into Jobs table
+                const string jobQuery = @"
+            INSERT INTO Jobs (OrganizationId, CategoryId, DescriptionId, Title, City, Address, HourlyRate, AgentId)
+            VALUES (@OrganizationId, @CategoryId, @DescriptionId, @Title, @City, @Address, @HourlyRate, @AgentId)";
+
+                var jobParameters = new[]
+                {
+            new MySqlParameter("@OrganizationId", loggedInUserId),
+            new MySqlParameter("@CategoryId", request.CategoryId),
+            new MySqlParameter("@DescriptionId", descriptionId),
+            new MySqlParameter("@Title", request.Title),
+            new MySqlParameter("@City", request.City),
+            new MySqlParameter("@Address", request.Address),
+            new MySqlParameter("@HourlyRate", request.HourlyRate),
+            new MySqlParameter("@AgentId", DBNull.Value)  // Always null for AgentId
+        };
+
+                var result = await _dbHelper.ExecuteNonQueryAsync(jobQuery, jobParameters);
+
+                if (result <= 0)
+                {
+                    throw new Exception("Job insert failed.");
+                }
+
+                return Ok(new { message = "A munka sikeresen létrehozva!" }); // "The job has been successfully created!"
             }
             catch (Exception ex)
             {
-                return StatusCode(500, new { message = "Hiba történt az adatok feldolgozása során.", error = ex.Message });
+                return StatusCode(500, new { message = "Hiba történt az adatok feldolgozása során.", error = ex.Message }); // "An error occurred while processing the data."
             }
         }
 
-        [HttpGet("jobs")]
-        public async Task<IActionResult> GetJobs()
-        {
-            // Get the logged-in user's ID from the token
-            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
-            if (userIdClaim == null)
-            {
-                return Unauthorized(new { message = "User is not authenticated." });
-            }
 
-            var loggedInUserId = userIdClaim.Value;
 
-            try
-            {
-                // Step 1: Get the OrganizationId for the logged-in user
-                const string getOrganizationQuery = "SELECT OrganizationId FROM Users WHERE Id = @UserId";
-                var organizationParameters = new[] {
+       [HttpGet("jobs")]
+public async Task<IActionResult> GetJobs()
+{
+    // Get the logged-in user's ID from the token
+    var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
+    if (userIdClaim == null)
+    {
+        return Unauthorized(new { message = "User is not authenticated." });
+    }
+
+    var loggedInUserId = userIdClaim.Value;
+
+    try
+    {
+        // Step 1: Get the OrganizationId for the logged-in user
+        const string getOrganizationQuery = "SELECT OrganizationId FROM Users WHERE Id = @UserId";
+        var organizationParameters = new[] {
             new MySqlParameter("@UserId", loggedInUserId)
         };
 
-                var organizationTable = await _dbHelper.ExecuteQueryAsync(getOrganizationQuery, organizationParameters);
-                if (organizationTable.Rows.Count == 0)
-                {
-                    return Unauthorized(new { message = "User does not belong to any organization." });
-                }
+        var organizationTable = await _dbHelper.ExecuteQueryAsync(getOrganizationQuery, organizationParameters);
+        if (organizationTable.Rows.Count == 0)
+        {
+            return Unauthorized(new { message = "User does not belong to any organization." });
+        }
 
-                var organizationId = organizationTable.Rows[0].Field<int>("OrganizationId");
+        var organizationId = organizationTable.Rows[0].Field<int>("OrganizationId");
 
-                // Step 2: Fetch jobs for the organization, including agent details
-                const string query = @"
+        // Step 2: Fetch jobs for the organization, including category and description details
+        const string query = @"
             SELECT 
                 j.Id, 
                 j.Title, 
-                j.Category, 
-                j.Location, 
+                j.CategoryId, 
+                c.CategoryName AS CategoryName,  -- Fetch only CategoryName
+                j.City, 
+                j.Address, 
                 j.HourlyRate, 
-                j.AgentId, 
+                NULL AS AgentId,  -- Set AgentId to null
                 j.CreatedAt, 
+                j.IsActive,
+                j.DescriptionId,
+                d.OurOffer, 
+                d.MainTaks, 
+                d.JobRequirements, 
+                d.Advantages,
                 u.FirstName AS AgentFirstName, 
                 u.LastName AS AgentLastName, 
                 o.Name AS OrganizationName 
             FROM Jobs j
-            JOIN Users u ON j.AgentId = u.Id 
-            JOIN Organizations o ON j.OrganizationId = o.Id 
-            WHERE j.OrganizationId = @OrganizationId";
+            LEFT JOIN Categories c ON j.CategoryId = c.Id  -- Join Category table (fetch CategoryName only)
+            LEFT JOIN Users u ON j.AgentId = u.Id 
+            LEFT JOIN Organizations o ON j.OrganizationId = o.Id 
+            LEFT JOIN Description d ON j.DescriptionId = d.Id  -- Join Description table
+            WHERE j.OrganizationId = @OrganizationId
+            AND j.DescriptionId IS NOT NULL";  // Ensure jobs have a DescriptionId
 
-                var jobParameters = new[] {
+        var jobParameters = new[] {
             new MySqlParameter("@OrganizationId", organizationId)
         };
 
-                var dataTable = await _dbHelper.ExecuteQueryAsync(query, jobParameters);
+        var dataTable = await _dbHelper.ExecuteQueryAsync(query, jobParameters);
 
-                // Map the jobs to a list
-                var jobs = dataTable.AsEnumerable().Select(row => new
+        // Map the jobs to a list
+        var jobs = dataTable.AsEnumerable().Select(row => new
+        {
+            Id = row.Field<int>("Id"),
+            Title = row.Field<string>("Title"),
+            CategoryName = row.Field<string>("CategoryName"),  // Only category name
+            City = row.Field<string>("City"),
+            Address = row.Field<string>("Address"),
+            HourlyRate = row.Field<int>("HourlyRate"),
+            AgentId = (int?)null,  // Ensure AgentId is always null
+            CreatedAt = row.Field<DateTime>("CreatedAt").ToString("yyyy-MM-dd"),
+            IsActive = row.Field<bool>("IsActive"),
+            DescriptionId = row.Field<int>("DescriptionId"),
+            OurOffer = row.Field<string>("OurOffer"),
+            MainTaks = row.Field<string>("MainTaks"),
+            JobRequirements = row.Field<string>("JobRequirements"),
+            Advantages = row.Field<string>("Advantages"),
+            AgentFirstName = row.Field<string>("AgentFirstName"),
+            AgentLastName = row.Field<string>("AgentLastName"),
+            OrganizationName = row.Field<string>("OrganizationName")
+        }).ToList();
+
+        return Ok(jobs);
+    }
+    catch (Exception ex)
+    {
+        return StatusCode(500, new { message = "Error loading data!", details = ex.Message });
+    }
+}
+
+
+
+        [HttpGet("categories")]
+        public async Task<IActionResult> GetCategories()
+        {
+            try
+            {
+                const string query = "SELECT Id, CategoryName FROM Categories";
+                var categoriesTable = await _dbHelper.ExecuteQueryAsync(query);
+
+                var categories = categoriesTable.AsEnumerable().Select(row => new
                 {
                     Id = row.Field<int>("Id"),
-                    Title = row.Field<string>("Title"),
-                    Category = row.Field<string>("Category"),
-                    Location = row.Field<string>("Location"),
-                    HourlyRate = row.Field<int>("HourlyRate"),
-                    AgentFirstName = row.Field<string>("AgentFirstName"),
-                    AgentLastName = row.Field<string>("AgentLastName"),
-                    OrganizationName = row.Field<string>("OrganizationName"),
-                    CreatedAt = row.Field<DateTime>("CreatedAt").ToString("yyyy-MM-dd")
+                    CategoryName = row.Field<string>("CategoryName")
                 }).ToList();
 
-                return Ok(jobs);
+                return Ok(categories);
             }
             catch (Exception ex)
             {
-                return StatusCode(500, new { message = "Hiba az adatok betöltése során!", details = ex.Message });
+                return StatusCode(500, new { message = "An error occurred while fetching categories.", details = ex.Message });
             }
         }
-
-
-
 
         [HttpGet("agents")]
         public async Task<IActionResult> GetAgents()
@@ -319,14 +394,15 @@ namespace StudentHiveServer.Controllers
 
         public class JobRequest
         {
-            public int OrganizationId { get; set; }
-            public int AgentId { get; set; } = 0;
             public string Title { get; set; }
-            public string Category { get; set; }
-            public string Location { get; set; }
-            public string Description { get; set; }
-            public double HourlyRate { get; set; }
-            public string ImagePath { get; set; }
+            public int CategoryId { get; set; }
+            public string City { get; set; }
+            public string Address { get; set; }
+            public int HourlyRate { get; set; }
+            public string OurOffer { get; set; }
+            public string MainTasks { get; set; }
+            public string JobRequirements { get; set; }
+            public string Advantages { get; set; }
         }
 
     }
