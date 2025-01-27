@@ -19,13 +19,11 @@ interface DecodedToken {
 
 const NewJob = () => {
   const [title, setTitle] = useState("");
-  const [category, setCategory] = useState("");
-  const [location, setLocation] = useState("");
-  const [description, setDescription] = useState("");
   const [hourlyrate, setHourlyRate] = useState("");
-  const [imagepath, setImagePath] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [isSidebarOpen, setIsSidebarOpen] = useState(window.innerWidth >= 1000);
+  const [isFaq1Open, setIsFaq1Open] = useState(false);
+  const [isFaq2Open, setIsFaq2Open] = useState(false);
   const navigate = useNavigate();
 
   const handleToggleSidebar = () => {
@@ -51,43 +49,33 @@ const NewJob = () => {
       setError("User is not authenticated.");
       return;
     }
-  
+
     try {
       const token = localStorage.getItem("token");
       if (!token) {
         setError("No authentication token found.");
         return;
       }
-  
-      // Az AgentId mindig 0-ra állítva, ha nem adtad meg
+
       const response = await axios.post(
         "https://localhost:7067/api/organization/new-job",
+        { title, hourlyrate },
         {
-          title,
-          category,
-          location,
-          description,
-          hourlyrate,
-          imagepath,
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`, // Send the token to authenticate the request
-          },
+          headers: { Authorization: `Bearer ${token}` },
         }
       );
-  
+
       console.log("New job created!:", response.data);
       setError(null);
       navigate("/current-jobs");
     } catch (error: any) {
       if (error.response?.data?.message) {
         setError(error.response.data.message);
+      } else {
         setError("An unknown error occurred.");
       }
     }
   };
-  
 
   return (
     <div className={styles.container}>
@@ -97,7 +85,7 @@ const NewJob = () => {
           isSidebarOpen ? styles.sidebarOpen : styles.sidebarClosed
         }`}
       >
-        <DashboardTitle title="Munka létrehozása" icon="./more.png" subTitle="Munka létrehozása"/>
+        <DashboardTitle title="Munka létrehozása" icon="./more.png" subTitle="Munka létrehozása" />
         <div className={styles.newJobContent}>
           <Title subTitle="Munka létrehozása" title="Adj hozzá új munkát pár adat megadásával!" />
           {error && <p style={{ color: "red" }}>{error}</p>}
@@ -109,7 +97,7 @@ const NewJob = () => {
             }}
           >
             <div className={styles.formWrapper}>
-              <div className={styles.column}>
+              <div className={styles.row}>
                 <div className={styles.inputBox}>
                   <input
                     type="text"
@@ -121,61 +109,105 @@ const NewJob = () => {
                   <img src="./id-card.png" alt="last name icon" />
                 </div>
                 <div className={styles.inputBox}>
-                  <input
-                    type="text"
-                    placeholder="Kategória"
-                    value={category}
-                    onChange={(e) => setCategory(e.target.value)}
-                    required
-                  />
-                  <img src="./id-card.png" alt="first name icon" />
-                </div>
-                <div className={styles.inputBox}>
-                  <input
-                    type="text"
-                    placeholder="Munkavégzés helye"
-                    value={location}
-                    onChange={(e) => setLocation(e.target.value)}
-                    required
-                    />
-                  <img src="./mail.png" alt="email icon" />
+                  <select>
+                    <option selected disabled>Válassz munkakört...</option>
+                  </select>
                 </div>
               </div>
-              <div className={styles.column}>
-                <div className={styles.inputBox}>
-                  <input
-                    type="text"
-                    placeholder="Leírás"
-                    value={description}
-                    onChange={(e) => setDescription(e.target.value)}
-                    required
-                  />
-                  <img src="./mail.png" alt="email icon" />
+              <div className={styles.row}>
+                {/* FAQ 1 */}
+                <div className={styles.faqElement}>
+                  <div className={styles.faqTitle}>
+                    <h2>Munkavégzés helye</h2>
+                    <img
+                      onClick={() => setIsFaq1Open(!isFaq1Open)}
+                      src={isFaq1Open ? "./src/assets/minus-sign.png" : "./src/assets/plus-sign.png"}
+                    />
+                  </div>
+                  {isFaq1Open && (
+                    <div className={styles.faqContent}>
+                      <div className={styles.inputBox}>
+                        <input
+                          type="text"
+                          placeholder="Város"
+                          required
+                        />
+                        <img src="./mail.png" alt="city icon" />
+                      </div>
+                      <div className={styles.inputBox}>
+                        <input
+                          type="text"
+                          placeholder="Cím"
+                          required
+                        />
+                        <img src="./mail.png" alt="address icon" />
+                      </div>
+                    </div>
+                  )}
                 </div>
+
+                {/* FAQ 2 */}
+                <div className={styles.faqElement}>
+                  <div className={`${styles.faqTitle} ${isFaq2Open ? "open" : ""}`}>
+                    <h2>Leírás megadása</h2>
+                    <img
+                      onClick={() => setIsFaq2Open(!isFaq2Open)}
+                      src={isFaq2Open ? "./src/assets/minus-sign.png" : "./src/assets/plus-sign.png"}
+                    />
+                  </div>
+                  {isFaq2Open && (
+                    <div className={styles.faqContent}>
+                      <div className={styles.inputBox}>
+                        <input
+                          type="text"
+                          placeholder="Kapcsolattartó neve"
+                          required
+                        />
+                        <img src="./mail.png" alt="contact icon" />
+                      </div>
+                      <div className={styles.inputBox}>
+                        <input
+                          type="text"
+                          placeholder="Kapcsolattartó elérhetősége"
+                          required
+                        />
+                        <img src="./mail.png" alt="contact info icon" />
+                      </div>
+                      <div className={styles.inputBox}>
+                        <input
+                          type="text"
+                          placeholder="Kapcsolattartó neve"
+                          required
+                        />
+                        <img src="./mail.png" alt="contact icon" />
+                      </div>
+                      <div className={styles.inputBox}>
+                        <input
+                          type="text"
+                          placeholder="Kapcsolattartó neve"
+                          required
+                        />
+                        <img src="./mail.png" alt="contact icon" />
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
+              <div className={styles.row}>
                 <div className={styles.inputBox}>
                   <input
-                    type="text"
+                    type="number"
                     placeholder="Órabér"
                     value={hourlyrate}
                     onChange={(e) => setHourlyRate(e.target.value)}
                     required
                   />
-                  <img src="./mail.png" alt="email icon" />
-                </div>
-                <div className={styles.inputBox}>
-                  <input
-                    type="text"
-                    placeholder="kép url"
-                    value={imagepath}
-                    onChange={(e) => setImagePath(e.target.value)}
-                    required
-                  />
-                  <img src="./mail.png" alt="email icon" />
+                  <img src="./hourly-rate.png" alt="hourly rate icon" />
                 </div>
               </div>
             </div>
             <button type="submit" className={styles.registerBtn}>
-              közvetítő hozzáadása
+              munka létrehozása
             </button>
           </form>
         </div>

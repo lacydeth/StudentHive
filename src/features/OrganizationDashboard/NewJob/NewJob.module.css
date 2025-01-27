@@ -26,7 +26,11 @@
   text-align: center;
   flex-direction: column;
 }
-
+.formWrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 25px;
+}
 .newJobForm {
   display: flex;
   flex-direction: column;
@@ -34,7 +38,7 @@
   justify-content: center;
   gap: 25px;
 }
-.column {
+.row {
   display: flex;
   flex-direction: column;
   gap: 25px;
@@ -50,13 +54,11 @@
   outline: 0;
   margin-bottom: 15px;
 }
-
 .inputBox {
   position: relative;
   width: 280px;
 }
-
-.inputBox input {
+.inputBox input, .inputBox select {
   border: none;
   padding: 15px 20px;
   background-color: #fff;
@@ -64,21 +66,50 @@
   width: 100%;
   border-radius: 8px;
 }
-
-.inputBox input:focus {
+.inputBox input:focus, .inputBox select:focus {
   outline: 2px solid #99BC85;
 }
-
 .inputBox img {
   position: absolute;
   top: 13px;
   right: 15px;
 }
+.faqElement {
+  .faqTitle {
+    display: flex;
+    width: 280px;
+    padding: 15px 20px;
+    background-color: #fff;
+    border-radius: 8px;
+    justify-content: space-between;
+    align-items: center;
+    h2 {
+      font-size: 16px;
+      max-width: 80%;
+      font-weight: 400;
+      color: #757575;
+    }
+    img {
+      width: 24px;
+    }
+  }
+  .faqContent {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    margin-top: 15px;
+  }
+  .faqTitle.open {
+    border: 2px solid #99BC85;
+  }
+}
 
 @media screen and (min-width:820px) {
   .formWrapper {
       display: flex;
-      gap: 15px;
-      flex-direction: row;
+      flex-direction: column;
+  }
+  .row {
+    flex-direction: row;
   }
 }
