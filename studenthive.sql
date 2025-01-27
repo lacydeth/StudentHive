@@ -62,13 +62,6 @@ CREATE TABLE `Jobs` (
   `IsActive` BOOLEAN DEFAULT true,
   `CreatedAt` TIMESTAMP DEFAULT (CURRENT_TIMESTAMP)
 );
--- Munkák beszúrása
-INSERT INTO `Jobs` (`OrganizationId`, `CategoryId`, `AgentId`, `DescriptionId`, `Title`, `City`, `Address`, `HourlyRate`, `IsActive`) 
-VALUES 
-(1, 1, 2, 1, 'Irodai asszisztens', 'Elsőváros', 'Iroda utca 123.', 15, true),
-(2, 3, 4, 2, 'Raktári dolgozó', 'Másodikváros', 'Raktár utca 456.', 18, true),
-(1, 5, 2, 3, 'Szoftverfejlesztő', 'Elsőváros', 'Technológia út 789.', 25, true);
-
 CREATE TABLE `Description` (
   `Id` INT PRIMARY KEY AUTO_INCREMENT,
   `OurOffer` TEXT NOT NULL,
@@ -76,11 +69,6 @@ CREATE TABLE `Description` (
   `JobRequirements` TEXT NOT NULL,
   `Advantages` TEXT NOT NULL
 );
-INSERT INTO `Description` (`OurOffer`, `MainTaks`, `JobRequirements`, `Advantages`) 
-VALUES 
-('Versenyképes fizetés, rugalmas munkaidő', 'Irodai feladatok segítése', 'Jó kommunikációs készségek', 'Tapasztalat hasonló munkakörben'),
-('Jó munkakörnyezet, egészségügyi juttatások', 'Áruk rakodása és ki- illetve berakodása a raktárban', 'Fizikai erőnlét, pontosság', 'Tapasztalat raktári munkákban'),
-('Magas fizetés, lehetőség legújabb technológiákkal dolgozni', 'Szoftverek fejlesztése és karbantartása', 'Programozási nyelvek ismerete', 'Tapasztalat szoftverfejlesztésben');
 CREATE TABLE `Applications` (
   `Id` INT PRIMARY KEY AUTO_INCREMENT,
   `JobId` INT NOT NULL,
