@@ -3,11 +3,29 @@ CREATE TABLE `Roles` (
   `RoleName` VARCHAR(50) UNIQUE NOT NULL
 );
 
+CREATE TABLE `Categories` (
+  `Id` INT PRIMARY KEY AUTO_INCREMENT,
+  `CategoryName` VARCHAR(100) UNIQUE NOT NULL,
+  `ImagePath` VARCHAR(100) NOT NULL
+);
 INSERT INTO `roles` (`Id`, `RoleName`) VALUES
 (1, 'Admin'),
 (3, 'Agent'),
 (2, 'Organization'),
 (4, 'User');
+
+INSERT INTO Categories (CategoryName, ImagePath) VALUES
+('Adminisztratív, irodai', '/categories/irodai-munka.jpg'),
+('Áruházi, bolti, eladói', '/categories/aruhazi-munka.jpg'),
+('Fizikai, gyári, raktári', '/categories/gyari-munka.jpg'),
+('Gazdasági, pénzügyi, marketing', '/categories/marketing-munka.jpg'),
+('Informatikai, mérnöki, műszaki', '/categories/mernok-munka.jpg'),
+('Mezőgazdasági', '/categories/mezogazdasagi-munka.jpg'),
+('Mozi', '/categories/mozi-munka.jpg'),
+('Telefonos munkák, értékesítés, piackutatás', '/categories/piackutatas-munka.jpg'),
+('Promóciós, host/hostess, animátor', '/categories/hostess-munka.jpg'),
+('Vendéglátás, gyorsétterem, idegenforgalom', '/categories/gyorsetterem-munka.jfif'),
+('Egyéb', '/categories/other.jfif');
 
 CREATE TABLE `Organizations` (
   `Id` INT PRIMARY KEY AUTO_INCREMENT,
@@ -15,6 +33,7 @@ CREATE TABLE `Organizations` (
   `Address` VARCHAR(255),
   `ContactEmail` VARCHAR(100),
   `ContactPhone` VARCHAR(15),
+  `IsActive` BOOLEAN DEFAULT true,
   `CreatedAt` TIMESTAMP DEFAULT (CURRENT_TIMESTAMP)
 );
 
@@ -33,14 +52,36 @@ CREATE TABLE `Users` (
 CREATE TABLE `Jobs` (
   `Id` INT PRIMARY KEY AUTO_INCREMENT,
   `OrganizationId` INT NOT NULL,
+  `CategoryId` VARCHAR(255) NOT NULL,
   `AgentId` INT,
+  `DescriptionId` INT,
   `Title` VARCHAR(255) NOT NULL,
-  `Category` VARCHAR(255) NOT NULL,
-  `Location` VARCHAR(120) NOT NULL,
-  `Description` TEXT NOT NULL,
+  `City` VARCHAR(50) NOT NULL,
+  `Address` VARCHAR(50) NOT NULL,
   `HourlyRate` INT NOT NULL,
-  `ImagePath` VARCHAR(255),
+  `IsActive` BOOLEAN DEFAULT true,
   `CreatedAt` TIMESTAMP DEFAULT (CURRENT_TIMESTAMP)
+);
+-- Munkák beszúrása
+INSERT INTO `Jobs` (`OrganizationId`, `CategoryId`, `AgentId`, `DescriptionId`, `Title`, `City`, `Address`, `HourlyRate`, `IsActive`) 
+VALUES 
+(1, 1, 2, 1, 'Irodai asszisztens', 'Elsőváros', 'Iroda utca 123.', 15, true),
+(2, 3, 4, 2, 'Raktári dolgozó', 'Másodikváros', 'Raktár utca 456.', 18, true),
+(1, 5, 2, 3, 'Szoftverfejlesztő', 'Elsőváros', 'Technológia út 789.', 25, true);
+
+-- Munkák leírásainak beszúrása
+INSERT INTO `Description` (`OurOffer`, `MainTaks`, `JobRequirements`, `Advantages`) 
+VALUES 
+('Versenyképes fizetés, rugalmas munkaidő', 'Irodai feladatok segítése', 'Jó kommunikációs készségek', 'Tapasztalat hasonló munkakörben'),
+('Jó munkakörnyezet, egészségügyi juttatások', 'Áruk rakodása és ki- illetve berakodása a raktárban', 'Fizikai erőnlét, pontosság', 'Tapasztalat raktári munkákban'),
+('Magas fizetés, lehetőség legújabb technológiákkal dolgozni', 'Szoftverek fejlesztése és karbantartása', 'Programozási nyelvek ismerete', 'Tapasztalat szoftverfejlesztésben');
+
+CREATE TABLE `Description` (
+  `Id` INT PRIMARY KEY AUTO_INCREMENT,
+  `OurOffer` TEXT NOT NULL,
+  `MainTaks` TEXT NOT NULL,
+  `JobRequirements` TEXT NOT NULL,
+  `Advantages` TEXT NOT NULL
 );
 
 CREATE TABLE `Applications` (
@@ -86,9 +127,7 @@ CREATE TABLE `StudentDetails` (
   `PlaceOfBirth` VARCHAR(100) NOT NULL,
   `Gender` ENUM ('Male', 'Female', 'Other') NOT NULL,
   `Citizenship` VARCHAR(50) NOT NULL,
-  `TAJNumber` CHAR(9) UNIQUE NOT NULL,
   `StudentCardNumber` VARCHAR(20) UNIQUE NOT NULL,
-  `TaxIdentificationNumber` CHAR(10) UNIQUE NOT NULL,
   `BankAccountNumber` VARCHAR(30) NOT NULL,
   `Country` VARCHAR(50) NOT NULL,
   `PostalCode` VARCHAR(10) NOT NULL,
@@ -112,6 +151,10 @@ CREATE TABLE `History` (
 ALTER TABLE `Users` ADD FOREIGN KEY (`OrganizationId`) REFERENCES `Organizations` (`Id`);
 
 ALTER TABLE `Users` ADD FOREIGN KEY (`RoleId`) REFERENCES `Roles` (`Id`);
+
+ALTER TABLE `Jobs` ADD FOREIGN KEY (`DescriptionId`) REFERENCES `Description` (`Id`);
+
+ALTER TABLE `Jobs` ADD FOREIGN KEY (`CategoryId`) REFERENCES `Categories` (`Id`);
 
 ALTER TABLE `Jobs` ADD FOREIGN KEY (`OrganizationId`) REFERENCES `Organizations` (`Id`);
 
