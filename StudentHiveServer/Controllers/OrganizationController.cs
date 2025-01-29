@@ -142,45 +142,45 @@ namespace StudentHiveServer.Controllers
 
 
 
-       [HttpGet("jobs")]
-public async Task<IActionResult> GetJobs()
-{
-    // Get the logged-in user's ID from the token
-    var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
-    if (userIdClaim == null)
-    {
-        return Unauthorized(new { message = "User is not authenticated." });
-    }
+        [HttpGet("jobs")]
+        public async Task<IActionResult> GetJobs([FromQuery] bool? isActive)
+        {
+            // Get the logged-in user's ID from the token
+            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
+            if (userIdClaim == null)
+            {
+                return Unauthorized(new { message = "User is not authenticated." });
+            }
 
-    var loggedInUserId = userIdClaim.Value;
+            var loggedInUserId = userIdClaim.Value;
 
-    try
-    {
-        // Step 1: Get the OrganizationId for the logged-in user
-        const string getOrganizationQuery = "SELECT OrganizationId FROM Users WHERE Id = @UserId";
-        var organizationParameters = new[] {
+            try
+            {
+                // Step 1: Get the OrganizationId for the logged-in user
+                const string getOrganizationQuery = "SELECT OrganizationId FROM Users WHERE Id = @UserId";
+                var organizationParameters = new[] {
             new MySqlParameter("@UserId", loggedInUserId)
         };
 
-        var organizationTable = await _dbHelper.ExecuteQueryAsync(getOrganizationQuery, organizationParameters);
-        if (organizationTable.Rows.Count == 0)
-        {
-            return Unauthorized(new { message = "User does not belong to any organization." });
-        }
+                var organizationTable = await _dbHelper.ExecuteQueryAsync(getOrganizationQuery, organizationParameters);
+                if (organizationTable.Rows.Count == 0)
+                {
+                    return Unauthorized(new { message = "User does not belong to any organization." });
+                }
 
-        var organizationId = organizationTable.Rows[0].Field<int>("OrganizationId");
+                var organizationId = organizationTable.Rows[0].Field<int>("OrganizationId");
 
-        // Step 2: Fetch jobs for the organization, including category and description details
-        const string query = @"
+                // Step 2: Fetch jobs for the organization, including category and description details
+                var query = @"
             SELECT 
                 j.Id, 
                 j.Title, 
                 j.CategoryId, 
-                c.CategoryName AS CategoryName,  -- Fetch only CategoryName
+                c.CategoryName AS CategoryName, 
                 j.City, 
                 j.Address, 
                 j.HourlyRate, 
-                NULL AS AgentId,  -- Set AgentId to null
+                NULL AS AgentId, 
                 j.CreatedAt, 
                 j.IsActive,
                 j.DescriptionId,
@@ -192,48 +192,56 @@ public async Task<IActionResult> GetJobs()
                 u.LastName AS AgentLastName, 
                 o.Name AS OrganizationName 
             FROM Jobs j
-            LEFT JOIN Categories c ON j.CategoryId = c.Id  -- Join Category table (fetch CategoryName only)
+            LEFT JOIN Categories c ON j.CategoryId = c.Id 
             LEFT JOIN Users u ON j.AgentId = u.Id 
             LEFT JOIN Organizations o ON j.OrganizationId = o.Id 
-            LEFT JOIN Description d ON j.DescriptionId = d.Id  -- Join Description table
+            LEFT JOIN Description d ON j.DescriptionId = d.Id 
             WHERE j.OrganizationId = @OrganizationId
-            AND j.DescriptionId IS NOT NULL";  // Ensure jobs have a DescriptionId
+            AND j.DescriptionId IS NOT NULL";
 
-        var jobParameters = new[] {
-            new MySqlParameter("@OrganizationId", organizationId)
+                if (isActive.HasValue)
+                {
+                    query += " AND j.IsActive = @IsActive";
+                }
+
+                var jobParameters = new[] {
+            new MySqlParameter("@OrganizationId", organizationId),
+            new MySqlParameter("@IsActive", 1) // Default to active jobs (IsActive = 1)
         };
 
-        var dataTable = await _dbHelper.ExecuteQueryAsync(query, jobParameters);
+                var dataTable = await _dbHelper.ExecuteQueryAsync(query, jobParameters);
 
-        // Map the jobs to a list
-        var jobs = dataTable.AsEnumerable().Select(row => new
-        {
-            Id = row.Field<int>("Id"),
-            Title = row.Field<string>("Title"),
-            CategoryName = row.Field<string>("CategoryName"),  // Only category name
-            City = row.Field<string>("City"),
-            Address = row.Field<string>("Address"),
-            HourlyRate = row.Field<int>("HourlyRate"),
-            AgentId = (int?)null,  // Ensure AgentId is always null
-            CreatedAt = row.Field<DateTime>("CreatedAt").ToString("yyyy-MM-dd"),
-            IsActive = row.Field<bool>("IsActive"),
-            DescriptionId = row.Field<int>("DescriptionId"),
-            OurOffer = row.Field<string>("OurOffer"),
-            MainTaks = row.Field<string>("MainTaks"),
-            JobRequirements = row.Field<string>("JobRequirements"),
-            Advantages = row.Field<string>("Advantages"),
-            AgentFirstName = row.Field<string>("AgentFirstName"),
-            AgentLastName = row.Field<string>("AgentLastName"),
-            OrganizationName = row.Field<string>("OrganizationName")
-        }).ToList();
+                // Map the jobs to a list
+                var jobs = dataTable.AsEnumerable().Select(row => new
+                {
+                    Id = row.Field<int>("Id"),
+                    Title = row.Field<string>("Title"),
+                    CategoryName = row.Field<string>("CategoryName"),
+                    City = row.Field<string>("City"),
+                    Address = row.Field<string>("Address"),
+                    HourlyRate = row.Field<int>("HourlyRate"),
+                    AgentId = (int?)null,  // Ensure AgentId is always null
+                    CreatedAt = row.Field<DateTime>("CreatedAt").ToString("yyyy-MM-dd"),
+                    IsActive = row.Field<bool>("IsActive"),
+                    DescriptionId = row.Field<int>("DescriptionId"),
+                    OurOffer = row.Field<string>("OurOffer"),
+                    MainTaks = row.Field<string>("MainTaks"),
+                    JobRequirements = row.Field<string>("JobRequirements"),
+                    Advantages = row.Field<string>("Advantages"),
+                    AgentFirstName = row.Field<string>("AgentFirstName"),
+                    AgentLastName = row.Field<string>("AgentLastName"),
+                    OrganizationName = row.Field<string>("OrganizationName")
+                }).ToList();
 
-        return Ok(jobs);
-    }
-    catch (Exception ex)
-    {
-        return StatusCode(500, new { message = "Error loading data!", details = ex.Message });
-    }
-}
+                return Ok(jobs);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "Error loading data!", details = ex.Message });
+            }
+        }
+
+
 
 
 
@@ -314,6 +322,67 @@ public async Task<IActionResult> GetJobs()
                 return StatusCode(500, new { message = "Error fetching data", details = ex.Message });
             }
         }
+
+        [HttpPatch("isactive/{jobId}")]
+        public async Task<IActionResult> UpdateJobStatus(int jobId, [FromBody] JobStatusUpdateRequest request)
+        {
+            // Check if the user is authenticated
+            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier); // JWT Claim for user ID
+            if (userIdClaim == null)
+            {
+                return Unauthorized(new { message = "User is not authenticated." });
+            }
+
+            var loggedInUserId = userIdClaim.Value;
+
+            try
+            {
+                // Step 1: Check if the job belongs to the logged-in user's organization
+                const string checkQuery = "SELECT OrganizationId FROM Jobs WHERE Id = @JobId";
+                var checkParameters = new[] { new MySqlParameter("@JobId", jobId) };
+
+                var jobTable = await _dbHelper.ExecuteQueryAsync(checkQuery, checkParameters);
+
+                if (jobTable.Rows.Count == 0)
+                {
+                    return NotFound(new { message = "Job not found." });
+                }
+
+                var organizationId = jobTable.Rows[0].Field<int>("OrganizationId");
+
+                if (organizationId != int.Parse(loggedInUserId))
+                {
+                    return Unauthorized(new { message = "You do not have permission to update this job's status." });
+                }
+
+                // Step 2: Update the IsActive status
+                const string updateQuery = "UPDATE Jobs SET IsActive = @IsActive WHERE Id = @JobId";
+                var updateParameters = new[]
+                {
+            new MySqlParameter("@IsActive", request.IsActive),
+            new MySqlParameter("@JobId", jobId)
+        };
+
+                var result = await _dbHelper.ExecuteNonQueryAsync(updateQuery, updateParameters);
+
+                if (result <= 0)
+                {
+                    return StatusCode(500, new { message = "An error occurred while updating the job status." });
+                }
+
+                return Ok(new { message = "Job status updated successfully." });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "Error occurred while updating job status.", details = ex.Message });
+            }
+        }
+
+        public class JobStatusUpdateRequest
+        {
+            public bool IsActive { get; set; }
+        }
+
 
         [HttpDelete("delete-agent/{Id}")]
         public async Task<IActionResult> DeleteAgent(int Id)
