@@ -17,7 +17,9 @@ ModuleRegistry.registerModules([ClientSideRowModelModule]);
 const CurrentJobs = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(window.innerWidth >= 1000);
   const [dialogContent, setDialogContent] = useState<React.ReactNode>(null);
-  const [rowData, setRowData] = useState<any[]>([]);
+  const [rowData, setRowData] = useState<any[]>([]);  // All Jobs
+  const [activeJobs, setActiveJobs] = useState<any[]>([]);  // Active Jobs
+  const [inactiveJobs, setInactiveJobs] = useState<any[]>([]);  // Inactive Jobs
   const gridRef = useRef<AgGridReact<any>>(null);
   const dialogRef = useRef<HTMLDialogElement>(null);
 
@@ -34,7 +36,7 @@ const CurrentJobs = () => {
         },
       });
       
-      setRowData(response.data.map((job: any) => ({
+      const allJobs = response.data.map((job: any) => ({
         ...job,
         categoryName: job.categoryName, // Kategória neve
         agentId: null, // AgentId mindig null
@@ -42,12 +44,19 @@ const CurrentJobs = () => {
         mainTasks: job.mainTaks, // Description MainTasks
         jobRequirements: job.jobRequirements, // Description JobRequirements
         advantages: job.advantages, // Description Advantages
-      })));
+      }));
+      
+      // Filter active and inactive jobs
+      const active = allJobs.filter((job) => job.isActive);
+      const inactive = allJobs.filter((job) => !job.isActive);
+      
+      setRowData(allJobs);  // Store all jobs
+      setActiveJobs(active);  // Store active jobs
+      setInactiveJobs(inactive);  // Store inactive jobs
     } catch (error) {
       console.error("Error fetching jobs:", error);
     }
   };
-  
 
   const deleteJob = async (jobId: number) => {
     try {
@@ -78,6 +87,27 @@ const CurrentJobs = () => {
       : dialogRef.current.showModal();
   };
 
+  const Isactive = async (jobId: number, currentStatus: boolean) => {
+    try {
+      const token = localStorage.getItem("token");
+      const updatedStatus = !currentStatus; // Toggle the status
+      await axios.patch(
+        `https://localhost:7067/api/organization/isactive/${jobId}`,
+        { jobId, isActive: updatedStatus },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      fetchJobs(); // Reload jobs to reflect the updated status
+      alert(`A munka státusza ${updatedStatus ? "aktívvá" : "inaktívvá"} vált!`);
+    } catch (error) {
+      console.error("Error updating job status:", error);
+      alert("Hiba történt a státusz frissítése során.");
+    }
+  };
+
   const actionCellRenderer = (params: any) => {
     const job = params.data;
     return (
@@ -86,6 +116,16 @@ const CurrentJobs = () => {
         <button
           onClick={() => {
             toggleDialog();
+          }}
+          className={styles.actionBtn}
+        >
+          <img src="./view.png" alt="View" />
+        </button>
+
+        {/* Inaktivitás gomb */}
+        <button
+          onClick={() => {
+            Isactive(job.id, job.isActive); // Pass job id and current status
           }}
           className={styles.actionBtn}
         >
@@ -111,12 +151,12 @@ const CurrentJobs = () => {
     () => [
       { field: "id", headerName: "Azonosító", flex: 0.5, minWidth: 100 },
       { field: "title", headerName: "Cím", flex: 1.5, minWidth: 150 },
-      { field: "categoryName", headerName: "Kategória", flex: 1, minWidth: 120 }, // CategoryName jelenik meg
+      { field: "categoryName", headerName: "Kategória", flex: 1, minWidth: 120 },
       { field: "city", headerName: "Helyszín", flex: 1.5, minWidth: 150 },
       { field: "address", headerName: "Cím", flex: 1, minWidth: 150 },
       { field: "hourlyRate", headerName: "Órabér", flex: 1, minWidth: 120 },
       { field: "isActive", headerName: "Aktív", flex: 1, minWidth: 120, valueGetter: (params: any) => (params.data.isActive ? "Igen" : "Nem") },
-      { field: "ourOffer", headerName: "Ajánlatunk", flex: 1.5, minWidth: 150 }, // Description mezők
+      { field: "ourOffer", headerName: "Ajánlatunk", flex: 1.5, minWidth: 150 },
       { field: "mainTasks", headerName: "Fő Feladatok", flex: 1.5, minWidth: 150 },
       { field: "jobRequirements", headerName: "Munkaköri Követelmények", flex: 2, minWidth: 180 },
       { field: "advantages", headerName: "Előnyök", flex: 1.5, minWidth: 150 },
@@ -129,7 +169,6 @@ const CurrentJobs = () => {
     ],
     []
   );
-  
 
   return (
     <div className={styles.container}>
@@ -146,8 +185,8 @@ const CurrentJobs = () => {
         />
         <div className={styles.currentJobsContent}>
           <Title
-            subTitle="Létrehozott munkák"
-            title="Tekintsd meg és kezeld az aktuális munkákat!"
+            subTitle="Aktív munkák"
+            title="Tekintsd meg és kezeld az aktív munkákat!"
           />
           <div
             className="ag-theme-alpine"
@@ -155,7 +194,33 @@ const CurrentJobs = () => {
           >
             <AgGridReact
               ref={gridRef}
-              rowData={rowData}
+              rowData={activeJobs}  // Pass only active jobs here
+              columnDefs={columnDefs}
+              domLayout="autoHeight"
+              pagination={true}
+              paginationPageSize={10}
+              suppressCellFocus={false}
+            />
+          </div>
+        </div>
+        
+        <DashboardTitle
+          title="Inaktív munkák"
+          icon="./briefcase.png"
+          subTitle="Inaktív munkák"
+        />
+        <div className={styles.currentJobsContent}>
+          <Title
+            subTitle="Inaktív munkák"
+            title="Tekintsd meg és kezeld az inaktív munkákat!"
+          />
+          <div
+            className="ag-theme-alpine"
+            style={{ width: "100%", overflowX: "auto" }}
+          >
+            <AgGridReact
+              ref={gridRef}
+              rowData={inactiveJobs}  // Pass only inactive jobs here
               columnDefs={columnDefs}
               domLayout="autoHeight"
               pagination={true}
