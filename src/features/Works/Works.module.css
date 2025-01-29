@@ -1,0 +1,109 @@
+.worksPage {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+}
+.content {
+    min-height: 100vh;
+    padding-left: 10%;
+    padding-top: 25%;
+    padding-right: 10%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    gap: 40px;
+}
+.filterOptions {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+.row {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    align-items: center;
+    justify-content: center;
+}
+.line {
+    border-color: #c2c2c27c;
+}
+.filterOptions select, .filterOptions input {
+    outline: 0;
+    border: 0;
+    border-radius: 8px;
+    padding: 10px 20px;
+    width: 250px;
+    height: 45px;
+    color: #0000007c;
+}
+.filterOptions .btnGroup {
+    display: flex;
+    gap: 15px;
+    align-items: center;
+    justify-content: center;
+}
+.filterOptions .btn {
+    cursor: pointer;
+    border: 0;
+    outline: 0;
+    background: var(--smoothGreen);
+    width: 50px;
+    border-radius: 8px;
+    height: 50px;
+}
+.filterOptions .filter {
+    border: 0;
+    outline: 0;
+    background: none;
+    cursor: pointer;
+}
+.btnGroup {
+    display: flex;
+}
+.mobileFilterBtn {
+    outline: 0;
+    border: 0;
+    background: var(--smoothGreen);
+    width: 100px;
+    height: 50px;
+    border-radius: 8px;
+    align-self: flex-end;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    gap: 5px;
+}
+.mobileFilterBtn img {
+    width: 26px;
+}
+.workCards {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 15px;
+    flex-direction: column;
+}
+@media screen and (min-width: 820px) {
+    .filterOptions select, .filterOptions input {
+        padding: 15px 25px;
+        height: 55px;
+    }
+    .row {
+        flex-direction: row;
+        justify-content: space-between;
+        gap: 25px;
+    }
+    .line {
+        display: none;
+    }
+    .workCards {
+        flex-direction: row;
+        flex-wrap: wrap;
+    }
+    .content {
+        padding-top: 5%;
+    }
+}

@@ -2,6 +2,7 @@ export const routes = {
     homePage: { path: '/', title: 'Home' },
     loginPage: { path: '/login', title: 'Login' },
     registerPage: { path: '/register', title: 'Register' },
+    worksPage: { path: '/works', title: 'Works'},
     unauthorized: { path: '/unauthorized', title: 'Unauthorized' },
     protectedPage: { path: '/user', title: 'User Dashboard' },
     adminPage: { path: '/admin', title: 'Admin Dashboard' },

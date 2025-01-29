@@ -26,7 +26,7 @@
     justify-content: space-around;
 }
 .navbar .logo .btn img{
-    width: 20%;
+    width: 15%;
     margin-right: 400px;
 }
 .navbar i {
@@ -50,10 +50,12 @@
 .menu-list li .btn{
     color: #000;
     font-size: 22px;
+    width: 22px;
     font-weight: 400;
     margin-left: 65px;
     text-transform: uppercase;
     text-decoration: none;
+    cursor: pointer;
     transition: all 0.3s ease;
 }
 .menu-list li .btn:hover, .menu-list li .login-btn:hover{

@@ -1,6 +1,7 @@
 import { Link } from "react-router-dom";
 import styles from "./Sidebar.module.css";
 import { handleLogout } from "../../utils/authUtils";
+import { routes } from "../../utils/routes";
 
 type MenuLink = {
   path: string;
@@ -56,9 +57,15 @@ const Sidebar = (props: SidebarProps) => {
                 </div>
               )}
               <div className={styles.menuItem}>
+                <Link className={styles.link} to={routes.homePage.path}>
+                  <img src="./home.png" alt="home icon" />
+                  Vissza a kezdőlapra
+                </Link>
+              </div>
+              <div className={styles.menuItem}>
                 <button onClick={handleLogout}>
                   <img src="./logout.png" alt="Logout" />
-                  kijelentkezés
+                  Kijelentkezés
                 </button>
               </div>
             </div>

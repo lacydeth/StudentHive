@@ -1,7 +1,7 @@
 import "./Navbar.css";
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { getRoleFromToken } from "../../utils/authUtils";
+import { getRoleFromToken, handleLogout } from "../../utils/authUtils";
 import { routes } from "../../utils/routes";
 
 const Navbar = () => {
@@ -10,7 +10,6 @@ const Navbar = () => {
   const [userRole, setUserRole] = useState<string | null>(null);
 
   useEffect(() => {
-    // Fetch the user role from the token
     const role = getRoleFromToken();
     setUserRole(role);
   }, []);
@@ -44,7 +43,7 @@ const Navbar = () => {
       <div className="content">
         <div className="logo">
           <Link to={routes.homePage.path} className="btn" onClick={closeMenu}>
-            <img src="./website-logo.png" alt="Weboldal logója." />
+            <img src="./website-logo.png" alt="Weboldal logója" />
           </Link>
         </div>
         <ul className="menu-list">
@@ -57,21 +56,27 @@ const Navbar = () => {
             </Link>
           </li>
           <li>
-            <Link to={routes.registerPage.path} className="btn" onClick={closeMenu}>
+            <Link to={routes.worksPage.path} className="btn" onClick={closeMenu}>
               Munkák
             </Link>
           </li>
 
           {userRole ? (
-            <li>
-              <Link
-                to={userRole === "User" ? "/user" : userRole === "Admin" ? "/admin" : "/organization"}
-                className="btn highlighted"
-                onClick={closeMenu}
-              >
-                Profil
-              </Link>
-            </li>
+            <>
+              <li>
+                <Link
+                  to={userRole === "User" ? "/user" : userRole === "Admin" ? "/admin" : "/organization"}
+                  className="btn highlighted"
+                  onClick={closeMenu}
+                >
+                  Profil
+                </Link>
+              </li>
+
+              <li>
+                <img onClick={handleLogout} className="btn" src="./logout.png"></img>
+              </li>
+            </>
           ) : (
             <>
               <li>
