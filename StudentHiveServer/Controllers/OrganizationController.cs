@@ -334,7 +334,6 @@ public async Task<IActionResult> GetJobs()
             }
         }
 
-
         [HttpDelete("delete-job/{jobId}")]
         public async Task<IActionResult> DeleteJob(int jobId)
         {
@@ -348,7 +347,7 @@ public async Task<IActionResult> GetJobs()
 
             try
             {
-                // Check if the job belongs to the logged-in user's organization
+                // Step 1: Check if the job belongs to the logged-in user's organization
                 const string checkQuery = "SELECT OrganizationId FROM Jobs WHERE Id = @JobId";
                 var checkParameters = new[] { new MySqlParameter("@JobId", jobId) };
 
@@ -359,11 +358,24 @@ public async Task<IActionResult> GetJobs()
                     return NotFound(new { message = "Job not found." });
                 }
 
-                // Delete the job
-                const string deleteQuery = "DELETE FROM Jobs WHERE Id = @JobId";
-                var deleteParameters = new[] { new MySqlParameter("@JobId", jobId) };
+                var organizationId = jobTable.Rows[0].Field<int>("OrganizationId");
 
-                await _dbHelper.ExecuteNonQueryAsync(deleteQuery, deleteParameters);
+                if (organizationId != int.Parse(loggedInUserId))
+                {
+                    return Unauthorized(new { message = "You do not have permission to delete this job." });
+                }
+
+                // Step 2: Delete dependent records (Applications, Shifts, JobReviews)
+                await _dbHelper.ExecuteNonQueryAsync("DELETE FROM Applications WHERE JobId = @JobId", new[] { new MySqlParameter("@JobId", jobId) });
+                await _dbHelper.ExecuteNonQueryAsync("DELETE FROM Shifts WHERE JobId = @JobId", new[] { new MySqlParameter("@JobId", jobId) });
+                await _dbHelper.ExecuteNonQueryAsync("DELETE FROM JobReviews WHERE JobId = @JobId", new[] { new MySqlParameter("@JobId", jobId) });
+
+                // Step 3: Optionally, delete the Description record if needed
+                await _dbHelper.ExecuteNonQueryAsync("DELETE FROM Description WHERE Id IN (SELECT DescriptionId FROM Jobs WHERE Id = @JobId)", new[] { new MySqlParameter("@JobId", jobId) });
+
+                // Step 4: Now delete the job itself
+                const string deleteJobQuery = "DELETE FROM Jobs WHERE Id = @JobId";
+                await _dbHelper.ExecuteNonQueryAsync(deleteJobQuery, new[] { new MySqlParameter("@JobId", jobId) });
 
                 return Ok(new { message = "Job deleted successfully." });
             }
@@ -372,6 +384,8 @@ public async Task<IActionResult> GetJobs()
                 return StatusCode(500, new { message = "Error occurred while deleting the job.", details = ex.Message });
             }
         }
+
+
 
         private static string GenerateRandomPassword(int length = 10)
         {
