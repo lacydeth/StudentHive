@@ -26,6 +26,8 @@ import AdminSettings from './features/AdminDashboard/AdminSettings/AdminSettings
 import CurrentJobs from './features/OrganizationDashboard/CurrentJobs/CurrentJobs';
 import { routes } from './utils/routes';
 import Works from './features/Works/Works';
+import WorkPage from './components/WorkPage/WorkPage';
+import NotFound from './pages/NotFound/NotFound';
 
 const App = () => {
   useEffect(() => {
@@ -37,9 +39,11 @@ const App = () => {
         <Route path={routes.homePage.path} element={<IndexPage />} />
         <Route path={routes.loginPage.path} element={<Login />} />
         <Route path={routes.registerPage.path} element={<Register />} />
-        <Route path={routes.unauthorized.path} element={<Unauthorized />} />
         <Route path={routes.worksPage.path} element={<Works/>} />
-        
+        <Route path={routes.workPage.path} element={<WorkPage />} />
+
+        <Route path={routes.unauthorized.path} element={<Unauthorized />} />
+        <Route path="*" element={<NotFound />} />
         {/* User protected routes */}
         <Route
           path={routes.protectedPage.path}

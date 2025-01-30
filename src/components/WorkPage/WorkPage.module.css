@@ -1,0 +1,227 @@
+.container {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.content {
+    min-height: 100vh;
+    padding: 20px;
+    display: flex;
+    padding-top: 25%;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.content .top {
+    width: 100%;
+    position: relative;
+}
+
+.top img {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+    display: block;
+    border-radius: 8px;
+}
+
+.top::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(to top, rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0));
+    z-index: 1;
+    border-radius: 8px;
+}
+
+.textOverlay {
+    position: absolute;
+    bottom: 10px;
+    left: 10px;
+    z-index: 2;
+    color: white;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.textOverlay h1 {
+    font-size: 1.2rem;
+}
+
+.textOverlay h3 {
+    font-size: 1rem;
+    color: #d6d6d6;
+    font-weight: 400;
+}
+
+.buttonOverlay {
+    position: absolute;
+    bottom: 10px;
+    right: 10px;
+    z-index: 2;
+}
+
+.buttonOverlay button {
+    width: 150px;
+    height: 35px;
+    background: var(--smoothGreen);
+    outline: 0;
+    border: 0;
+    border-radius: 6px;
+    color: #fff;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.buttonOverlay button:hover {
+    background: var(--hoverGreen);
+}
+
+.bottom {
+    display: flex;
+    width: 100%;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.left {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 25px;
+    order: 2;
+}
+
+.left .section h2 {
+    font-size: 1.5rem;
+    margin-bottom: 15px;
+    color: #333;
+}
+
+.left .section p {
+    font-size: 1rem;
+    color: #666;
+    line-height: 1.6;
+}
+
+.right {
+    width: 100%;
+    order: 1;
+}
+
+.right .infoCard {
+    background: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.infoCard .cardItem {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.infoCard img {
+    width: 24px;
+}
+
+.cardItemText h3 {
+    font-size: 1rem;
+    margin: 0;
+    color: #333;
+}
+
+.cardItemText p {
+    font-size: 0.9rem;
+    margin: 0;
+    color: #666;
+}
+
+.back {
+    display: flex;
+    align-items: center;
+    align-self: flex-start;
+    justify-content: center;
+    gap: 5px;
+    text-decoration: none;
+    color: #fff;
+    background: var(--smoothGreen);
+    border-radius: 6px;
+    padding: 5px 10px;
+}
+
+@media (min-width: 820px) {
+    .content {
+        padding-left: 10%;
+        padding-right: 10%;
+        gap: 40px;
+        padding-top: 5%;
+    }
+
+    .content .top {
+        width: 90%;
+    }
+
+    .top img {
+        height: 300px;
+        border-radius: 12px;
+    }
+
+    .textOverlay {
+        bottom: 20px;
+        left: 20px;
+    }
+
+    .textOverlay h1 {
+        font-size: 1.5rem;
+    }
+
+    .textOverlay h3 {
+        font-size: 1.2rem;
+    }
+
+    .buttonOverlay {
+        bottom: 20px;
+        right: 20px;
+    }
+
+    .buttonOverlay button {
+        width: 250px;
+        height: 40px;
+        border-radius: 8px;
+    }
+    .infoCard {
+        width: 300px;
+    }
+    .bottom {
+        width: 90%;
+        flex-direction: row;
+        justify-content: space-between;
+        gap: 40px;
+    }
+
+    .left {
+        width: 60%;
+        order: 1;
+    }
+
+    .right {
+        width: auto;
+    }
+
+    .back {
+        width: auto;
+        margin-left: 5%;
+    }
+}

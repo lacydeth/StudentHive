@@ -60,15 +60,33 @@
     align-items: center;
     gap: 10px;
 }
+.bottom .type {
+    background: var(--bodyGray);
+    color: var(--darkGreen);
+    padding: 2px 5px;
+    border-radius: 6px;
+}
 .bottom .btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
     border: 0;
     outline: 0;
     background: var(--smoothGreen);
     color: #fff;
-    width: 50%;
-    align-self: center;
+    width: 20%;
     padding: 5px;
     border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+.bottom .btn:hover {
+    background: var(--hoverGreen);
+}
+.bottom .bottomEnd {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
 }
 .card:hover {
     transform: scale(1.05);

@@ -19,7 +19,8 @@ export const routes = {
     studentsList: { path: '/students-list', title: 'Students List' },
     studentApply: { path: '/student-apply', title: 'Student Apply' },
     agentSettings: { path: '/agent-settings', title: 'Agent Settings' },
-    adminSettings: { path: '/admin-settings', title: 'Admin Settings'}, 
+    adminSettings: { path: '/admin-settings', title: 'Admin Settings'},
+    workPage: { path: '/works/:id', title: 'Work page'}
 };
 
 export const orgMenuLinks = [

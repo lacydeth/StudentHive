@@ -3,6 +3,8 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { getRoleFromToken, handleLogout } from "../../utils/authUtils";
 import { routes } from "../../utils/routes";
+import websiteLogo from "/website-logo.png"
+import logout from "/logout.png"
 
 const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -43,7 +45,7 @@ const Navbar = () => {
       <div className="content">
         <div className="logo">
           <Link to={routes.homePage.path} className="btn" onClick={closeMenu}>
-            <img src="./website-logo.png" alt="Weboldal logója" />
+            <img src={websiteLogo} alt="Weboldal logója" />
           </Link>
         </div>
         <ul className="menu-list">
@@ -66,7 +68,7 @@ const Navbar = () => {
               <li>
                 <Link
                   to={userRole === "User" ? "/user" : userRole === "Admin" ? "/admin" : "/organization"}
-                  className="btn highlighted"
+                  className="btn"
                   onClick={closeMenu}
                 >
                   Profil
@@ -74,7 +76,7 @@ const Navbar = () => {
               </li>
 
               <li>
-                <img onClick={handleLogout} className="btn" src="./logout.png"></img>
+                <img onClick={handleLogout} className="btn" src={logout}></img>
               </li>
             </>
           ) : (
