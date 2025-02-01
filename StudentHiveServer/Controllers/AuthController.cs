@@ -60,9 +60,20 @@ namespace StudentHiveServer.Controllers
             if (!BCrypt.Net.BCrypt.Verify(request.Password, passwordHash))
                 return Unauthorized(new { message = "Hibás felhasználónév vagy jelszó!" });
 
-            var token = GenerateJwtToken(userId, roleId == 1 ? "Admin" : roleId == 2 ? "Organization" : "User", request.StayLoggedIn);
-            return Ok(new { token, role = roleId == 1 ? "Admin" : roleId == 2 ? "Organization" : "User" });
+            var roleMap = new Dictionary<int, string>
+            {
+                { 1, "Admin" },
+                { 2, "Organization" },
+                { 3, "Agent" },
+                { 4, "User" } 
+            };
+
+            var role = roleMap.GetValueOrDefault(roleId, "User");
+            var token = GenerateJwtToken(userId, role, request.StayLoggedIn);
+
+            return Ok(new { token, role });
         }
+
 
         [HttpPost("logout")]
         public IActionResult Logout()
