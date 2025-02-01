@@ -1,77 +1,51 @@
 
--- Organization 1
-INSERT INTO `Organizations` (`Name`, `Address`, `ContactEmail`, `ContactPhone`)
-VALUES
-('Tech Solutions', 'Budapest, Fő utca 12', 'info@techsolutions.hu', '0612345678'),
--- Organization 2
-('Creative Agency', 'Debrecen, Kossuth Lajos utca 45', 'contact@creativeagency.hu', '0620123456'),
--- Organization 3
-('Munkavállaló Kft.', 'Szeged, Petőfi utca 10', 'hello@munkavallalo.hu', '0630555123');
 
--- Admin felhasználó
 INSERT INTO `Users` (`OrganizationId`, `RoleId`, `FirstName`, `LastName`, `Email`, `PasswordHash`)
-VALUES
-(1, 1, 'János', 'Kovács', 'janos.kovacs@admin.hu', '$2a$11$2xUzPD4M9vbbXkSOHIVJbumT1O94PS8BpEZJtScPH7ANYdrHQgToy'), 
--- Agent 1
-(1, 2, 'László', 'Szabó', 'laszlo.szabo@agent.hu', '$2a$11$2xUzPD4M9vbbXkSOHIVJbumT1O94PS8BpEZJtScPH7ANYdrHQgToy'),
--- Agent 2
-(1, 2, 'Péter', 'Tóth', 'peter.toth@agent.hu', '$2a$11$2xUzPD4M9vbbXkSOHIVJbumT1O94PS8BpEZJtScPH7ANYdrHQgToy'),
--- Agent 3
-(1, 2, 'Mária', 'Nagy', 'maria.nagy@agent.hu', '$2a$11$2xUzPD4M9vbbXkSOHIVJbumT1O94PS8BpEZJtScPH7ANYdrHQgToy'),
--- User 1
-(2, 4, 'Zoltán', 'Horváth', 'zoltan.horvath@user.hu', '$2a$11$2xUzPD4M9vbbXkSOHIVJbumT1O94PS8BpEZJtScPH7ANYdrHQgToy'),
--- User 2
-(3, 4, 'Anita', 'Varga', 'anita.varga@user.hu', '$2a$11$2xUzPD4M9vbbXkSOHIVJbumT1O94PS8BpEZJtScPH7ANYdrHQgToy');
+VALUES (NULL, 1, 'Admin', 'User', 'admin@domain.com', '$2a$11$mqnkjwfQykPQZCf/yP29XuevK1ESD2QwPqY2085FAdECTG/12G2wW');
 
+-- Szervezetek hozzáadása
+INSERT INTO `Organizations` (`Name`, `Address`, `ContactEmail`, `ContactPhone`)
+VALUES 
+('Szervezet A', 'Szervezet A cím 1', 'contactA@domain.com', '987654321'),
+('Szervezet B', 'Szervezet B cím 2', 'contactB@domain.com', '123456789');
 
+-- Felhasználók hozzáadása
+INSERT INTO `Users` (`OrganizationId`, `RoleId`, `FirstName`, `LastName`, `Email`, `PasswordHash`)
+VALUES 
+(1, 2, 'Organization', 'User A', 'orguserA@domain.com', '$2a$11$mqnkjwfQykPQZCf/yP29XuevK1ESD2QwPqY2085FAdECTG/12G2wW'),
+(2, 2, 'Organization', 'User B', 'orguserB@domain.com', '$2a$11$mqnkjwfQykPQZCf/yP29XuevK1ESD2QwPqY2085FAdECTG/12G2wW');
 
--- Description 1
+-- Leírások hozzáadása
 INSERT INTO `Description` (`OurOffer`, `MainTaks`, `JobRequirements`, `Advantages`)
-VALUES
-('Kínálunk versenyképes órabért és dinamikus munkakörnyezetet.',
- 'Feladatod lesz a napi irodai adminisztratív munkák ellátása.',
- 'Elvárásaink között szerepel a jó kommunikációs készség és a precíz munkavégzés.',
- 'A munkaidő rugalmas, és home office lehetőség is adott.'),
--- Description 2
-('Kellemes munkakörnyezet és a csapatmunka támogatása.',
- 'A feladatok közé tartozik az eladói tevékenység, vásárlók kiszolgálása.',
- 'Képesség a jó kapcsolatok kiépítésére és fenntartására szükséges.',
- 'Jó csapat és teljesítmény alapján bónuszok.'),
--- Description 3
-('Szabadtéri munka és erőnléti kihívások, rugalmas munkaidő.',
- 'A munkavégzéshez szükséges az erőnlét és a fizikai állóképesség.',
- 'Elvárás a munkahelyi biztonságra vonatkozó szabályok betartása.',
- 'Kiemelkedő juttatások és munkaruha biztosítása.'),
--- Description 4
-('Jó csapat és biztos jövő egy nemzetközi cégnél.',
- 'Feladatod lesz marketing kampányok koordinálása, közösségi média kezelése.',
- 'Szükséges marketing vagy kommunikációs végzettség.',
- 'Céges tréningek, nemzetközi projektekben való részvétel.'),
--- Description 5
-('Izgalmas kihívások, innovatív mérnöki csapatban.',
- 'A feladatod mérnöki megoldások kidolgozása, fejlesztés és tesztelés.',
- 'Szükséges mérnöki végzettség és problémamegoldó készségek.',
- 'Versenyképes juttatás és szakmai fejlődési lehetőség.'),
--- Description 6
-('Szabadon választható munkarend, családbarát munkakörnyezet.',
- 'A munkahelyen a mezőgazdasági feladatok ellátása és a terület karbantartása.',
- 'Elvárás: alapszintű mezőgazdasági ismeretek.',
- 'Hosszú távú munkalehetőség, szállás biztosítása.');
--- Job 1
--- Job 1 (Irodai asszisztens)
+VALUES 
+('Kiemelkedő munkahelyi környezetet biztosítunk.', 'Az eladó feladata az áruk eladása, a bolt rendben tartása.', 'Rendelkezzen alapvető kommunikációs készségekkel.', 'Rugalmasság és bónusz lehetőség.');
+
+-- Munkák hozzáadása
 INSERT INTO `Jobs` (`OrganizationId`, `CategoryId`, `AgentId`, `DescriptionId`, `Title`, `City`, `Address`, `HourlyRate`)
-VALUES
-(1, 1, NULL, 1, 'Irodai asszisztens', 'Budapest', 'Fő utca 12', 1500),
--- Job 2 (Eladó)
-(1, 2, NULL, 2, 'Eladó', 'Debrecen', 'Kossuth Lajos utca 45', 1200),
--- Job 3 (Raktári munkás)
-(1, 3, NULL, 3, 'Raktári munkás', 'Szeged', 'Petőfi utca 10', 1000),
--- Job 4 (Marketing asszisztens)
-(2, 4, NULL, 4, 'Marketing asszisztens', 'Budapest', 'Fő utca 12', 1800),
--- Job 5 (Mérnök)
-(2, 5, NULL, 5, 'Mérnök', 'Debrecen', 'Kossuth Lajos utca 45', 2000),
--- Job 6 (Mezőgazdasági munkás)
-(3, 6, NULL, 6, 'Mezőgazdasági munkás', 'Szeged', 'Petőfi utca 10', 1300);
+VALUES 
+(1, 2, NULL, LAST_INSERT_ID(), 'Eladó', 'Budapest', 'Fő utca 12.', 1500),
+(1, 2, NULL, LAST_INSERT_ID(), 'Raktáros', 'Budapest', 'Fő utca 12.', 1600),
+(1, 2, NULL, LAST_INSERT_ID(), 'Ügyfélszolgálatos', 'Budapest', 'Fő utca 12.', 1700);
 
+-- Leírások hozzáadása
+INSERT INTO `Description` (`OurOffer`, `MainTaks`, `JobRequirements`, `Advantages`)
+VALUES 
+('Rugalmas munkaidőt és versenyképes bérezést kínálunk.', 'A munkavállaló felelős lesz a termékek kiszállításáért és a raktár kezeléseért.', 'Jó fizikai állapot és csapatmunka készség szükséges.', 'Szuper csapat és fejlődési lehetőségek.');
 
+-- Munkák hozzáadása
+INSERT INTO `Jobs` (`OrganizationId`, `CategoryId`, `AgentId`, `DescriptionId`, `Title`, `City`, `Address`, `HourlyRate`)
+VALUES 
+(2, 3, NULL, LAST_INSERT_ID(), 'Kiszállító', 'Budapest', 'Kossuth utca 45.', 1800),
+(2, 3, NULL, LAST_INSERT_ID(), 'Raktáros', 'Budapest', 'Kossuth utca 45.', 1600),
+(2, 3, NULL, LAST_INSERT_ID(), 'Szállítmányozási koordinátor', 'Budapest', 'Kossuth utca 45.', 1900);
+
+INSERT INTO `Users` (`OrganizationId`, `RoleId`, `FirstName`, `LastName`, `Email`, `PasswordHash`)
+VALUES 
+(1, 3, 'Agent', 'A1', 'agentA1@domain.com', '$2a$11$mqnkjwfQykPQZCf/yP29XuevK1ESD2QwPqY2085FAdECTG/12G2wW'),
+(1, 3, 'Agent', 'A2', 'agentA2@domain.com', '$2a$11$mqnkjwfQykPQZCf/yP29XuevK1ESD2QwPqY2085FAdECTG/12G2wW');
+
+INSERT INTO `Users` (`OrganizationId`, `RoleId`, `FirstName`, `LastName`, `Email`, `PasswordHash`)
+VALUES 
+(2, 3, 'Agent', 'B1', 'agentB1@domain.com', '$2a$11$mqnkjwfQykPQZCf/yP29XuevK1ESD2QwPqY2085FAdECTG/12G2wW'),
+(2, 3, 'Agent', 'B2', 'agentB2@domain.com', '$2a$11$mqnkjwfQykPQZCf/yP29XuevK1ESD2QwPqY2085FAdECTG/12G2wW');
 
