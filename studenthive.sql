@@ -65,7 +65,7 @@ CREATE TABLE `Jobs` (
 CREATE TABLE `Description` (
   `Id` INT PRIMARY KEY AUTO_INCREMENT,
   `OurOffer` TEXT NOT NULL,
-  `MainTasks` TEXT NOT NULL,
+  `MainTaks` TEXT NOT NULL,
   `JobRequirements` TEXT NOT NULL,
   `Advantages` TEXT NOT NULL
 );
