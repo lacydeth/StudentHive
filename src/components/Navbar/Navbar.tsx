@@ -2,7 +2,7 @@ import "./Navbar.css";
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { getRoleFromToken, handleLogout } from "../../utils/authUtils";
-import { routes } from "../../utils/routes";
+import { roleRoutes, routes } from "../../utils/routes";
 import websiteLogo from "/website-logo.png"
 import logout from "/logout.png"
 
@@ -66,9 +66,9 @@ const Navbar = () => {
           {userRole ? (
             <>
               <li>
-                <Link
-                  to={userRole === "User" ? "/user" : userRole === "Admin" ? "/admin" : "/organization"}
-                  className="btn"
+                <Link 
+                  to={roleRoutes[userRole] || "/"} 
+                  className="btn" 
                   onClick={closeMenu}
                 >
                   Profil

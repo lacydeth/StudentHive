@@ -4,7 +4,6 @@ import Register from './features/Register/Register';
 import AOS from "aos";
 import 'aos/dist/aos.css';
 import { useEffect } from 'react';
-import ProtectedPage from './features/UserDashboard/UserDashboard';
 import AdminDashboard from './features/AdminDashboard/AdminDashboardView/AdminDashboard';
 import ProtectedRoute from './components/ProtectedRoute/ProtectedRoute';
 import Unauthorized from './pages/Unauthorized/Unauthorized';
@@ -28,6 +27,7 @@ import { routes } from './utils/routes';
 import Works from './features/Works/Works';
 import WorkPage from './components/WorkPage/WorkPage';
 import NotFound from './pages/NotFound/NotFound';
+import UserDashboard from './features/UserDashboard/UserDashboardView/UserDashboard';
 
 const App = () => {
   useEffect(() => {
@@ -39,17 +39,18 @@ const App = () => {
         <Route path={routes.homePage.path} element={<IndexPage />} />
         <Route path={routes.loginPage.path} element={<Login />} />
         <Route path={routes.registerPage.path} element={<Register />} />
-        <Route path={routes.worksPage.path} element={<Works/>} />
+        <Route path={routes.worksPage.path} element={<Works />} />
         <Route path={routes.workPage.path} element={<WorkPage />} />
 
         <Route path={routes.unauthorized.path} element={<Unauthorized />} />
         <Route path="*" element={<NotFound />} />
+
         {/* User protected routes */}
         <Route
           path={routes.protectedPage.path}
           element={
             <ProtectedRoute allowedRoles={["User"]}>
-              <ProtectedPage />
+              <UserDashboard />
             </ProtectedRoute>
           }
         />
@@ -142,47 +143,43 @@ const App = () => {
             </ProtectedRoute>
           }
         />
-         <Route
+        {/* Agent protected routes */}
+        <Route
           path={routes.studentShifts.path}
           element={
-            <ProtectedRoute allowedRoles={["Organization"]}>
-              //Agent kell legyen a role tesztelésből átállitom
+            <ProtectedRoute allowedRoles={["Agent"]}>
               <StuddentShift/>
             </ProtectedRoute>
           }
         />
-         <Route
+        <Route
           path={routes.studentsList.path}
           element={
             <ProtectedRoute allowedRoles={["Agent"]}>
-              //Agent kell legyen a role tesztelésből átállitom
               <StudentsList/>
             </ProtectedRoute>
           }
         />
-         <Route
+        <Route
           path={routes.agentSettings.path}
           element={
-            <ProtectedRoute allowedRoles={["Organization"]}>
-              //Agent kell legyen a role tesztelésből átállitom
+            <ProtectedRoute allowedRoles={["Agent"]}>
               <AgentSettings/>
             </ProtectedRoute>
           }
         />
-         <Route
+        <Route
           path={routes.agentPage.path}
           element={
-            <ProtectedRoute allowedRoles={["Organization"]}>
-              //Agent kell legyen a role tesztelésből átállitom
+            <ProtectedRoute allowedRoles={["Agent"]}>
               <AgentDashboard/>
             </ProtectedRoute>
           }
         />
-         <Route
+        <Route
           path={routes.studentApply.path}
           element={
-            <ProtectedRoute allowedRoles={["Organization"]}>
-              //Agent kell legyen a role tesztelésből átállitom
+            <ProtectedRoute allowedRoles={["Agent"]}>
               <StudentApply/>
             </ProtectedRoute>
           }

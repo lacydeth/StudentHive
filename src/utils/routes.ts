@@ -23,6 +23,12 @@ export const routes = {
     workPage: { path: '/works/:id', title: 'Work page'}
 };
 
+export const adminTopLinks = [
+  { path: routes.adminPage.path, icon: "./dashboard.png", label: "Kezelőpult" },
+  { path: routes.newOrgPage.path, icon: "./more.png", label: "Szövetkezet felvétele" },
+  { path: routes.existingOrgPage.path, icon: "./people.png", label: "Meglévő szövetkezetek" },
+  { path: routes.adminSettings.path, icon: "./settings.png", label: "Beállítások" },
+];
 export const orgMenuLinks = [
     { path: routes.orgPage.path, icon: "./dashboard.png", label: "Kezelőpult" },
     { path: routes.orgAddAgent.path, icon: "./realtor.png", label: "Közvetítő felvétele" },
@@ -31,9 +37,15 @@ export const orgMenuLinks = [
     { path: routes.currentJobs.path, icon: "./job.png", label: "Létrehozott munkák" },
     { path: routes.orgSettings.path, icon: "./settings.png", label: "Beállítások" }
 ];  
-export const adminTopLinks = [
-  { path: routes.adminPage.path, icon: "./dashboard.png", label: "Kezelőpult" },
-  { path: routes.newOrgPage.path, icon: "./more.png", label: "Szövetkezet felvétele" },
-  { path: routes.existingOrgPage.path, icon: "./people.png", label: "Meglévő szövetkezetek" },
-  { path: routes.adminSettings.path, icon: "./settings.png", label: "Beállítások" },
+export const agentMenuLinks = [
+
 ];
+export const userMenuLinks = [
+
+];
+export const roleRoutes: Record<string, string> = {
+  Admin: routes.adminPage.path,
+  User: routes.protectedPage.path,
+  Organization: routes.orgPage.path,
+  Agent: routes.agentPage.path
+};

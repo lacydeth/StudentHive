@@ -1,3 +1,4 @@
+import Footer from "../../components/Footer/Footer";
 import Navbar from "../../components/Navbar/Navbar";
 import Title from "../../components/Title/Title";
 import "./Index.css";
@@ -118,6 +119,7 @@ const IndexPage = () => {
           </p>
         </div>
       </section>
+      <Footer/>
     </div>
   );
 };

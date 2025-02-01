@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import Sidebar from "../../../components/Sidebar/Sidebar";
 import styles from "./AdminSettings.module.css";
 import DashboardTitle from "../../../components/DashboardTitle/DashboardTitle";
