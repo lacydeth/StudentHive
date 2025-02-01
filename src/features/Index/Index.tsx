@@ -1,3 +1,4 @@
+import Footer from "../../components/Footer/Footer";
 import Navbar from "../../components/Navbar/Navbar";
 import Title from "../../components/Title/Title";
 import "./Index.css";
@@ -30,11 +31,11 @@ const IndexPage = () => {
     <div className="home-page">
       <Navbar />
       <section className="welcome-section">
-        <div className="title" data-aos="fade-right" data-aos-duration="2000">
+        <div className="title">
           <h1>StudentHive</h1>
           <h3>Álommunka. Könnyedén. Azonnal.</h3>
         </div>
-        <div className="search" data-aos="fade-left" data-aos-duration="2000">
+        <div className="search">
           <h1>Kezdj neki a keresésnek!</h1>
           <div className="job-search">
             <h4>Munkakör</h4>
@@ -118,6 +119,7 @@ const IndexPage = () => {
           </p>
         </div>
       </section>
+      <Footer/>
     </div>
   );
 };

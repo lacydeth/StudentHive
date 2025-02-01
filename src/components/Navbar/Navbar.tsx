@@ -1,8 +1,10 @@
 import "./Navbar.css";
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { getRoleFromToken } from "../../utils/authUtils";
-import { routes } from "../../utils/routes";
+import { getRoleFromToken, handleLogout } from "../../utils/authUtils";
+import { roleRoutes, routes } from "../../utils/routes";
+import websiteLogo from "/website-logo.png"
+import logout from "/logout.png"
 
 const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -10,7 +12,6 @@ const Navbar = () => {
   const [userRole, setUserRole] = useState<string | null>(null);
 
   useEffect(() => {
-    // Fetch the user role from the token
     const role = getRoleFromToken();
     setUserRole(role);
   }, []);
@@ -44,7 +45,7 @@ const Navbar = () => {
       <div className="content">
         <div className="logo">
           <Link to={routes.homePage.path} className="btn" onClick={closeMenu}>
-            <img src="./website-logo.png" alt="Weboldal logója." />
+            <img src={websiteLogo} alt="Weboldal logója" />
           </Link>
         </div>
         <ul className="menu-list">
@@ -57,21 +58,27 @@ const Navbar = () => {
             </Link>
           </li>
           <li>
-            <Link to={routes.registerPage.path} className="btn" onClick={closeMenu}>
+            <Link to={routes.worksPage.path} className="btn" onClick={closeMenu}>
               Munkák
             </Link>
           </li>
 
           {userRole ? (
-            <li>
-              <Link
-                to={userRole === "User" ? "/user" : userRole === "Admin" ? "/admin" : "/organization"}
-                className="btn highlighted"
-                onClick={closeMenu}
-              >
-                Profil
-              </Link>
-            </li>
+            <>
+              <li>
+                <Link 
+                  to={roleRoutes[userRole] || "/"} 
+                  className="btn" 
+                  onClick={closeMenu}
+                >
+                  Profil
+                </Link>
+              </li>
+
+              <li>
+                <img onClick={handleLogout} className="btn" src={logout}></img>
+              </li>
+            </>
           ) : (
             <>
               <li>

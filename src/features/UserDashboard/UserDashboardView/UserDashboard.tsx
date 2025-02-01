@@ -1,4 +1,4 @@
-import { handleLogout } from "../../utils/authUtils"
+import { handleLogout } from "../../../utils/authUtils"
 
 const UserDashboard = () => {
   return (

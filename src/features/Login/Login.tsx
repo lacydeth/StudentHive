@@ -4,7 +4,7 @@ import styles from './Login.module.css';
 import Title from '../../components/Title/Title';
 import { Link } from 'react-router-dom';
 import Navbar from '../../components/Navbar/Navbar';
-import { routes } from '../../utils/routes';
+import { roleRoutes, routes } from '../../utils/routes';
 
 const Login = () => {
   const [email, setEmail] = useState('');
@@ -16,32 +16,22 @@ const Login = () => {
     e.preventDefault();
   
     try {
-      const passwordTrimmed = password.trim();
-      console.log('Logging in with:', email, passwordTrimmed);
       const response = await axios.post('https://localhost:7067/api/auth/login', {
         email,
-        password: passwordTrimmed,
-        stayLoggedIn,
+        password,
+        stayLoggedIn
       });
   
-      // Extract token and role from the response
       const { token, role } = response.data;
   
-      // Store token in localStorage
       localStorage.setItem('token', token);
-  
-      // Redirect based on role
-      if (role === 'Admin') {
-        window.location.href = routes.adminPage.path;
-      } else if (role === 'User') {
-        window.location.href = routes.protectedPage.path;
-      } else if (role === 'Organization') {
-        window.location.href = routes.orgPage.path;
-      }
+      
+      const redirectTo = roleRoutes[role] || routes.homePage.path;
+      window.location.href = redirectTo;
+      
     } catch (error: any) {
       if (error.response && error.response.data) {
         const { message } = error.response.data;
-        console.error('Login failed:', message);
         setError(message || 'An error occurred during login.');
       } else {
         setError('An unknown error occurred.');

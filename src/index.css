@@ -13,6 +13,7 @@
     --smoothGreen: #99BC85;
     --darkGreen: #556D48;
     --bodyGray: #F4F4F4;
+    --hoverGreen: #4e6b4e;
 }
 html, body {
     scroll-behavior: smooth;

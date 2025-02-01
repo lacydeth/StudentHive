@@ -28,14 +28,10 @@ const ExistingOrg = () => {
   };
 
   const fetchOrganizations = async () => {
-    try {
-      const response = await axios.get(
-        "https://localhost:7067/api/admin/organizations"
-      );
-      setRowData(response.data);
-    } catch (error) {
-      console.error("Error fetching organizations data:", error);
-    }
+    axios
+    .get("https://localhost:7067/api/admin/organizations")
+    .then((response) => setRowData(response.data))
+    .catch((error) => console.error("Error fetching work cards:", error));
   };
 
   useEffect(() => {

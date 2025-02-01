@@ -27,7 +27,7 @@ const AdminDashboard = () => {
         const userRegistrationsResponse = await axios.get("https://localhost:7067/api/admin/users-by-month");
 
         const mappedUserRegistrations = userRegistrationsResponse.data.map((item: any) => ({
-          month: `${item.year}-${item.month < 10 ? '0' : ''}${item.month}`, // Format month as YYYY-MM
+          month: `${item.year}-${item.month < 10 ? '0' : ''}${item.month}`,
           registrations: item.userCount
         }));
 
