@@ -11,15 +11,15 @@ import { ClientSideRowModelModule, ModuleRegistry } from "ag-grid-community";
 import "./Table.css";
 import Dialog from "../../../components/Dialog/Dialog";
 import { orgMenuLinks } from "../../../utils/routes";
+import JobViewModal from "../../../components/Modals/JobViewModal";
 
 ModuleRegistry.registerModules([ClientSideRowModelModule]);
 
 const CurrentJobs = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(window.innerWidth >= 1000);
   const [dialogContent, setDialogContent] = useState<React.ReactNode>(null);
-  const [rowData, setRowData] = useState<any[]>([]);  // All Jobs
-  const [activeJobs, setActiveJobs] = useState<any[]>([]);  // Active Jobs
-  const [inactiveJobs, setInactiveJobs] = useState<any[]>([]);  // Inactive Jobs
+  const [activeJobs, setActiveJobs] = useState<any[]>([]);
+  const [inactiveJobs, setInactiveJobs] = useState<any[]>([]);
   const gridRef = useRef<AgGridReact<any>>(null);
   const dialogRef = useRef<HTMLDialogElement>(null);
 
@@ -35,28 +35,58 @@ const CurrentJobs = () => {
           Authorization: `Bearer ${token}`,
         },
       });
-      
+
       const allJobs = response.data.map((job: any) => ({
         ...job,
-        categoryName: job.categoryName, // Kategória neve
-        agentId: null, // AgentId mindig null
-        ourOffer: job.ourOffer, // Description OurOffer
-        mainTasks: job.mainTaks, // Description MainTasks
-        jobRequirements: job.jobRequirements, // Description JobRequirements
-        advantages: job.advantages, // Description Advantages
+        categoryName: job.categoryName,
+        agentId: null,
+        ourOffer: job.ourOffer,
+        MainTaks: job.mainTaks,
+        jobRequirements: job.jobRequirements,
+        advantages: job.advantages,
       }));
-      
-      // Filter active and inactive jobs
+
       const active = allJobs.filter((job) => job.isActive);
       const inactive = allJobs.filter((job) => !job.isActive);
-      
-      setRowData(allJobs);  // Store all jobs
-      setActiveJobs(active);  // Store active jobs
-      setInactiveJobs(inactive);  // Store inactive jobs
+
+      setActiveJobs(active);
+      setInactiveJobs(inactive);
     } catch (error) {
       console.error("Error fetching jobs:", error);
     }
   };
+
+  const handleUpdateJob = async (e: React.FormEvent, jobId: number) => {
+    e.preventDefault();
+    const formData = new FormData(e.target as HTMLFormElement);
+    
+    const updatedJob = {
+      Title: formData.get("title"),
+      CategoryId: formData.get("categoryId"),
+      City: formData.get("city"),
+      Address: formData.get("address"),
+      HourlyRate: formData.get("hourlyRate"),
+      OurOffer: formData.get("ourOffer"),
+      MainTaks: formData.get("mainTaks"),
+      JobRequirements: formData.get("jobRequirements"),
+      Advantages: formData.get("advantages"),
+    };
+  
+    try {
+      const token = localStorage.getItem("token");
+      await axios.put(`https://localhost:7067/api/organization/update-job/${jobId}`, updatedJob, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+  
+      fetchJobs();
+      toggleDialog();
+      alert("A munka sikeresen frissítve!");
+    } catch (error) {
+      console.error("Error updating job:", error);
+      alert("Hiba történt a frissítés során.");
+    }
+  };
+  
 
   const deleteJob = async (jobId: number) => {
     try {
@@ -90,17 +120,17 @@ const CurrentJobs = () => {
   const Isactive = async (jobId: number, currentStatus: boolean) => {
     try {
       const token = localStorage.getItem("token");
-      const updatedStatus = !currentStatus; // Toggle the status
+      const updatedStatus = !currentStatus;
       await axios.patch(
         `https://localhost:7067/api/organization/isactive/${jobId}`,
-        { jobId, isActive: updatedStatus },
+        { isActive: updatedStatus },
         {
           headers: {
             Authorization: `Bearer ${token}`,
           },
         }
       );
-      fetchJobs(); // Reload jobs to reflect the updated status
+      fetchJobs();
       alert(`A munka státusza ${updatedStatus ? "aktívvá" : "inaktívvá"} vált!`);
     } catch (error) {
       console.error("Error updating job status:", error);
@@ -110,29 +140,34 @@ const CurrentJobs = () => {
 
   const actionCellRenderer = (params: any) => {
     const job = params.data;
+    const [isActive, setIsActive] = useState(job.isActive);
+
+    const handleToggleStatus = async () => {
+      await Isactive(job.id, isActive);
+      setIsActive(!isActive);
+    };
+
+    const handleViewJob = () => {
+      setDialogContent(
+        <JobViewModal job={job}/>
+
+      );
+      toggleDialog();
+    };
+
+    
+
     return (
-      <div style={{ display: "flex", gap: "10px" }}>
-        {/* Megtekintés gomb */}
-        <button
-          onClick={() => {
-            toggleDialog();
-          }}
-          className={styles.actionBtn}
-        >
+      <div style={{ display: "flex", gap: "10px", alignItems: "center" }}>
+        <button onClick={handleViewJob} className={styles.actionBtn}>
           <img src="./view.png" alt="View" />
         </button>
 
-        {/* Inaktivitás gomb */}
-        <button
-          onClick={() => {
-            Isactive(job.id, job.isActive); // Pass job id and current status
-          }}
-          className={styles.actionBtn}
-        >
-          <img src="./view.png" alt="View" />
+        <button onClick={handleToggleStatus} className={styles.actionBtn}>
+          <img src={isActive ? "./onbutton.png" : "./offbutton.png"} alt={isActive ? "Active" : "Inactive"} />
+          {isActive ? "Active" : "Inactive"}
         </button>
 
-        {/* Törlés gomb */}
         <button
           onClick={() => {
             if (window.confirm("Biztosan törölni szeretnéd ezt a munkát?")) {
@@ -141,30 +176,31 @@ const CurrentJobs = () => {
           }}
           className={`${styles.actionBtn} ${styles.deleteBtn}`}
         >
-          <img src="./delete.png" alt="Delete" />
+          <img src="./trashcan.png" alt="Delete" />
+          Delete
         </button>
       </div>
     );
   };
-
   const columnDefs = useMemo(
     () => [
       { field: "id", headerName: "Azonosító", flex: 0.5, minWidth: 100 },
-      { field: "title", headerName: "Cím", flex: 1.5, minWidth: 150 },
+      { field: "categoryId", headerName: "KategoryID", flex: 1.5, minWidth: 150 },
       { field: "categoryName", headerName: "Kategória", flex: 1, minWidth: 120 },
+      { field: "title", headerName: "Cím", flex: 1.5, minWidth: 150 },
       { field: "city", headerName: "Helyszín", flex: 1.5, minWidth: 150 },
       { field: "address", headerName: "Cím", flex: 1, minWidth: 150 },
       { field: "hourlyRate", headerName: "Órabér", flex: 1, minWidth: 120 },
       { field: "isActive", headerName: "Aktív", flex: 1, minWidth: 120, valueGetter: (params: any) => (params.data.isActive ? "Igen" : "Nem") },
       { field: "ourOffer", headerName: "Ajánlatunk", flex: 1.5, minWidth: 150 },
-      { field: "mainTasks", headerName: "Fő Feladatok", flex: 1.5, minWidth: 150 },
+      { field: "mainTaks", headerName: "Fő Feladatok", flex: 1.5, minWidth: 150 },
       { field: "jobRequirements", headerName: "Munkaköri Követelmények", flex: 2, minWidth: 180 },
       { field: "advantages", headerName: "Előnyök", flex: 1.5, minWidth: 150 },
       {
         headerName: "Műveletek",
         field: "actions",
         cellRenderer: actionCellRenderer,
-        width: 150,
+        width: 330,
       },
     ],
     []
@@ -194,13 +230,14 @@ const CurrentJobs = () => {
           >
             <AgGridReact
               ref={gridRef}
-              rowData={activeJobs}  // Pass only active jobs here
+              rowData={activeJobs}
               columnDefs={columnDefs}
               domLayout="autoHeight"
               pagination={true}
               paginationPageSize={10}
               suppressCellFocus={false}
-            />
+              getRowHeight={() =>30}
+            />  
           </div>
         </div>
         
@@ -220,12 +257,13 @@ const CurrentJobs = () => {
           >
             <AgGridReact
               ref={gridRef}
-              rowData={inactiveJobs}  // Pass only inactive jobs here
+              rowData={inactiveJobs}
               columnDefs={columnDefs}
               domLayout="autoHeight"
               pagination={true}
               paginationPageSize={10}
               suppressCellFocus={false}
+              getRowHeight={() =>30}
             />
           </div>
         </div>
