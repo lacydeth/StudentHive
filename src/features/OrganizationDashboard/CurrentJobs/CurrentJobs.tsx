@@ -41,7 +41,7 @@ const CurrentJobs = () => {
         categoryName: job.categoryName,
         agentId: null,
         ourOffer: job.ourOffer,
-        MainTaks: job.mainTaks,
+        mainTaks: job.mainTaks,
         jobRequirements: job.jobRequirements,
         advantages: job.advantages,
       }));
@@ -67,7 +67,7 @@ const CurrentJobs = () => {
       Address: formData.get("address"),
       HourlyRate: formData.get("hourlyRate"),
       OurOffer: formData.get("ourOffer"),
-      MainTaks: formData.get("mainTaks"),
+      mainTaks: formData.get("mainTaks"),
       JobRequirements: formData.get("jobRequirements"),
       Advantages: formData.get("advantages"),
     };

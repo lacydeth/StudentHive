@@ -10,10 +10,10 @@ type JobViewModalProps = {
     hourlyRate: number;
     city: string;
     ourOffer: string;
-    MainTaks: string;
+    mainTaks: string;
     jobRequirements: string;
     advantages: string;
-    categoryId: number;
+    categoryId: number; // Alapértelmezett kategória ID
   };
 };
 
@@ -23,7 +23,7 @@ const JobViewModal = ({ job }: JobViewModalProps) => {
   const [hourlyRate, setHourlyRate] = useState<number>(job.hourlyRate);
   const [city, setCity] = useState<string>(job.city);
   const [ourOffer, setOurOffer] = useState<string>(job.ourOffer);
-  const [MainTaks, setMainTasks] = useState<string>(job.MainTaks);
+  const [mainTaks, setmainTaks] = useState<string>(job.mainTaks);
   const [jobRequirements, setJobRequirements] = useState<string>(job.jobRequirements);
   const [advantages, setAdvantages] = useState<string>(job.advantages);
   const [error, setError] = useState<string | null>(null);
@@ -49,15 +49,17 @@ const JobViewModal = ({ job }: JobViewModalProps) => {
 
     const request = {
       title,
-      categoryid: categoryid.toString(),
+      categoryid: categoryid.toString(), // Convert the categoryId to a string
       address,
       hourlyRate,
       city,
       ourOffer,
-      MainTaks,
+      mainTaks,
       jobRequirements,
       advantages,
     };
+    
+
     try {
       const token = localStorage.getItem("token");
 
@@ -156,8 +158,8 @@ const JobViewModal = ({ job }: JobViewModalProps) => {
           <div className={styles.inputBox}>
             <input
               placeholder="Fő Feladatok"
-              value={MainTaks}
-              onChange={(e) => setMainTasks(e.target.value)}
+              value={mainTaks}
+              onChange={(e) => setmainTaks(e.target.value)}
               required
             />
             <img src="./tasks.png" alt="main tasks icon" />
