@@ -28,7 +28,7 @@ namespace StudentHiveServer.Controllers
                 new MySqlParameter("@LastName", request.LastName),
                 new MySqlParameter("@Email", request.Email),
                 new MySqlParameter("@PasswordHash", BCrypt.Net.BCrypt.HashPassword(request.Password)),
-                new MySqlParameter("@RoleId", 4) // Default User role
+                new MySqlParameter("@RoleId", 4) 
             };
 
             try

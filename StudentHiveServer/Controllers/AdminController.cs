@@ -18,7 +18,6 @@ namespace StudentHiveServer.Controllers
         {
             _dbHelper = new DatabaseHelper(configuration.GetConnectionString("DefaultConnection"));
         }
-        // GET: All registered users by month (user role)
         [HttpGet("users-by-month")]
         public async Task<IActionResult> GetUsersByMonth()
         {
@@ -45,7 +44,6 @@ namespace StudentHiveServer.Controllers
             }
         }
 
-        // GET: Total number of registered organizations and users
         [HttpGet("total-organizations-and-users")]
         public async Task<IActionResult> GetTotalOrganizationsAndUsers()
         {
@@ -69,7 +67,6 @@ namespace StudentHiveServer.Controllers
             }
         }
 
-        // GET: list all organizations
         [HttpGet("organizations")]
         public async Task<IActionResult> GetOrganizations()
         {
@@ -95,7 +92,6 @@ namespace StudentHiveServer.Controllers
                 return StatusCode(500, new { message = "Hiba az adatok betöltése során!", details = ex.Message });
             }
         }
-        // PUT: change organziation password from admin panel
         [HttpPut("organization/{organizationId}/password")]
         public async Task<IActionResult> ChangeOrganizationPassword(int organizationId, [FromBody] ChangePasswordRequest request)
         {
@@ -202,7 +198,6 @@ namespace StudentHiveServer.Controllers
             }
         }
 
-        // PUT: update organization details 
         [HttpPut("organization/{organizationId}")]
         public async Task<IActionResult> UpdateOrganizationDetails(int organizationId, [FromBody] UpdateOrganizationRequest request)
         {
@@ -286,7 +281,6 @@ namespace StudentHiveServer.Controllers
                 Console.WriteLine($"Error sending email: {ex.Message}");
             }
         }
-        // PUT: Update admin email and password
         [HttpPut("settings/{userId}")]
         public async Task<IActionResult> UpdateAdminSettings(int userId, [FromBody] UpdateAdminSettingsRequest request)
         {
