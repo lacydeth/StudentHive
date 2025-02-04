@@ -25,7 +25,7 @@ const NewJob = () => {
   const [ourOffer, setOurOffer] = useState("");
   const [city, setCity] = useState("");
   const [address, setAddress] = useState("");
-  const [mainTasks, setMainTasks] = useState("");
+  const [mainTaks, setmainTaks] = useState("");
   const [jobRequirements, setJobRequirements] = useState("");
   const [advantages, setAdvantages] = useState("");
   const [error, setError] = useState<string | null>(null);
@@ -87,7 +87,7 @@ const NewJob = () => {
           city,
           address,
           ourOffer,
-          mainTasks,
+          mainTaks,
           jobRequirements,
           advantages
         },
@@ -217,8 +217,8 @@ const NewJob = () => {
                         <input
                           type="text"
                           placeholder="Főbb feladatok"
-                          value={mainTasks}
-                          onChange={(e) => setMainTasks(e.target.value)}
+                          value={mainTaks}
+                          onChange={(e) => setmainTaks(e.target.value)}
                           required
                         />
                       </div>
