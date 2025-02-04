@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { getRoleFromToken, handleLogout } from "../../utils/authUtils";
 import { roleRoutes, routes } from "../../utils/routes";
-import websiteLogo from "/website-logo.png"
+import websiteLogo from "/studenthive-logo.png"
 import logout from "/logout.png"
 
 const Navbar = () => {
