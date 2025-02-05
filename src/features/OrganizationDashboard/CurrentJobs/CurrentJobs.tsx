@@ -12,6 +12,7 @@ import "./Table.css";
 import Dialog from "../../../components/Dialog/Dialog";
 import { orgMenuLinks } from "../../../utils/routes";
 import JobViewModal from "../../../components/Modals/JobViewModal";
+import JobPatchVIewModal from "../../../components/Modals/JobPatchVIewModal";
 
 ModuleRegistry.registerModules([ClientSideRowModelModule]);
 
@@ -155,6 +156,13 @@ const CurrentJobs = () => {
       toggleDialog();
     };
 
+    const handlePatchJob = () => {
+    setDialogContent(
+      <JobPatchVIewModal jobId={job.id} />  // Itt adjuk át az ID-t
+    );
+    toggleDialog();
+  };
+
     
 
     return (
@@ -167,6 +175,10 @@ const CurrentJobs = () => {
           <img src={isActive ? "./onbutton.png" : "./offbutton.png"} alt={isActive ? "Active" : "Inactive"} />
           {isActive ? "Active" : "Inactive"}
         </button>
+
+        <button onClick={handlePatchJob} className={styles.actionBtn}>
+        Update
+      </button>
 
         <button
           onClick={() => {
