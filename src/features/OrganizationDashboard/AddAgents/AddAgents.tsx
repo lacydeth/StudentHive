@@ -72,7 +72,6 @@ const AddAgents = () => {
 
       console.log("Registration successful:", response.data);
       setError(null);
-      navigate("/agents");
     } catch (error: any) {
       if (error.response?.data?.message) {
         setError(error.response.data.message);

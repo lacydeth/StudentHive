@@ -2,19 +2,16 @@
     display: flex;
     height: 100vh;
     overflow: hidden;
-  }
-  
-  .content {
+}
+.content {
     transition: margin-left 0.3s ease;
     width: 100%;
     padding: 20px;
-  }
-  
-  .sidebarOpen {
+}
+.sidebarOpen {
     margin-left: 300px;
-  }
-  
-  .sidebarClosed {
+}
+.sidebarClosed {
     margin-left: 0;
-  }
-  
+}
+    

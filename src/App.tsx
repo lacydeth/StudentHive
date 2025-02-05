@@ -12,11 +12,7 @@ import OrganizationDashboard from './features/OrganizationDashboard/Organization
 import AddAgents from './features/OrganizationDashboard/AddAgents/AddAgents';
 import CurrentAgents from './features/OrganizationDashboard/CurrentAgents/CurrentAgents';
 import SettingsAgents from './features/OrganizationDashboard/OrganizationSettings/OrganizationSettings';
-import StuddentShift from './features/AgentDashboard/StudentShift/StudentShift';
-import StudentsList from './features/AgentDashboard/StudentsList/StudentsList';
-import AgentSettings from './features/AgentDashboard/AgentSettings/AgentSettings';
 import AgentDashboard from './features/AgentDashboard/AgentDashboard/AgentDashboard';
-import StudentApply from './features/AgentDashboard/StudentApply.tsx/StudentApply';
 import NewOrg from './features/AdminDashboard/NewOrg/NewOrg';
 import ExistingOrg from './features/AdminDashboard/ExistingOrg/ExistingOrg';
 import NewJob from './features/OrganizationDashboard/NewJob/NewJob';
@@ -28,6 +24,8 @@ import Works from './features/Works/Works';
 import WorkPage from './components/WorkPage/WorkPage';
 import NotFound from './pages/NotFound/NotFound';
 import UserDashboard from './features/UserDashboard/UserDashboardView/UserDashboard';
+import StudentApplications from './features/AgentDashboard/AgentDashboard/StudentApplications/StudentApplications';
+import AgentSettings from './features/AgentDashboard/AgentDashboard/AgentSettings/AgentSettings';
 
 const App = () => {
   useEffect(() => {
@@ -145,30 +143,6 @@ const App = () => {
         />
         {/* Agent protected routes */}
         <Route
-          path={routes.studentShifts.path}
-          element={
-            <ProtectedRoute allowedRoles={["Agent"]}>
-              <StuddentShift/>
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path={routes.studentsList.path}
-          element={
-            <ProtectedRoute allowedRoles={["Agent"]}>
-              <StudentsList/>
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path={routes.agentSettings.path}
-          element={
-            <ProtectedRoute allowedRoles={["Agent"]}>
-              <AgentSettings/>
-            </ProtectedRoute>
-          }
-        />
-        <Route
           path={routes.agentPage.path}
           element={
             <ProtectedRoute allowedRoles={["Agent"]}>
@@ -177,10 +151,26 @@ const App = () => {
           }
         />
         <Route
-          path={routes.studentApply.path}
+          path={routes.studentApplications.path}
           element={
             <ProtectedRoute allowedRoles={["Agent"]}>
-              <StudentApply/>
+              <StudentApplications/>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path={routes.studentApplications.path}
+          element={
+            <ProtectedRoute allowedRoles={["Agent"]}>
+              <StudentApplications/>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path={routes.agentSettings.path}
+          element={
+            <ProtectedRoute allowedRoles={["Agent"]}>
+              <AgentSettings/>
             </ProtectedRoute>
           }
         />
