@@ -38,20 +38,20 @@ CREATE TABLE Organizations (
   CreatedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
-CREATE TABLE Users (
-  Id INT PRIMARY KEY AUTO_INCREMENT,
-  OrganizationId INT,
-  RoleId INT NOT NULL,
-  JobId INT,
-  FirstName VARCHAR(50) NOT NULL,
-  LastName VARCHAR(50) NOT NULL,
-  Email VARCHAR(100) UNIQUE NOT NULL,
-  PasswordHash VARCHAR(255) NOT NULL,
-  IsActive BOOLEAN DEFAULT true,
-  CreatedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  FOREIGN KEY (OrganizationId) REFERENCES Organizations (Id),
-  FOREIGN KEY (RoleId) REFERENCES Roles (Id)
+CREATE TABLE `Users` (
+  `Id` INT PRIMARY KEY AUTO_INCREMENT,
+  `OrganizationId` INT,
+  `RoleId` INT NOT NULL,
+  `FirstName` VARCHAR(50) NOT NULL,
+  `LastName` VARCHAR(50) NOT NULL,
+  `Email` VARCHAR(100) UNIQUE NOT NULL,
+  `PasswordHash` VARCHAR(255) NOT NULL,
+  `IsActive` BOOLEAN DEFAULT true,
+  `CreatedAt` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (`OrganizationId`) REFERENCES `Organizations` (`Id`),
+  FOREIGN KEY (`RoleId`) REFERENCES `Roles` (`Id`)
 );
+
 
 CREATE TABLE Description (
   Id INT PRIMARY KEY AUTO_INCREMENT,
@@ -147,7 +147,7 @@ CREATE TABLE `JobAssignments` (
   `AssignedAt` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   FOREIGN KEY (`UserId`) REFERENCES `Users` (`Id`) ON DELETE CASCADE,
   FOREIGN KEY (`JobId`) REFERENCES `Jobs` (`Id`) ON DELETE CASCADE,
-  UNIQUE (`UserId`, `JobId`) -- Ensures a user can't be assigned to the same job multiple times
+  UNIQUE (`UserId`, `JobId`)
 );
 
 CREATE TABLE History (
