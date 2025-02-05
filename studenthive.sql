@@ -26,7 +26,6 @@ INSERT INTO Categories (CategoryName, ImagePath) VALUES
 ('Promóciós, host/hostess, animátor', '/categories/hostess-munka.jpg'),
 ('Vendéglátás, gyorsétterem, idegenforgalom', '/categories/gyorsetterem-munka.jfif'),
 ('Egyéb', '/categories/other.jfif');
-
 CREATE TABLE `Organizations` (
   `Id` INT PRIMARY KEY AUTO_INCREMENT,
   `Name` VARCHAR(255) NOT NULL,
@@ -41,6 +40,7 @@ CREATE TABLE `Users` (
   `Id` INT PRIMARY KEY AUTO_INCREMENT,
   `OrganizationId` INT,
   `RoleId` INT NOT NULL,
+  `JobId` INT,
   `FirstName` VARCHAR(50) NOT NULL,
   `LastName` VARCHAR(50) NOT NULL,
   `Email` VARCHAR(100) UNIQUE NOT NULL,
@@ -52,7 +52,7 @@ CREATE TABLE `Users` (
 CREATE TABLE `Jobs` (
   `Id` INT PRIMARY KEY AUTO_INCREMENT,
   `OrganizationId` INT NOT NULL,
-  `CategoryId` INT NOT NULL,
+  `CategoryId` VARCHAR(255) NOT NULL,
   `AgentId` INT,
   `DescriptionId` INT,
   `Title` VARCHAR(255) NOT NULL,
@@ -62,6 +62,7 @@ CREATE TABLE `Jobs` (
   `IsActive` BOOLEAN DEFAULT true,
   `CreatedAt` TIMESTAMP DEFAULT (CURRENT_TIMESTAMP)
 );
+
 CREATE TABLE `Description` (
   `Id` INT PRIMARY KEY AUTO_INCREMENT,
   `OurOffer` TEXT NOT NULL,
@@ -69,6 +70,7 @@ CREATE TABLE `Description` (
   `JobRequirements` TEXT NOT NULL,
   `Advantages` TEXT NOT NULL
 );
+
 CREATE TABLE `Applications` (
   `Id` INT PRIMARY KEY AUTO_INCREMENT,
   `JobId` INT NOT NULL,
@@ -128,16 +130,16 @@ CREATE TABLE `History` (
   `StudentId` INT NOT NULL,
   `JobId` INT NOT NULL,
   `StartDate` DATE NOT NULL,
-  `EndDate` DATE NOT NULL,
-  `PerformanceRating` INT NOT NULL DEFAULT 0,
-  `Feedback` TEXT
+  `EndDate` DATE NOT NULL
 );
 
 ALTER TABLE `Users` ADD FOREIGN KEY (`OrganizationId`) REFERENCES `Organizations` (`Id`);
 
 ALTER TABLE `Users` ADD FOREIGN KEY (`RoleId`) REFERENCES `Roles` (`Id`);
 
-ALTER TABLE `Jobs` ADD FOREIGN KEY (`DescriptionId`) REFERENCES `Description` (`Id`) ON DELETE CASCADE;
+ALTER TABLE `Jobs` ADD FOREIGN KEY (`Id`) REFERENCES `Users` (`JobId`);
+
+ALTER TABLE `Jobs` ADD FOREIGN KEY (`DescriptionId`) REFERENCES `Description` (`Id`);
 
 ALTER TABLE `Jobs` ADD FOREIGN KEY (`CategoryId`) REFERENCES `Categories` (`Id`);
 
@@ -145,17 +147,17 @@ ALTER TABLE `Jobs` ADD FOREIGN KEY (`OrganizationId`) REFERENCES `Organizations`
 
 ALTER TABLE `Jobs` ADD FOREIGN KEY (`AgentId`) REFERENCES `Users` (`Id`);
 
-ALTER TABLE `Applications` ADD FOREIGN KEY (`JobId`) REFERENCES `Jobs` (`Id`) ON DELETE CASCADE;
+ALTER TABLE `Applications` ADD FOREIGN KEY (`JobId`) REFERENCES `Jobs` (`Id`);
 
 ALTER TABLE `Applications` ADD FOREIGN KEY (`StudentId`) REFERENCES `Users` (`Id`);
 
-ALTER TABLE `Shifts` ADD FOREIGN KEY (`JobId`) REFERENCES `Jobs` (`Id`) ON DELETE CASCADE;
+ALTER TABLE `Shifts` ADD FOREIGN KEY (`JobId`) REFERENCES `Jobs` (`Id`);
 
 ALTER TABLE `StudentShifts` ADD FOREIGN KEY (`ShiftId`) REFERENCES `Shifts` (`Id`);
 
 ALTER TABLE `StudentShifts` ADD FOREIGN KEY (`StudentId`) REFERENCES `Users` (`Id`);
 
-ALTER TABLE `JobReviews` ADD FOREIGN KEY (`JobId`) REFERENCES `Jobs` (`Id`) ON DELETE CASCADE;
+ALTER TABLE `JobReviews` ADD FOREIGN KEY (`JobId`) REFERENCES `Jobs` (`Id`);
 
 ALTER TABLE `JobReviews` ADD FOREIGN KEY (`ReviewerId`) REFERENCES `Users` (`Id`);
 
