@@ -19,6 +19,78 @@ namespace StudentHiveServer.Controllers
             _dbHelper = new DatabaseHelper(configuration.GetConnectionString("DefaultConnection"));
         }
 
+        [HttpGet("total-students-and-jobs/{orgId}")]
+        public async Task<IActionResult> GetTotalStudentsAndJobs(int orgId)
+        {
+            const string query = @"
+                SELECT 
+                    (SELECT COUNT(*) FROM Users WHERE RoleId = 4 AND OrganizationId = @OrgId) AS TotalStudents,
+                    (SELECT COUNT(*) FROM Jobs WHERE OrganizationId = @OrgId) AS TotalJobs";
+
+            try
+            {
+                MySqlParameter[] parameters = new MySqlParameter[]
+                {
+                    new MySqlParameter("@OrgId", orgId)
+                };
+
+                var result = await _dbHelper.ExecuteQueryAsync(query, parameters);
+                var data = result.AsEnumerable().Select(row => new
+                {
+                    TotalStudents = row.Field<long>("TotalStudents"),
+                    TotalJobs = row.Field<long>("TotalJobs")
+                }).FirstOrDefault();
+
+                return Ok(data);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new
+                {
+                    message = "Error fetching total students and jobs.",
+                    details = ex.Message
+                });
+            }
+        }
+
+        // GET: api/organization/jobs-created-by-month/{orgId}
+        [HttpGet("jobs-created-by-month/{orgId}")]
+        public async Task<IActionResult> GetJobsCreatedByMonth(int orgId)
+        {
+            const string query = @"
+                SELECT YEAR(CreatedAt) AS Year, MONTH(CreatedAt) AS Month, COUNT(*) AS UserCount
+                FROM Jobs
+                WHERE OrganizationId = @OrgId
+                GROUP BY YEAR(CreatedAt), MONTH(CreatedAt)
+                ORDER BY Year, Month";
+
+            try
+            {
+                MySqlParameter[] parameters = new MySqlParameter[]
+                {
+                    new MySqlParameter("@OrgId", orgId)
+                };
+
+                var dataTable = await _dbHelper.ExecuteQueryAsync(query, parameters);
+                var jobsByMonth = dataTable.AsEnumerable().Select(row => new
+                {
+                    year = row.Field<int>("Year"),
+                    month = row.Field<int>("Month"),
+                    userCount = row.Field<long>("UserCount")
+                }).ToList();
+
+                return Ok(jobsByMonth);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new
+                {
+                    message = "Error fetching jobs created by month.",
+                    details = ex.Message
+                });
+            }
+        }
+
         [HttpPost("new-agent")]
         public async Task<IActionResult> AddAgent([FromBody] NewAgentRequest request)
         {
@@ -138,8 +210,6 @@ namespace StudentHiveServer.Controllers
                 return StatusCode(500, new { message = "Hiba történt az adatok feldolgozása során.", error = ex.Message });
             }
         }
-
-
 
         [HttpGet("jobs")]
         public async Task<IActionResult> GetJobs([FromQuery] bool? isActive)
@@ -266,6 +336,66 @@ namespace StudentHiveServer.Controllers
             }
         }
 
+        [HttpPatch("assign-agent/{agentId}/{JobId}")]
+        public async Task<IActionResult> PatchJobs(int agentId, int JobId)
+        {
+            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
+            var roleClaim = User.FindFirst(ClaimTypes.Role);
+
+            if (userIdClaim == null || roleClaim == null)
+            {
+                return Unauthorized(new { message = "User is not authenticated." });
+            }
+
+            var loggedInUserId = userIdClaim.Value;
+            var userRole = roleClaim.Value;
+
+            // Check if the user has the appropriate role (Organization in this case)
+            if (userRole != "Organization")
+            {
+                return Unauthorized(new { message = "You do not have the required permissions." });
+            }
+
+            try
+            {
+                // Fetch OrganizationId of the logged-in user
+                const string getOrganizationQuery = "SELECT OrganizationId FROM Users WHERE Id = @UserId";
+                var organizationParams = new[] { new MySqlParameter("@UserId", loggedInUserId) };
+                var organizationTable = await _dbHelper.ExecuteQueryAsync(getOrganizationQuery, organizationParams);
+
+                if (organizationTable.Rows.Count == 0)
+                {
+                    return Unauthorized(new { message = "User does not belong to any organization." });
+                }
+
+                var organizationId = organizationTable.Rows[0].Field<int>("OrganizationId");
+
+                // Update the job with the agentId and organizationId
+                const string updateQuery = "UPDATE Jobs SET AgentId = @AgentId WHERE Id = @JobId";
+                var parameters = new[]
+                {
+            new MySqlParameter("@AgentId", agentId),
+            new MySqlParameter("@JobId", JobId), // Corrected: use JobId directly
+            new MySqlParameter("@OrganizationId", organizationId) // OrganizationId from the logged-in user
+        };
+
+                var result = await _dbHelper.ExecuteNonQueryAsync(updateQuery, parameters);
+
+                if (result <= 0)
+                {
+                    return StatusCode(500, new { message = "An error occurred while updating the job." });
+                }
+
+                return Ok(new { message = "Agent successfully assigned to job." });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "Error occurred while assigning agent.", details = ex.Message });
+            }
+        }
+
+
+
         [HttpGet("agents")]
         public async Task<IActionResult> GetAgents()
         {
@@ -320,21 +450,28 @@ namespace StudentHiveServer.Controllers
                 return StatusCode(500, new { message = "Error fetching data", details = ex.Message });
             }
         }
-
         [HttpPatch("isactive/{jobId}")]
         public async Task<IActionResult> UpdateJobStatus(int jobId, [FromBody] JobStatusUpdateRequest request)
         {
             var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
-            if (userIdClaim == null)
+            var roleClaim = User.FindFirst(ClaimTypes.Role);
+
+            if (userIdClaim == null || roleClaim == null)
             {
                 return Unauthorized(new { message = "User is not authenticated." });
             }
 
             var loggedInUserId = userIdClaim.Value;
+            var userRole = roleClaim.Value;
+
+            // Check if the user has the appropriate role (Organization in this case)
+            if (userRole != "Organization")
+            {
+                return Unauthorized(new { message = "You do not have the required permissions." });
+            }
 
             try
             {
-
                 const string checkQuery = "SELECT OrganizationId FROM Jobs WHERE Id = @JobId";
                 var checkParameters = new[] { new MySqlParameter("@JobId", jobId) };
 
@@ -347,11 +484,11 @@ namespace StudentHiveServer.Controllers
 
                 var organizationId = jobTable.Rows[0].Field<int>("OrganizationId");
 
+                // Parse loggedInUserId to integer before comparing
                 if (organizationId != int.Parse(loggedInUserId))
                 {
                     return Unauthorized(new { message = "You do not have permission to update this job's status." });
                 }
-
 
                 const string updateQuery = "UPDATE Jobs SET IsActive = @IsActive WHERE Id = @JobId";
                 var updateParameters = new[]
@@ -374,6 +511,7 @@ namespace StudentHiveServer.Controllers
                 return StatusCode(500, new { message = "Error occurred while updating job status.", details = ex.Message });
             }
         }
+
 
         public class JobStatusUpdateRequest
         {
@@ -539,7 +677,6 @@ namespace StudentHiveServer.Controllers
             public string LastName { get; set; }
             public string NewAgentEmail { get; set; }
         }
-
 
         public class JobRequest
         {
