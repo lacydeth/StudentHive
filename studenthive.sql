@@ -8,10 +8,11 @@ CREATE TABLE `Categories` (
   `CategoryName` VARCHAR(100) UNIQUE NOT NULL,
   `ImagePath` VARCHAR(100) NOT NULL
 );
+
 INSERT INTO `roles` (`Id`, `RoleName`) VALUES
 (1, 'Admin'),
-(3, 'Agent'),
 (2, 'Organization'),
+(3, 'Agent'),
 (4, 'User');
 
 INSERT INTO Categories (CategoryName, ImagePath) VALUES
@@ -26,6 +27,7 @@ INSERT INTO Categories (CategoryName, ImagePath) VALUES
 ('Promóciós, host/hostess, animátor', '/categories/hostess-munka.jpg'),
 ('Vendéglátás, gyorsétterem, idegenforgalom', '/categories/gyorsetterem-munka.jfif'),
 ('Egyéb', '/categories/other.jfif');
+
 CREATE TABLE `Organizations` (
   `Id` INT PRIMARY KEY AUTO_INCREMENT,
   `Name` VARCHAR(255) NOT NULL,
@@ -33,7 +35,7 @@ CREATE TABLE `Organizations` (
   `ContactEmail` VARCHAR(100),
   `ContactPhone` VARCHAR(15),
   `IsActive` BOOLEAN DEFAULT true,
-  `CreatedAt` TIMESTAMP DEFAULT (CURRENT_TIMESTAMP)
+  `CreatedAt` TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
 CREATE TABLE `Users` (
@@ -46,21 +48,9 @@ CREATE TABLE `Users` (
   `Email` VARCHAR(100) UNIQUE NOT NULL,
   `PasswordHash` VARCHAR(255) NOT NULL,
   `IsActive` BOOLEAN DEFAULT true,
-  `CreatedAt` TIMESTAMP DEFAULT (CURRENT_TIMESTAMP)
-);
-
-CREATE TABLE `Jobs` (
-  `Id` INT PRIMARY KEY AUTO_INCREMENT,
-  `OrganizationId` INT NOT NULL,
-  `CategoryId` VARCHAR(255) NOT NULL,
-  `AgentId` INT,
-  `DescriptionId` INT,
-  `Title` VARCHAR(255) NOT NULL,
-  `City` VARCHAR(50) NOT NULL,
-  `Address` VARCHAR(50) NOT NULL,
-  `HourlyRate` INT NOT NULL,
-  `IsActive` BOOLEAN DEFAULT true,
-  `CreatedAt` TIMESTAMP DEFAULT (CURRENT_TIMESTAMP)
+  `CreatedAt` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (`OrganizationId`) REFERENCES `Organizations` (`Id`),
+  FOREIGN KEY (`RoleId`) REFERENCES `Roles` (`Id`)
 );
 
 CREATE TABLE `Description` (
@@ -71,12 +61,32 @@ CREATE TABLE `Description` (
   `Advantages` TEXT NOT NULL
 );
 
+CREATE TABLE `Jobs` (
+  `Id` INT PRIMARY KEY AUTO_INCREMENT,
+  `OrganizationId` INT NOT NULL,
+  `CategoryId` INT NOT NULL,
+  `AgentId` INT,
+  `DescriptionId` INT,
+  `Title` VARCHAR(255) NOT NULL,
+  `City` VARCHAR(50) NOT NULL,
+  `Address` VARCHAR(50) NOT NULL,
+  `HourlyRate` INT NOT NULL,
+  `IsActive` BOOLEAN DEFAULT true,
+  `CreatedAt` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (`DescriptionId`) REFERENCES `Description` (`Id`),
+  FOREIGN KEY (`CategoryId`) REFERENCES `Categories` (`Id`),
+  FOREIGN KEY (`OrganizationId`) REFERENCES `Organizations` (`Id`),
+  FOREIGN KEY (`AgentId`) REFERENCES `Users` (`Id`)
+);
+
 CREATE TABLE `Applications` (
   `Id` INT PRIMARY KEY AUTO_INCREMENT,
   `JobId` INT NOT NULL,
   `StudentId` INT NOT NULL,
   `Status` ENUM ('Pending', 'Accepted', 'Rejected') DEFAULT 'Pending',
-  `AppliedAt` TIMESTAMP DEFAULT (CURRENT_TIMESTAMP)
+  `AppliedAt` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (`JobId`) REFERENCES `Jobs` (`Id`),
+  FOREIGN KEY (`StudentId`) REFERENCES `Users` (`Id`)
 );
 
 CREATE TABLE `Shifts` (
@@ -84,14 +94,17 @@ CREATE TABLE `Shifts` (
   `JobId` INT NOT NULL,
   `Date` DATE NOT NULL,
   `ShiftStart` TIME NOT NULL,
-  `ShiftEnd` TIME NOT NULL
+  `ShiftEnd` TIME NOT NULL,
+  FOREIGN KEY (`JobId`) REFERENCES `Jobs` (`Id`)
 );
 
 CREATE TABLE `StudentShifts` (
   `Id` INT PRIMARY KEY AUTO_INCREMENT,
   `StudentId` INT NOT NULL,
   `ShiftId` INT NOT NULL,
-  `Approved` BOOLEAN DEFAULT false
+  `Approved` BOOLEAN DEFAULT false,
+  FOREIGN KEY (`ShiftId`) REFERENCES `Shifts` (`Id`),
+  FOREIGN KEY (`StudentId`) REFERENCES `Users` (`Id`)
 );
 
 CREATE TABLE `JobReviews` (
@@ -100,7 +113,9 @@ CREATE TABLE `JobReviews` (
   `ReviewerId` INT NOT NULL,
   `Rating` INT NOT NULL,
   `Comment` TEXT,
-  `CreatedAt` TIMESTAMP DEFAULT (CURRENT_TIMESTAMP)
+  `CreatedAt` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (`JobId`) REFERENCES `Jobs` (`Id`),
+  FOREIGN KEY (`ReviewerId`) REFERENCES `Users` (`Id`)
 );
 
 CREATE TABLE `StudentDetails` (
@@ -122,7 +137,8 @@ CREATE TABLE `StudentDetails` (
   `Address` VARCHAR(255) NOT NULL,
   `SchoolName` VARCHAR(255) NOT NULL,
   `StudyStartDate` DATE NOT NULL,
-  `StudyEndDate` DATE NOT NULL
+  `StudyEndDate` DATE NOT NULL,
+  FOREIGN KEY (`UserId`) REFERENCES `Users` (`Id`) ON DELETE CASCADE
 );
 
 CREATE TABLE `History` (
@@ -130,39 +146,7 @@ CREATE TABLE `History` (
   `StudentId` INT NOT NULL,
   `JobId` INT NOT NULL,
   `StartDate` DATE NOT NULL,
-  `EndDate` DATE NOT NULL
+  `EndDate` DATE NOT NULL,
+  FOREIGN KEY (`StudentId`) REFERENCES `Users` (`Id`),
+  FOREIGN KEY (`JobId`) REFERENCES `Jobs` (`Id`)
 );
-
-ALTER TABLE `Users` ADD FOREIGN KEY (`OrganizationId`) REFERENCES `Organizations` (`Id`);
-
-ALTER TABLE `Users` ADD FOREIGN KEY (`RoleId`) REFERENCES `Roles` (`Id`);
-
-ALTER TABLE `Jobs` ADD FOREIGN KEY (`Id`) REFERENCES `Users` (`JobId`);
-
-ALTER TABLE `Jobs` ADD FOREIGN KEY (`DescriptionId`) REFERENCES `Description` (`Id`);
-
-ALTER TABLE `Jobs` ADD FOREIGN KEY (`CategoryId`) REFERENCES `Categories` (`Id`);
-
-ALTER TABLE `Jobs` ADD FOREIGN KEY (`OrganizationId`) REFERENCES `Organizations` (`Id`);
-
-ALTER TABLE `Jobs` ADD FOREIGN KEY (`AgentId`) REFERENCES `Users` (`Id`);
-
-ALTER TABLE `Applications` ADD FOREIGN KEY (`JobId`) REFERENCES `Jobs` (`Id`);
-
-ALTER TABLE `Applications` ADD FOREIGN KEY (`StudentId`) REFERENCES `Users` (`Id`);
-
-ALTER TABLE `Shifts` ADD FOREIGN KEY (`JobId`) REFERENCES `Jobs` (`Id`);
-
-ALTER TABLE `StudentShifts` ADD FOREIGN KEY (`ShiftId`) REFERENCES `Shifts` (`Id`);
-
-ALTER TABLE `StudentShifts` ADD FOREIGN KEY (`StudentId`) REFERENCES `Users` (`Id`);
-
-ALTER TABLE `JobReviews` ADD FOREIGN KEY (`JobId`) REFERENCES `Jobs` (`Id`);
-
-ALTER TABLE `JobReviews` ADD FOREIGN KEY (`ReviewerId`) REFERENCES `Users` (`Id`);
-
-ALTER TABLE `StudentDetails` ADD FOREIGN KEY (`UserId`) REFERENCES `Users` (`Id`) ON DELETE CASCADE;
-
-ALTER TABLE `History` ADD FOREIGN KEY (`StudentId`) REFERENCES `Users` (`Id`);
-
-ALTER TABLE `History` ADD FOREIGN KEY (`JobId`) REFERENCES `Jobs` (`Id`);
