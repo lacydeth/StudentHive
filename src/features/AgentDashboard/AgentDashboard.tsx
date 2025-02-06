@@ -1,11 +1,11 @@
 import { useEffect, useState } from "react";
-import Sidebar from "../../../components/Sidebar/Sidebar";
+import Sidebar from "../../components/Sidebar/Sidebar";
 import styles from "./AgentDashboard.module.css";
-import DashboardTitle from "../../../components/DashboardTitle/DashboardTitle";
+import DashboardTitle from "../../components/DashboardTitle/DashboardTitle";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import axios from "axios";
-import Title from "../../../components/Title/Title";
-import { agentMenuLinks } from "../../../utils/routes";
+import Title from "../../components/Title/Title";
+import { agentMenuLinks } from "../../utils/routes";
 
 const AgentDashboard = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(window.innerWidth >= 1000);

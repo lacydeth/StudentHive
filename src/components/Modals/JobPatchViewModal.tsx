@@ -12,7 +12,6 @@ const JobPatchViewModal: React.FC<JobPatchViewModalProps> = ({ jobId }) => {
   const [currentJobId, setCurrentJobId] = useState<string>("");
 
   useEffect(() => {
-    // Frissítsd a currentJobId-t, amikor a jobId prop változik
     setCurrentJobId(jobId.toString());
   }, [jobId]);
 

@@ -1,11 +1,11 @@
-import DashboardTitle from "../../../../components/DashboardTitle/DashboardTitle";
-import Sidebar from "../../../../components/Sidebar/Sidebar";
-import { agentMenuLinks } from "../../../../utils/routes";
+import DashboardTitle from "../../../components/DashboardTitle/DashboardTitle";
+import Sidebar from "../../../components/Sidebar/Sidebar";
+import { agentMenuLinks } from "../../../utils/routes";
 import styles from "./StudentApplications.module.css";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { ClientSideRowModelModule, ModuleRegistry } from "ag-grid-community";
 import axios from "axios";
-import Title from "../../../../components/Title/Title";
+import Title from "../../../components/Title/Title";
 import { AgGridReact } from "ag-grid-react";
 
 ModuleRegistry.registerModules([ClientSideRowModelModule]);
