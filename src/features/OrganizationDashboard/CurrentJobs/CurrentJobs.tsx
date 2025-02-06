@@ -12,8 +12,7 @@ import "./Table.css";
 import Dialog from "../../../components/Dialog/Dialog";
 import { orgMenuLinks } from "../../../utils/routes";
 import JobViewModal from "../../../components/Modals/JobViewModal";
-import JobPatchVIewModal from "../../../components/Modals/JobPatchVIewModal";
-
+import JobPatchViewModal from "../../../components/Modals/JobPatchViewModal";
 ModuleRegistry.registerModules([ClientSideRowModelModule]);
 
 const CurrentJobs = () => {
@@ -56,38 +55,6 @@ const CurrentJobs = () => {
       console.error("Error fetching jobs:", error);
     }
   };
-
-  const handleUpdateJob = async (e: React.FormEvent, jobId: number) => {
-    e.preventDefault();
-    const formData = new FormData(e.target as HTMLFormElement);
-    
-    const updatedJob = {
-      Title: formData.get("title"),
-      CategoryId: formData.get("categoryId"),
-      City: formData.get("city"),
-      Address: formData.get("address"),
-      HourlyRate: formData.get("hourlyRate"),
-      OurOffer: formData.get("ourOffer"),
-      mainTaks: formData.get("mainTaks"),
-      JobRequirements: formData.get("jobRequirements"),
-      Advantages: formData.get("advantages"),
-    };
-  
-    try {
-      const token = localStorage.getItem("token");
-      await axios.put(`https://localhost:7067/api/organization/update-job/${jobId}`, updatedJob, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-  
-      fetchJobs();
-      toggleDialog();
-      alert("A munka sikeresen frissítve!");
-    } catch (error) {
-      console.error("Error updating job:", error);
-      alert("Hiba történt a frissítés során.");
-    }
-  };
-  
 
   const deleteJob = async (jobId: number) => {
     try {
@@ -158,7 +125,7 @@ const CurrentJobs = () => {
 
     const handlePatchJob = () => {
     setDialogContent(
-      <JobPatchVIewModal jobId={job.id} />  // Itt adjuk át az ID-t
+      <JobPatchViewModal jobId={job.id} />  // Itt adjuk át az ID-t
     );
     toggleDialog();
   };

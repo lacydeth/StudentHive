@@ -12,7 +12,7 @@ import OrganizationDashboard from './features/OrganizationDashboard/Organization
 import AddAgents from './features/OrganizationDashboard/AddAgents/AddAgents';
 import CurrentAgents from './features/OrganizationDashboard/CurrentAgents/CurrentAgents';
 import SettingsAgents from './features/OrganizationDashboard/OrganizationSettings/OrganizationSettings';
-import AgentDashboard from './features/AgentDashboard/AgentDashboard/AgentDashboard';
+import AgentDashboard from './features/AgentDashboard/AgentDashboard';
 import NewOrg from './features/AdminDashboard/NewOrg/NewOrg';
 import ExistingOrg from './features/AdminDashboard/ExistingOrg/ExistingOrg';
 import NewJob from './features/OrganizationDashboard/NewJob/NewJob';
@@ -24,8 +24,10 @@ import Works from './features/Works/Works';
 import WorkPage from './components/WorkPage/WorkPage';
 import NotFound from './pages/NotFound/NotFound';
 import UserDashboard from './features/UserDashboard/UserDashboardView/UserDashboard';
-import StudentApplications from './features/AgentDashboard/AgentDashboard/StudentApplications/StudentApplications';
-import AgentSettings from './features/AgentDashboard/AgentDashboard/AgentSettings/AgentSettings';
+import StudentApplications from './features/AgentDashboard/StudentApplications/StudentApplications';
+import AgentSettings from './features/AgentDashboard/AgentSettings/AgentSettings';
+import AgentShift from './features/AgentDashboard/AgentShift/AgentShift';
+import AgentStudentList from './features/AgentDashboard/AgentStudentList/AgentStudentList';
 
 const App = () => {
   useEffect(() => {
@@ -159,10 +161,18 @@ const App = () => {
           }
         />
         <Route
-          path={routes.studentApplications.path}
+          path={routes.agentShift.path}
           element={
             <ProtectedRoute allowedRoles={["Agent"]}>
-              <StudentApplications/>
+              <AgentShift/>
+            </ProtectedRoute>
+          }
+        />
+         <Route
+          path={routes.agentStudentList.path}
+          element={
+            <ProtectedRoute allowedRoles={["Agent"]}>
+              <AgentStudentList/>
             </ProtectedRoute>
           }
         />

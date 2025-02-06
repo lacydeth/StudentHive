@@ -1,11 +1,10 @@
-import DashboardTitle from "../../../../components/DashboardTitle/DashboardTitle";
-import Sidebar from "../../../../components/Sidebar/Sidebar";
-import { agentMenuLinks } from "../../../../utils/routes";
-import styles from "./AgentSettings.module.css"
 import { useState } from "react";
+import DashboardTitle from "../../../components/DashboardTitle/DashboardTitle";
+import Sidebar from "../../../components/Sidebar/Sidebar";
+import { agentMenuLinks } from "../../../utils/routes";
+import styles from "./AgentShift.module.css";
 
-
-const AgentSettings = () => {
+const AgentShift = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(window.innerWidth >= 1000);
 
   const handleToggleSidebar = () => {
@@ -20,7 +19,7 @@ const AgentSettings = () => {
           isSidebarOpen ? styles.sidebarOpen : styles.sidebarClosed
         }`}
       >
-        <DashboardTitle title="Közvetítői beállítások" icon="./settings.png" subTitle="Közvetítői beállítások"/>
+        <DashboardTitle title="Műszak Kezelése" icon="./timetable.png" subTitle="Műszak Kezelése"/>
         <div className={styles.settingsContent}>
 
         </div>
@@ -29,4 +28,4 @@ const AgentSettings = () => {
   );
 };
 
-export default AgentSettings
+export default AgentShift
