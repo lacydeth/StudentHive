@@ -27,7 +27,7 @@ namespace StudentHiveServer.Controllers
                                 FROM Applications a
                                 JOIN Jobs j ON a.JobId = j.Id
                                 JOIN Users u ON a.StudentId = u.Id
-                                JOIN Organizations o ON j.OrganizationId = o.Id";
+                                JOIN Organizations o ON j.OrganizationId = o.Id WHERE a.Status = 0";
 
             try
             {
