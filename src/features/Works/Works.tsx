@@ -13,8 +13,8 @@ type WorkCardData = {
   location: string;
   category: string;
   image: string;
-  hourlyRate: number; // Assuming hourlyRate exists in the API response
-  createdAt: string;  // Assuming createdAt exists
+  hourlyRate: number;
+  createdAt: string; 
 };
 
 const Works = () => {

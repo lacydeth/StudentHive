@@ -22,4 +22,13 @@
 .actionBtn img {
     width: 22px;
 }
-    
+.inputBox select {
+    outline: 0;
+    border: 0;
+    border-radius: 8px;
+    padding: 10px 20px;
+    width: 250px;
+    height: 45px;
+    color: #0000007c;
+    margin-bottom: 15px;
+}
