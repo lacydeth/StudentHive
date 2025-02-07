@@ -130,17 +130,17 @@ namespace StudentHiveServer.Controllers
             var loggedInUserId = int.Parse(userIdClaim.Value);
 
             const string query = @"
-        SELECT 
-            u.Id AS StudentId, 
-            u.FirstName, 
-            u.LastName, 
-            u.Email, 
-            a.JobId,
-            j.Title AS JobTitle
-        FROM Users u
-        INNER JOIN Applications a ON u.Id = a.StudentId
-        INNER JOIN Jobs j ON a.JobId = j.Id
-        WHERE a.Status = 1 AND j.AgentId = @AgentId";
+SELECT 
+    u.Id AS StudentId, 
+    u.FirstName, 
+    u.LastName, 
+    u.Email, 
+    ja.JobId,
+    j.Title AS JobTitle
+FROM Users u
+INNER JOIN JobAssignments ja ON u.Id = ja.UserId
+INNER JOIN Jobs j ON ja.JobId = j.Id
+WHERE j.AgentId = @AgentId";
 
             try
             {
@@ -150,6 +150,7 @@ namespace StudentHiveServer.Controllers
                 };
 
                 DataTable dataTable = await _dbHelper.ExecuteQueryAsync(query, parameters);
+
                 var students = dataTable.AsEnumerable().Select(row => new
                 {
                     StudentId = row.Field<int>("StudentId"),
@@ -167,6 +168,8 @@ namespace StudentHiveServer.Controllers
                 return StatusCode(500, new { message = "Error loading students!", details = ex.Message });
             }
         }
+
+
 
 
         [HttpPatch("applications/{id}/decline")]
