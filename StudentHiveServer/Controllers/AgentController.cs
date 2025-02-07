@@ -38,6 +38,50 @@ namespace StudentHiveServer.Controllers
                 return StatusCode(500, new { message = "Hiba történt a munkák lekérdezése közben.", details = ex.Message });
             }
         }
+        [HttpGet("agent-work-cards")]
+        public async Task<IActionResult> GetAgentWorkCards([FromQuery] int agentId)
+        {
+            var query = @"SELECT 
+                            j.Id,
+                            j.Title, 
+                            j.City, 
+                            c.CategoryName, 
+                            c.ImagePath,
+                            u.FirstName AS AgentFirstName,
+                            u.LastName AS AgentLastName
+                          FROM Jobs j
+                          JOIN Categories c ON j.CategoryId = c.Id
+                          JOIN Users u ON j.AgentId = u.Id
+                          WHERE j.IsActive = 1 
+                            AND j.AgentId = @AgentId
+                            AND u.RoleId = 3";
+
+            var parameters = new List<MySqlParameter>
+            {
+                new MySqlParameter("@AgentId", agentId)
+            };
+
+            try
+            {
+                var dataTable = await _dbHelper.ExecuteQueryAsync(query, parameters.ToArray());
+                var workCards = dataTable.AsEnumerable().Select(row => new
+                {
+                    Id = row.Field<int>("Id"),
+                    Title = row.Field<string>("Title"),
+                    Location = row.Field<string>("City"),
+                    Category = row.Field<string>("CategoryName"),
+                    Image = row.Field<string>("ImagePath"),
+                    AgentName = $"{row.Field<string>("AgentFirstName")} {row.Field<string>("AgentLastName")}"
+                }).ToList();
+
+                return Ok(workCards);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "Hiba történt a munkák lekérdezése közben.", details = ex.Message });
+            }
+        }
+
         [HttpGet("applications")]
         public async Task<IActionResult> GetApplications([FromQuery] int agentId, [FromQuery] string? title = null, [FromQuery] int? status = null)
         {
