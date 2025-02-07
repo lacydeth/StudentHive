@@ -8,6 +8,7 @@ import { AgGridReact } from "ag-grid-react";
 import Dialog from "../../../components/Dialog/Dialog";
 import AgentStudentListViewModal from "../../../components/Modals/AgentStudentListViewModal";
 import axios from "axios";
+import { getUserIdFromToken } from "../../../utils/authUtils";
 
 const AgentStudentList = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(window.innerWidth >= 1000);
@@ -19,11 +20,29 @@ const AgentStudentList = () => {
     setIsSidebarOpen(!isSidebarOpen);
   };
   const fetchStudents = async () => {
-    axios
-    .get("https://localhost:7067/api/Agent/StudentList")
-    .then((response) => setRowData(response.data))
-    .catch((error) => console.error("Error fetching work cards:", error));
+    const token = localStorage.getItem("token");
+    const userId = getUserIdFromToken();
+  
+    if (!token || !userId) {
+      console.error("User is not authenticated or token missing.");
+      return;
+    }
+  
+    try {
+      const response = await axios.get(
+        `https://localhost:7067/api/Agent/student-list?userId=${userId}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      setRowData(response.data);
+    } catch (error) {
+      console.error("Error fetching students:", error);
+    }
   };
+  
 
   useEffect(() => {
     fetchStudents();
@@ -64,9 +83,9 @@ const AgentStudentList = () => {
   };
 
   const columnDefs = useMemo(() => [
-        { field: "id", headerName: "Azonosító", flex: 0.5, minWidth: 100 },
-        { field: "firstname", headerName: "Vezetéknév", flex: 1, minWidth: 150 },
-        { field: "lastname", headerName: "Keresztnév", flex: 1, minWidth: 200 },
+        { field: "studentId", headerName: "Azonosító", flex: 0.5, minWidth: 100 },
+        { field: "firstName", headerName: "Vezetéknév", flex: 1, minWidth: 150 },
+        { field: "lastName", headerName: "Keresztnév", flex: 1, minWidth: 200 },
         { field: "email", headerName: "Email", flex: 1.5, minWidth: 180 },
         {
           headerName: "Műveletek",
