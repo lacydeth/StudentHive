@@ -39,24 +39,23 @@ namespace StudentHiveServer.Controllers
             }
         }
         [HttpGet("applications")]
-        public async Task<IActionResult> GetApplications([FromQuery] int agentId, [FromQuery] string? title = null)
-
+        public async Task<IActionResult> GetApplications([FromQuery] int agentId, [FromQuery] string? title = null, [FromQuery] int? status = null)
         {
             string query = @"SELECT 
-                                a.*,
-                                j.Title AS JobTitle,
-                                CONCAT(u.FirstName, ' ', u.LastName) AS StudentName,
-                                o.Name AS OrganizationName
-                            FROM Applications a
-                            JOIN Jobs j ON a.JobId = j.Id
-                            JOIN Users u ON a.StudentId = u.Id
-                            JOIN Organizations o ON j.OrganizationId = o.Id
-                            WHERE a.Status = 0 AND j.AgentId = @AgentId";
+                        a.*,
+                        j.Title AS JobTitle,
+                        CONCAT(u.FirstName, ' ', u.LastName) AS StudentName,
+                        o.Name AS OrganizationName
+                     FROM Applications a
+                     JOIN Jobs j ON a.JobId = j.Id
+                     JOIN Users u ON a.StudentId = u.Id
+                     JOIN Organizations o ON j.OrganizationId = o.Id
+                     WHERE j.AgentId = @AgentId";
 
+            if (status.HasValue)
+                query += " AND a.Status = @Status";
             if (!string.IsNullOrEmpty(title))
-            {
                 query += " AND j.Title = @Title";
-            }
 
             try
             {
@@ -65,12 +64,13 @@ namespace StudentHiveServer.Controllers
                     new MySqlParameter("@AgentId", agentId)
                 };
 
+                if (status.HasValue)
+                    parameters.Add(new MySqlParameter("@Status", status));
                 if (!string.IsNullOrEmpty(title))
-                {
                     parameters.Add(new MySqlParameter("@Title", title));
-                }
 
                 var dataTable = await _dbHelper.ExecuteQueryAsync(query, parameters.ToArray());
+
                 var applications = dataTable.AsEnumerable().Select(row => new
                 {
                     ApplicationId = row.Field<int>("Id"),
@@ -87,35 +87,60 @@ namespace StudentHiveServer.Controllers
             }
             catch (Exception ex)
             {
-                return StatusCode(500, new { message = "Error loading applications!", details = ex.Message });
+                return StatusCode(500, new { message = "Hiba a jelentkezések betöltése során!", details = ex.Message });
             }
         }
-
 
         [HttpPatch("applications/{id}/accept")]
         public async Task<IActionResult> AcceptApplication(int id)
         {
-            const string query = "UPDATE Applications SET Status = 1 WHERE Id = @Id";
+            const string updateQuery = "UPDATE Applications SET Status = 1 WHERE Id = @Id";
+            const string insertAssignmentQuery = "INSERT INTO JobAssignments (UserId, JobId) VALUES (@UserId, @JobId)";
 
             try
             {
-                var parameters = new MySqlParameter[]
+                string getApplicationQuery = @"SELECT a.StudentId, a.JobId, j.AgentId
+                                                FROM Applications a
+                                                JOIN Jobs j ON a.JobId = j.Id
+                                                WHERE a.Id = @Id";
+
+                var applicationParams = new MySqlParameter[] { new MySqlParameter("@Id", id) };
+                var applicationDataTable = await _dbHelper.ExecuteQueryAsync(getApplicationQuery, applicationParams);
+
+                if (applicationDataTable.Rows.Count == 0)
+                    return NotFound(new { message = "Jelentkezés nem található!" });
+
+                var row = applicationDataTable.Rows[0];
+                int studentId = row.Field<int>("StudentId");
+                int jobId = row.Field<int>("JobId");
+
+                var updateParams = new MySqlParameter[] { new MySqlParameter("@Id", id) };
+                int rowsAffected = await _dbHelper.ExecuteNonQueryAsync(updateQuery, updateParams);
+
+                if (rowsAffected == 0)
+                    return NotFound(new { message = "Jelentkezés nem található!" });
+
+                var insertParams = new MySqlParameter[]
                 {
-                    new MySqlParameter("@Id", id)
+                    new MySqlParameter("@UserId", studentId),
+                    new MySqlParameter("@JobId", jobId)
                 };
 
-                int rowsAffected = await _dbHelper.ExecuteNonQueryAsync(query, parameters);
+                int assignmentRowsAffected = await _dbHelper.ExecuteNonQueryAsync(insertAssignmentQuery, insertParams);
 
-                if (rowsAffected > 0)
-                    return Ok(new { message = "Jelentkezés sikeresen elfogadva!" });
+                if (assignmentRowsAffected > 0)
+                {
+                    return Ok(new { message = "Jelentkezés sikeresen elfogadva és munkakörhöz rendelve!" });
+                }
 
-                return NotFound(new { message = "Jelentkezés nem található!" });
+                return StatusCode(500, new { message = "Hiba a munkakörhöz való hozzárendelés során!" });
             }
             catch (Exception ex)
             {
                 return StatusCode(500, new { message = "Hiba a jelentkezés elfogadása során!", details = ex.Message });
             }
         }
+
 
         [HttpPatch("applications/{id}/decline")]
         public async Task<IActionResult> DeclineApplication(int id)
@@ -132,13 +157,13 @@ namespace StudentHiveServer.Controllers
                 int rowsAffected = await _dbHelper.ExecuteNonQueryAsync(query, parameters);
 
                 if (rowsAffected > 0)
-                    return Ok(new { message = "Application declined successfully!" });
+                    return Ok(new { message = "Jelentkezés sikeresen elutasítva!" });
 
-                return NotFound(new { message = "Application not found!" });
+                return NotFound(new { message = "Jelentkezés nem található!" });
             }
             catch (Exception ex)
             {
-                return StatusCode(500, new { message = "Error declining application!", details = ex.Message });
+                return StatusCode(500, new { message = "Hiba a jelentkezés elutasítása során!", details = ex.Message });
             }
         }
     }
