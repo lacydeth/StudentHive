@@ -39,7 +39,8 @@ namespace StudentHiveServer.Controllers
             }
         }
         [HttpGet("applications")]
-        public async Task<IActionResult> GetApplications([FromQuery] int agentId, [FromQuery] string title)
+        public async Task<IActionResult> GetApplications([FromQuery] int agentId, [FromQuery] string? title = null)
+
         {
             string query = @"SELECT 
                                 a.*,
