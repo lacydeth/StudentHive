@@ -7,7 +7,7 @@ import { ClientSideRowModelModule, ModuleRegistry } from "ag-grid-community";
 import axios from "axios";
 import Title from "../../../components/Title/Title";
 import { AgGridReact } from "ag-grid-react";
-import { getUserIdFromToken } from "../../../../utils/authUtils";
+import { getUserIdFromToken } from "../../../utils/authUtils";
 
 ModuleRegistry.registerModules([ClientSideRowModelModule]);
 
