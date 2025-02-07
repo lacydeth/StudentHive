@@ -116,7 +116,7 @@ const StudentApplications = () => {
           <Title subTitle="Munka jelentkezések" title="Tekintsd meg az elfogadásra váró jelentkezéseket!" />
           <div className={styles.inputBox}>
             <select value={selectedWork} onChange={(e) => setSelectedWork(e.target.value)}>
-              <option value="">Kategória</option>
+              <option value="">Pozíció</option>
               {works.map((work: { id: number; title: string }) => (
                 <option key={work.id} value={work.title}>
                   {work.title}
