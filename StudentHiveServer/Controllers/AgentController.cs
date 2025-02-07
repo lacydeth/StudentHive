@@ -144,7 +144,6 @@ namespace StudentHiveServer.Controllers
         [HttpGet("student-list")]
         public async Task<IActionResult> GetStudents()
         {
-            // Ellenőrizzük, hogy a felhasználó hitelesített-e
             var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
             if (userIdClaim == null)
             {
@@ -154,23 +153,23 @@ namespace StudentHiveServer.Controllers
             var loggedInUserId = int.Parse(userIdClaim.Value);
 
             const string query = @"
-SELECT 
-    u.Id AS StudentId, 
-    u.FirstName, 
-    u.LastName, 
-    u.Email, 
-    ja.JobId,
-    j.Title AS JobTitle
-FROM Users u
-INNER JOIN JobAssignments ja ON u.Id = ja.UserId
-INNER JOIN Jobs j ON ja.JobId = j.Id
-WHERE j.AgentId = @AgentId";
+                                    SELECT 
+                                        u.Id AS StudentId, 
+                                        u.FirstName, 
+                                        u.LastName, 
+                                        u.Email, 
+                                        ja.JobId,
+                                        j.Title AS JobTitle
+                                    FROM Users u
+                                    INNER JOIN JobAssignments ja ON u.Id = ja.UserId
+                                    INNER JOIN Jobs j ON ja.JobId = j.Id
+                                    WHERE j.AgentId = @AgentId";
 
             try
             {
                 var parameters = new MySqlParameter[]
                 {
-            new MySqlParameter("@AgentId", loggedInUserId)
+                  new MySqlParameter("@AgentId", loggedInUserId)
                 };
 
                 DataTable dataTable = await _dbHelper.ExecuteQueryAsync(query, parameters);
@@ -192,10 +191,6 @@ WHERE j.AgentId = @AgentId";
                 return StatusCode(500, new { message = "Error loading students!", details = ex.Message });
             }
         }
-
-
-
-
 
         [HttpPatch("applications/{id}/decline")]
         public async Task<IActionResult> DeclineApplication(int id)
