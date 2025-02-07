@@ -1,0 +1,98 @@
+.card {
+    width: 300px;
+    min-height: 300px;
+    border-radius: 12px;
+    overflow: hidden;
+    background: #fff;
+    position: relative;
+    border-bottom: 2px solid var(--smoothGreen);
+    transition: all 0.3s ease;
+}
+
+.top {
+    position: relative;
+    width: 100%;
+}
+
+.top img {
+    width: 100%;
+    max-height: 150px;
+    object-fit: cover;
+    display: block;
+}
+
+.top::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to top, rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0));
+}
+
+.textOverlay {
+    position: absolute;
+    bottom: 10px;
+    left: 10px;
+    z-index: 2;
+    color: white;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.textOverlay {
+    color: #fff;
+}
+
+.textOverlay h3 {
+    font-weight: 400;
+}
+.bottom {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    max-height: 150px;
+    padding: 20px 20px;
+}
+.bottom img {
+    width: 24px;
+}
+.bottom .detail {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 0.9rem;
+}
+.bottom .type {
+    background: var(--bodyGray);
+    color: var(--darkGreen);
+    padding: 2px 5px;
+    border-radius: 6px;
+}
+.bottom .btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 0;
+    outline: 0;
+    background: var(--smoothGreen);
+    color: #fff;
+    padding: 10px;
+    width: 150px;
+    font-size: 11px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+.bottom .btn:hover {
+    background: var(--hoverGreen);
+}
+.bottom .bottomEnd {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    justify-content: space-around;
+}
+.card:hover {
+    transform: scale(1.05);
+    cursor: pointer;
+}

@@ -1,0 +1,22 @@
+.container {
+    display: flex;
+    height: 100vh;
+    overflow: hidden;
+}
+.content {
+    transition: margin-left 0.3s ease;
+    width: 100%;
+    padding: 20px;
+}
+.sidebarOpen {
+    margin-left: 300px;
+}
+.sidebarClosed {
+    margin-left: 0;
+}
+@media screen and (min-width: 1000px) {
+    .jobsWrapper {
+        display: flex;
+        gap: 15px;
+    }
+}

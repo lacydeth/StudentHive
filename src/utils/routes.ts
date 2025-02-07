@@ -19,6 +19,7 @@ export const routes = {
     agentStudentList: {path: '/agent-student-list', title: 'Agent Student List'},
     studentApplications: { path: '/applications', title: 'Student Applications'},
     agentSettings: { path: '/agent-settings', title: 'Agent Settings'},
+    agentJobs: { path: '/agent-jobs', title: 'Agent Jobs'},
     adminSettings: { path: '/admin-settings', title: 'Admin Settings'},
     workPage: { path: '/works/:id', title: 'Work page'}
 };
@@ -39,9 +40,10 @@ export const orgMenuLinks = [
 ];  
 export const agentMenuLinks = [
   { path: routes.agentPage.path, icon: "./dashboard.png", label: "Kezelőpult"},
+  { path: routes.agentJobs.path, icon: "./job-description.png", label: "Munkák"},
+  { path: routes.agentShift.path, icon: "./timetable.png", label: "Műszak"},
   { path: routes.studentApplications.path, icon: "./resume.png", label: "Jelentkezések"},
   { path: routes.agentSettings.path, icon: "./settings.png", label: "Beállítások"},
-  { path: routes.agentShift.path, icon: "./timetable.png", label: "Műszak"},
   { path: routes.agentStudentList.path, icon: "./realtor.png", label: "Diákok listázása"}
 ];
 export const userMenuLinks = [

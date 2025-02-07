@@ -28,6 +28,7 @@ import StudentApplications from './features/AgentDashboard/StudentApplications/S
 import AgentSettings from './features/AgentDashboard/AgentSettings/AgentSettings';
 import AgentShift from './features/AgentDashboard/AgentShift/AgentShift';
 import AgentStudentList from './features/AgentDashboard/AgentStudentList/AgentStudentList';
+import AgentJobs from './features/AgentDashboard/AgentJobs/AgentJobs';
 
 const App = () => {
   useEffect(() => {
@@ -181,6 +182,14 @@ const App = () => {
           element={
             <ProtectedRoute allowedRoles={["Agent"]}>
               <AgentSettings/>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path={routes.agentJobs.path}
+          element={
+            <ProtectedRoute allowedRoles={["Agent"]}>
+              <AgentJobs/>
             </ProtectedRoute>
           }
         />

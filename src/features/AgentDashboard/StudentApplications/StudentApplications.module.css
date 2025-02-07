@@ -34,5 +34,12 @@
 }
 .filters {
     display: flex;
-    gap: 15px;
+    flex-direction: column;
+}
+
+@media screen and (min-width:1000px) {
+    .filters {
+        flex-direction: row;
+        gap: 15px;
+    }
 }
