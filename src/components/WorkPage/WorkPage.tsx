@@ -29,7 +29,7 @@ const WorkPage = () => {
       .catch((error) => console.error("Error fetching work details:", error));
   }, [id]);
 
-  if (!work) return <p>Loading...</p>;
+  if (!work) return <p>Betöltés...</p>;
 
   return (
     <div className={styles.container}>

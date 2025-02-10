@@ -22,11 +22,8 @@ const NewOrg = () => {
   };
 
   const handleNewOrganization = async () => {
-    if (!orgName || !email || !phoneNumber || !address) {
-      setError("Please fill out all fields.");
-      return;
-    }
-
+    setMessage(null);
+    setError(null);
     try {
       const response = await axios.post("https://localhost:7067/api/admin/new-organization", {
         orgName,
@@ -42,10 +39,10 @@ const NewOrg = () => {
       setAddress("");
     } catch (error: any) {
       if (error.response && error.response.data) {
-        const { code, description } = error.response.data;
-        setError(`${code}: ${description}`);
+          const { message } = error.response.data; 
+          setError(message || "Ismeretlen hiba lépett fel."); 
       } else {
-        setError("An unknown error occurred.");
+          setError("Ismeretlen hiba lépett fel.");
       }
     }
   };

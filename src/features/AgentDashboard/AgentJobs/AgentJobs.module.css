@@ -14,6 +14,9 @@
 .sidebarClosed {
     margin-left: 0;
 }
+.jobsContainer {
+    padding: 5%;
+}
 @media screen and (min-width: 1000px) {
     .jobsWrapper {
         display: flex;

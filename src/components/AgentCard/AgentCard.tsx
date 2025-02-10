@@ -14,7 +14,7 @@ const AgentCard = ({ id, title, agentName, location, category, image }: WorkCard
   const navigate = useNavigate();
 
   const handleShifts = () => {
-    navigate(`/manage-shift/${id}`);
+    navigate(`/shift/${id}`);
   };
   const handleShiftApplications = () => {
     navigate(`/shift-application/${id}`);

@@ -18,7 +18,6 @@ type SidebarProps = {
 const Sidebar = (props: SidebarProps) => {
   const { isOpen, toggleSidebar, topLinks = [] } = props;
 
-  // Check if "Beállítások" is in the topLinks and remove it for the bottom section
   const topLinksFiltered = topLinks.filter(link => link.label !== "Beállítások");
   const bottomLink = topLinks.find(link => link.label === "Beállítások");
 
@@ -58,13 +57,13 @@ const Sidebar = (props: SidebarProps) => {
               )}
               <div className={styles.menuItem}>
                 <Link className={styles.link} to={routes.homePage.path}>
-                  <img src="./home.png" alt="home icon" />
+                  <img src="/home.png" alt="home icon" />
                   Vissza a kezdőlapra
                 </Link>
               </div>
               <div className={styles.menuItem}>
                 <button onClick={handleLogout}>
-                  <img src="./logout.png" alt="Logout" />
+                  <img src="/logout.png" alt="Logout" />
                   Kijelentkezés
                 </button>
               </div>

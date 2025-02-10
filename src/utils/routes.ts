@@ -21,7 +21,8 @@ export const routes = {
     agentSettings: { path: '/agent-settings', title: 'Agent Settings'},
     agentJobs: { path: '/agent-jobs', title: 'Agent Jobs'},
     adminSettings: { path: '/admin-settings', title: 'Admin Settings'},
-    workPage: { path: '/works/:id', title: 'Work page'}
+    workPage: { path: '/works/:id', title: 'Work page'},
+    shiftPage: { path: '/shift/:id', title: 'Shift page'}
 };
 
 export const adminTopLinks = [
@@ -39,12 +40,12 @@ export const orgMenuLinks = [
   { path: routes.orgSettings.path, icon: "./settings.png", label: "Beállítások" }
 ];  
 export const agentMenuLinks = [
-  { path: routes.agentPage.path, icon: "./dashboard.png", label: "Kezelőpult"},
-  { path: routes.agentJobs.path, icon: "./job-description.png", label: "Munkák"},
-  { path: routes.agentShift.path, icon: "./timetable.png", label: "Műszak"},
-  { path: routes.studentApplications.path, icon: "./resume.png", label: "Jelentkezések"},
-  { path: routes.agentSettings.path, icon: "./settings.png", label: "Beállítások"},
-  { path: routes.agentStudentList.path, icon: "./realtor.png", label: "Diákok listázása"}
+  { path: routes.agentPage.path, icon: "/dashboard.png", label: "Kezelőpult"},
+  { path: routes.agentJobs.path, icon: "/job-description.png", label: "Munkák"},
+  { path: routes.agentShift.path, icon: "/timetable.png", label: "Műszak"},
+  { path: routes.studentApplications.path, icon: "/resume.png", label: "Jelentkezések"},
+  { path: routes.agentSettings.path, icon: "/settings.png", label: "Beállítások"},
+  { path: routes.agentStudentList.path, icon: "/realtor.png", label: "Diákok listázása"}
 ];
 export const userMenuLinks = [
 

@@ -29,6 +29,7 @@ import AgentSettings from './features/AgentDashboard/AgentSettings/AgentSettings
 import AgentShift from './features/AgentDashboard/AgentShift/AgentShift';
 import AgentStudentList from './features/AgentDashboard/AgentStudentList/AgentStudentList';
 import AgentJobs from './features/AgentDashboard/AgentJobs/AgentJobs';
+import ShiftPage from './components/ShiftPage/ShiftPage';
 
 const App = () => {
   useEffect(() => {
@@ -42,7 +43,6 @@ const App = () => {
         <Route path={routes.registerPage.path} element={<Register />} />
         <Route path={routes.worksPage.path} element={<Works />} />
         <Route path={routes.workPage.path} element={<WorkPage />} />
-
         <Route path={routes.unauthorized.path} element={<Unauthorized />} />
         <Route path="*" element={<NotFound />} />
 
@@ -158,6 +158,14 @@ const App = () => {
           element={
             <ProtectedRoute allowedRoles={["Agent"]}>
               <StudentApplications/>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path={routes.shiftPage.path}
+          element={
+            <ProtectedRoute allowedRoles={["Agent"]}>
+              <ShiftPage/>
             </ProtectedRoute>
           }
         />
