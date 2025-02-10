@@ -81,8 +81,8 @@ CREATE TABLE `Applications` (
 CREATE TABLE `Shifts` (
   `Id` INT PRIMARY KEY AUTO_INCREMENT,
   `JobId` INT NOT NULL,
-  `ShiftStart` DATE NOT NULL,
-  `ShiftEnd` date NOT NULL
+  `ShiftStart` DATETIME NOT NULL,
+  `ShiftEnd` DATETIME NOT NULL
 );
 
 CREATE TABLE `StudentShifts` (
