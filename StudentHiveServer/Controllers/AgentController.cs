@@ -71,7 +71,7 @@ namespace StudentHiveServer.Controllers
                     Location = row.Field<string>("City"),
                     Category = row.Field<string>("CategoryName"),
                     Image = row.Field<string>("ImagePath"),
-                    AgentName = $"{row.Field<string>("AgentFirstName")} {row.Field<string>("AgentLastName")}"
+                    AgentName = $"{row.Field<string>("AgentLastName")} {row.Field<string>("AgentFirstName")}"
                 }).ToList();
 
                 return Ok(workCards);
@@ -79,6 +79,57 @@ namespace StudentHiveServer.Controllers
             catch (Exception ex)
             {
                 return StatusCode(500, new { message = "Hiba történt a munkák lekérdezése közben.", details = ex.Message });
+            }
+        }
+        [HttpGet("work-details/{id}")]
+        public async Task<IActionResult> GetWorkDetailsById(int id)
+        {
+            const string query = @"SELECT 
+                             j.Id,
+                             j.Title, 
+                             j.HourlyRate, 
+                             j.City,
+                             j.Address,
+                             c.CategoryName, 
+                             c.ImagePath,
+                             u.FirstName AS AgentFirstName,
+                             u.LastName AS AgentLastName
+                         FROM Jobs j
+                         JOIN Categories c ON j.CategoryId = c.Id
+                         JOIN Users u ON j.AgentId = u.Id
+                         WHERE j.Id = @Id;";
+
+            try
+            {
+                var parameters = new MySqlParameter[]
+                {
+                    new MySqlParameter("@Id", id)
+                };
+
+                var dataTable = await _dbHelper.ExecuteQueryAsync(query, parameters);
+
+                if (dataTable.Rows.Count == 0)
+                    return NotFound(new { message = "A keresett munka nem található." });
+
+                var row = dataTable.Rows[0];
+
+                var workDetails = new
+                {
+                    Id = row.Field<int>("Id"),
+                    Title = row.Field<string>("Title"),
+                    Salary = row.Field<int>("HourlyRate").ToString("N0") + " Ft/óra",
+                    City = row.Field<string>("City"),
+                    Address = row.Field<string>("Address"),
+                    Category = row.Field<string>("CategoryName"),
+                    Image = row.Field<string>("ImagePath"),
+                    AgentName = $"{row.Field<string>("AgentLastName")} {row.Field<string>("AgentFirstName")}"
+                };
+
+                return Ok(workDetails);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "Hiba történt a munka lekérdezése közben.", details = ex.Message });
             }
         }
 
@@ -235,6 +286,47 @@ namespace StudentHiveServer.Controllers
                 return StatusCode(500, new { message = "Error loading students!", details = ex.Message });
             }
         }
+        [HttpPost("add-shift")]
+        public async Task<IActionResult> AddShift([FromBody] ShiftRequest shiftRequest)
+        {
+            if (shiftRequest == null || shiftRequest.JobId <= 0 || shiftRequest.ShiftStart == default || shiftRequest.ShiftEnd == default)
+            {
+                return BadRequest(new { message = "Érvénytelen adatok!" });
+            }
+
+            if (shiftRequest.ShiftStart < DateTime.Now || shiftRequest.ShiftEnd < DateTime.Now)
+            {
+                return BadRequest(new { message = "A műszak kezdő- vagy befejező időpontja nem lehet a jelenlegi dátum előtt!" });
+            }
+
+            if (shiftRequest.ShiftEnd < shiftRequest.ShiftStart)
+            {
+                return BadRequest(new { message = "A műszak befejező időpontja nem lehet korábbi, mint a kezdő időpont!" });
+            }
+
+            const string query = "INSERT INTO Shifts (JobId, ShiftStart, ShiftEnd) VALUES (@JobId, @ShiftStart, @ShiftEnd)";
+
+            var parameters = new MySqlParameter[]
+            {
+                new MySqlParameter("@JobId", shiftRequest.JobId),
+                new MySqlParameter("@ShiftStart", shiftRequest.ShiftStart),
+                new MySqlParameter("@ShiftEnd", shiftRequest.ShiftEnd)
+            };
+
+            try
+            {
+                int rowsAffected = await _dbHelper.ExecuteNonQueryAsync(query, parameters);
+
+                if (rowsAffected > 0)
+                    return Ok(new { message = "Műszak sikeresen hozzáadva!" });
+
+                return StatusCode(500, new { message = "Hiba a műszak hozzáadása során!" });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "Hiba a műszak hozzáadása során!", details = ex.Message });
+            }
+        }
 
         [HttpPatch("applications/{id}/decline")]
         public async Task<IActionResult> DeclineApplication(int id)
@@ -260,5 +352,12 @@ namespace StudentHiveServer.Controllers
                 return StatusCode(500, new { message = "Hiba a jelentkezés elutasítása során!", details = ex.Message });
             }
         }
+        public class ShiftRequest
+        {
+            public int JobId { get; set; }
+            public DateTime ShiftStart { get; set; }
+            public DateTime ShiftEnd { get; set; }
+        }
+
     }
 }
