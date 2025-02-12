@@ -6,7 +6,6 @@
     position: fixed;
     z-index: 10;
     transform: translateX(0);
-
 }
 .sidebarContainer {
     i {
@@ -29,6 +28,7 @@
         margin-left: 15px;
         padding: 35px 15px;
         font-weight: 700;
+        width: 300px;
         color: var(--smoothGreen);
         h1 {
             font-size: 1.5rem;
@@ -40,7 +40,7 @@
         justify-content: space-between;
         min-height: 75vh;
         margin-left: 15px;
-
+        width: 300px;
         button {
             display: flex;
             align-items: center;

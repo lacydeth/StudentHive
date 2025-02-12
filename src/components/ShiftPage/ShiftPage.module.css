@@ -1,12 +1,15 @@
 .container {
     display: flex;
     height: 100vh;
-    overflow: hidden;
+    overflow: visible;
 }
 .content {
     transition: margin-left 0.3s ease;
     width: 100%;
     padding: 20px;
+}
+.container .content.sidebarOpen {
+    overflow: hidden;
 }
 .sidebarOpen {
     margin-left: 300px;
@@ -69,29 +72,6 @@
     font-size: 1rem;
     color: #d6d6d6;
     font-weight: 400;
-}
-
-.buttonOverlay {
-    position: absolute;
-    bottom: 10px;
-    right: 10px;
-    z-index: 2;
-}
-
-.buttonOverlay button {
-    width: 150px;
-    height: 35px;
-    background: var(--smoothGreen);
-    outline: 0;
-    border: 0;
-    border-radius: 6px;
-    color: #fff;
-    cursor: pointer;
-    transition: all 0.3s ease;
-}
-
-.buttonOverlay button:hover {
-    background: var(--hoverGreen);
 }
 
 .bottom {
@@ -214,9 +194,45 @@
 .addShift button:hover {
     background: var(--hoverGreen);
 }
-@media (min-width: 820px) {
-    .container {
+.shiftContainer {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+.shiftContainer h4 {
+    font-size: 0.8rem;
+}
+.pagination {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 20px;
+}
+
+.pagination button {
+    margin: 0 10px;
+    padding: 5px 10px;
+    background-color: var(--smoothGreen);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+.pagination button:disabled {
+    background-color: #ccc;
+    cursor: not-allowed;
+}
+
+.pagination span {
+    margin: 0 10px;
+}
+@media screen and (min-width: 820px) {
+    .container .content.sidebarOpen {
         overflow: visible;
+    }
+    .shiftContainer {
+        flex-direction: row;
     }
     .content {
         gap: 40px;
