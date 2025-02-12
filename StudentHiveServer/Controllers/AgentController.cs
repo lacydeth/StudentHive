@@ -2,6 +2,8 @@
 using MySql.Data.MySqlClient;
 using StudentHiveServer.Utils;
 using System.Data;
+using System.Net.Mail;
+using System.Net;
 using System.Security.Claims;
 
 namespace StudentHiveServer.Controllers
@@ -130,6 +132,52 @@ namespace StudentHiveServer.Controllers
             catch (Exception ex)
             {
                 return StatusCode(500, new { message = "Hiba történt a munka lekérdezése közben.", details = ex.Message });
+            }
+        }
+        [HttpGet("manage-shifts/{jobId}")]
+        public async Task<IActionResult> GetShiftsByJobId(int jobId)
+        {
+            const string query = @"SELECT 
+                                        s.Id,
+                                        s.ShiftStart,
+                                        s.ShiftEnd,
+                                        j.Title
+                                    FROM Shifts s
+                                    JOIN Jobs j ON j.Id = s.JobId
+                                    WHERE s.JobId = @JobId
+                                    AND s.ShiftStart >= NOW()"; 
+
+            try
+            {
+                var parameters = new MySqlParameter[]
+                {
+                    new MySqlParameter("@JobId", jobId) 
+                };
+
+                var dataTable = await _dbHelper.ExecuteQueryAsync(query, parameters);
+
+                if (dataTable.Rows.Count == 0)
+                    return NotFound(new { message = "Nincsenek elérhető műszakok ehhez a munkához." });
+
+                var shifts = new List<object>();
+                foreach (DataRow row in dataTable.Rows)
+                {
+                    var shiftDetails = new
+                    {
+                        Id = row.Field<int>("Id"),
+                        ShiftStart = row.Field<DateTime>("ShiftStart"),
+                        ShiftEnd = row.Field<DateTime>("ShiftEnd"),
+                        JobTitle = row.Field<string>("Title")
+                    };
+
+                    shifts.Add(shiftDetails);
+                }
+
+                return Ok(shifts);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "Hiba történt a műszakok lekérdezése közben.", details = ex.Message });
             }
         }
 
@@ -294,12 +342,16 @@ namespace StudentHiveServer.Controllers
                 return BadRequest(new { message = "Érvénytelen adatok!" });
             }
 
-            if (shiftRequest.ShiftStart < DateTime.Now || shiftRequest.ShiftEnd < DateTime.Now)
+            var budapestTimeZone = TimeZoneInfo.FindSystemTimeZoneById("Central European Standard Time");
+            var shiftStartBudapest = TimeZoneInfo.ConvertTimeFromUtc(shiftRequest.ShiftStart, budapestTimeZone);
+            var shiftEndBudapest = TimeZoneInfo.ConvertTimeFromUtc(shiftRequest.ShiftEnd, budapestTimeZone);
+
+            if (shiftStartBudapest < DateTime.Now || shiftEndBudapest < DateTime.Now)
             {
                 return BadRequest(new { message = "A műszak kezdő- vagy befejező időpontja nem lehet a jelenlegi dátum előtt!" });
             }
 
-            if (shiftRequest.ShiftEnd < shiftRequest.ShiftStart)
+            if (shiftEndBudapest < shiftStartBudapest)
             {
                 return BadRequest(new { message = "A műszak befejező időpontja nem lehet korábbi, mint a kezdő időpont!" });
             }
@@ -309,8 +361,8 @@ namespace StudentHiveServer.Controllers
             var parameters = new MySqlParameter[]
             {
                 new MySqlParameter("@JobId", shiftRequest.JobId),
-                new MySqlParameter("@ShiftStart", shiftRequest.ShiftStart),
-                new MySqlParameter("@ShiftEnd", shiftRequest.ShiftEnd)
+                new MySqlParameter("@ShiftStart", shiftStartBudapest),
+                new MySqlParameter("@ShiftEnd", shiftEndBudapest)
             };
 
             try
@@ -327,7 +379,70 @@ namespace StudentHiveServer.Controllers
                 return StatusCode(500, new { message = "Hiba a műszak hozzáadása során!", details = ex.Message });
             }
         }
+        [HttpDelete("delete-shift/{id}")]
+        public async Task<IActionResult> DeleteShift(int id)
+        {
+            const string getShiftQuery = "SELECT * FROM Shifts WHERE Id = @Id";
+            const string getBookedUsersQuery = "SELECT StudentId FROM StudentShifts WHERE ShiftId = @ShiftId";
+            const string deleteShiftQuery = "DELETE FROM Shifts WHERE Id = @Id";
+            const string deleteStudentShiftsQuery = "DELETE FROM StudentShifts WHERE ShiftId = @ShiftId";
 
+            try
+            {
+                var shiftParams = new MySqlParameter[] { new MySqlParameter("@Id", id) };
+                var shiftDataTable = await _dbHelper.ExecuteQueryAsync(getShiftQuery, shiftParams);
+
+                if (shiftDataTable.Rows.Count == 0)
+                    return NotFound(new { message = "Műszak nem található!" });
+
+                var shiftRow = shiftDataTable.Rows[0];
+                int jobId = shiftRow.Field<int>("JobId");
+                DateTime shiftStart = shiftRow.Field<DateTime>("ShiftStart");
+                DateTime shiftEnd = shiftRow.Field<DateTime>("ShiftEnd");
+
+                var bookedUsersParams = new MySqlParameter[] { new MySqlParameter("@ShiftId", id) };
+                var bookedUsersDataTable = await _dbHelper.ExecuteQueryAsync(getBookedUsersQuery, bookedUsersParams);
+
+                var userIds = bookedUsersDataTable.AsEnumerable()
+                    .Select(row => row.Field<int>("StudentId"))
+                    .ToList();
+
+                var deleteShiftParams = new MySqlParameter[] { new MySqlParameter("@Id", id) };
+                var deleteStudentShiftsParams = new MySqlParameter[] { new MySqlParameter("@ShiftId", id) };
+
+                await _dbHelper.ExecuteNonQueryAsync(deleteShiftQuery, deleteShiftParams);
+                await _dbHelper.ExecuteNonQueryAsync(deleteStudentShiftsQuery, deleteStudentShiftsParams);
+
+                foreach (var userId in userIds)
+                {
+                    var userQuery = "SELECT Email, FirstName, LastName FROM Users WHERE Id = @UserId";
+                    var userParams = new MySqlParameter[] { new MySqlParameter("@UserId", userId) };
+                    var userDataTable = await _dbHelper.ExecuteQueryAsync(userQuery, userParams);
+
+                    if (userDataTable.Rows.Count > 0)
+                    {
+                        var userRow = userDataTable.Rows[0];
+                        string email = userRow.Field<string>("Email");
+                        string firstName = userRow.Field<string>("FirstName");
+                        string lastName = userRow.Field<string>("LastName");
+
+                        string message = $"Tisztelt {firstName} {lastName},\n\nA következő műszak törölve lett:\n\n" +
+                                         $"Műszak kezdete: {shiftStart}\n" +
+                                         $"Műszak vége: {shiftEnd}\n\n" +
+                                         "Kérjük, jelentkezzen be a rendszerbe további információkért.\n\n" +
+                                         "Üdvözlettel,\nA StudentHive csapata";
+
+                        SendEmail(email, message, $"{firstName} {lastName}");
+                    }
+                }
+
+                return Ok(new { message = "Műszak sikeresen törölve!" });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "Hiba a műszak törlése során!", details = ex.Message });
+            }
+        }
         [HttpPatch("applications/{id}/decline")]
         public async Task<IActionResult> DeclineApplication(int id)
         {
@@ -352,6 +467,37 @@ namespace StudentHiveServer.Controllers
                 return StatusCode(500, new { message = "Hiba a jelentkezés elutasítása során!", details = ex.Message });
             }
         }
+        private void SendEmail(string toEmail, string emailBody, string name)
+        {
+            try
+            {
+                using (var client = new SmtpClient())
+                {
+                    client.Host = "smtp.gmail.com";
+                    client.Port = 587;
+                    client.DeliveryMethod = SmtpDeliveryMethod.Network;
+                    client.UseDefaultCredentials = false;
+                    client.EnableSsl = true;
+                    client.Credentials = new NetworkCredential("info.studenthive@gmail.com", "nuccijdmnyurqzel");
+
+                    using (var mailMessage = new MailMessage(
+                        from: new MailAddress("info.studenthive@gmail.com", "StudentHive"),
+                        to: new MailAddress(toEmail, name)))
+                    {
+                        mailMessage.Subject = "Műszak törölve";
+                        mailMessage.Body = emailBody;
+                        mailMessage.IsBodyHtml = false; 
+
+                        client.Send(mailMessage);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error sending email: {ex.Message}");
+            }
+        }
+
         public class ShiftRequest
         {
             public int JobId { get; set; }
