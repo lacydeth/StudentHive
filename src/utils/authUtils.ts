@@ -18,7 +18,7 @@ const isTokenExpired = (token: string): boolean => {
 const refreshToken = async (): Promise<string | null> => {
   try {
     const response = await axios.post("https://localhost:7067/api/auth/refresh", {}, { 
-      withCredentials: true  // Optional: depending on your setup
+      withCredentials: true  
     });
 
     if (response.status === 200 && response.data.token) {
@@ -74,7 +74,7 @@ api.interceptors.response.use(
 
       if (newToken) {
         error.config.headers["Authorization"] = `Bearer ${newToken}`;
-        return axios(error.config); // Retry the request
+        return axios(error.config);
       } else {
         localStorage.removeItem("token");
         window.location.href = "/login";

@@ -52,7 +52,7 @@ export const userMenuLinks = [
 ];
 export const roleRoutes: Record<string, string> = {
   Admin: routes.adminPage.path,
-  User: routes.protectedPage.path,
+  User: routes.homePage.path,
   Organization: routes.orgPage.path,
   Agent: routes.agentPage.path
 };

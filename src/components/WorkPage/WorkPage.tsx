@@ -1,33 +1,79 @@
 import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
-import axios from "axios";
 import styles from "./WorkPage.module.css";
 import Navbar from "../Navbar/Navbar";
 import { routes } from "../../utils/routes";
+import { apiInstance } from "../../utils/authUtils"; 
+import { getUserIdFromToken } from "../../utils/authUtils"; 
+import { ToastContainer, toast } from 'react-toastify';  // Importáld a szükséges komponenseket
+import 'react-toastify/dist/ReactToastify.css';  // Importáld a stílusokat
+import axios from "axios";
 
 type WorkDetails = {
-    title: string;
-    salary: string;
-    city: string;
-    address: string;
-    category: string;
-    image: string;
-    ourOffer: string;
-    mainTasks: string;
-    jobRequirements: string;
-    advantages: string;
+  title: string;
+  salary: string;
+  city: string;
+  address: string;
+  category: string;
+  image: string;
+  ourOffer: string;
+  mainTasks: string;
+  jobRequirements: string;
+  advantages: string;
 };
 
 const WorkPage = () => {
   const { id } = useParams();
   const [work, setWork] = useState<WorkDetails | null>(null);
+  const [isApplying, setIsApplying] = useState(false);
 
   useEffect(() => {
-    axios
+    apiInstance
       .get(`https://localhost:7067/api/general/workcards/${id}`)
       .then((response) => setWork(response.data))
       .catch((error) => console.error("Error fetching work details:", error));
   }, [id]);
+
+  const handleApply = async () => {
+    if (!id) return;
+    setIsApplying(true);
+  
+    try {
+      const userId = getUserIdFromToken();
+      if (!userId) {
+        toast.error("Nem sikerült azonosítani a felhasználót.");  // Hiba üzenet
+        setIsApplying(false);
+        return;
+      }
+  
+      const token = localStorage.getItem("token");
+      if (!token) {
+        toast.error("Nincs bejelentkezve felhasználó.");  // Hiba üzenet
+        setIsApplying(false);
+        return;
+      }
+  
+      const response = await axios.post(
+        `https://localhost:7067/api/user/apply`,
+        {
+          jobId: parseInt(id),
+          studentId: parseInt(userId),
+          Status : 0,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+  
+      toast.success(response.data.message);  // Sikeres jelentkezés üzenet
+    } catch (error: any) {
+      toast.error("Már jelentkezett a munkára!");  // Hiba üzenet
+    } finally {
+      setIsApplying(false);
+    }
+  };
 
   if (!work) return <p>Betöltés...</p>;
 
@@ -45,7 +91,9 @@ const WorkPage = () => {
                     <h3>{work.salary}</h3>
                 </div>
                 <div className={styles.buttonOverlay}>
-                    <button>Jelentkezem</button>
+                    <button onClick={handleApply} disabled={isApplying}>
+                        {isApplying ? "Jelentkezés folyamatban..." : "Jelentkezem"}
+                    </button>
                 </div>
             </div>
             <div className={styles.bottom}>
@@ -94,6 +142,9 @@ const WorkPage = () => {
                 </div>
             </div>
         </div>
+
+        {/* ToastContainer a popup értesítésekhez */}
+        <ToastContainer />
     </div>
   );
 };
