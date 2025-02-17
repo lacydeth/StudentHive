@@ -351,9 +351,19 @@ namespace StudentHiveServer.Controllers
                 return BadRequest(new { message = "A műszak kezdő- vagy befejező időpontja nem lehet a jelenlegi dátum előtt!" });
             }
 
+            if (shiftStartBudapest > DateTime.Now.AddDays(7))
+            {
+                return BadRequest(new { message = "A műszak kezdő időpontja nem lehet több, mint egy héttel a jelenlegi dátum után!" });
+            }
+
             if (shiftEndBudapest < shiftStartBudapest)
             {
                 return BadRequest(new { message = "A műszak befejező időpontja nem lehet korábbi, mint a kezdő időpont!" });
+            }
+
+            if ((shiftEndBudapest - shiftStartBudapest).TotalHours > 12)
+            {
+                return BadRequest(new { message = "A műszak hossza nem haladhatja meg a 24 órát!" });
             }
 
             const string query = "INSERT INTO Shifts (JobId, ShiftStart, ShiftEnd) VALUES (@JobId, @ShiftStart, @ShiftEnd)";
@@ -384,12 +394,12 @@ namespace StudentHiveServer.Controllers
         {
             const string getShiftQuery = "SELECT * FROM Shifts WHERE Id = @Id";
             const string getBookedUsersQuery = "SELECT StudentId FROM StudentShifts WHERE ShiftId = @ShiftId";
-            const string deleteShiftQuery = "DELETE FROM Shifts WHERE Id = @Id";
             const string deleteStudentShiftsQuery = "DELETE FROM StudentShifts WHERE ShiftId = @ShiftId";
+            const string deleteShiftQuery = "DELETE FROM Shifts WHERE Id = @Id";
 
             try
             {
-                var shiftParams = new MySqlParameter[] { new MySqlParameter("@Id", id) };
+                var shiftParams = new MySqlParameter[] { new("@Id", id) };
                 var shiftDataTable = await _dbHelper.ExecuteQueryAsync(getShiftQuery, shiftParams);
 
                 if (shiftDataTable.Rows.Count == 0)
@@ -400,23 +410,21 @@ namespace StudentHiveServer.Controllers
                 DateTime shiftStart = shiftRow.Field<DateTime>("ShiftStart");
                 DateTime shiftEnd = shiftRow.Field<DateTime>("ShiftEnd");
 
-                var bookedUsersParams = new MySqlParameter[] { new MySqlParameter("@ShiftId", id) };
+                var bookedUsersParams = new MySqlParameter[] { new("@ShiftId", id) };
                 var bookedUsersDataTable = await _dbHelper.ExecuteQueryAsync(getBookedUsersQuery, bookedUsersParams);
 
                 var userIds = bookedUsersDataTable.AsEnumerable()
                     .Select(row => row.Field<int>("StudentId"))
                     .ToList();
 
-                var deleteShiftParams = new MySqlParameter[] { new MySqlParameter("@Id", id) };
-                var deleteStudentShiftsParams = new MySqlParameter[] { new MySqlParameter("@ShiftId", id) };
+                await _dbHelper.ExecuteNonQueryAsync(deleteStudentShiftsQuery, bookedUsersParams);
 
-                await _dbHelper.ExecuteNonQueryAsync(deleteShiftQuery, deleteShiftParams);
-                await _dbHelper.ExecuteNonQueryAsync(deleteStudentShiftsQuery, deleteStudentShiftsParams);
+                await _dbHelper.ExecuteNonQueryAsync(deleteShiftQuery, shiftParams);
 
                 foreach (var userId in userIds)
                 {
                     var userQuery = "SELECT Email, FirstName, LastName FROM Users WHERE Id = @UserId";
-                    var userParams = new MySqlParameter[] { new MySqlParameter("@UserId", userId) };
+                    var userParams = new MySqlParameter[] { new("@UserId", userId) };
                     var userDataTable = await _dbHelper.ExecuteQueryAsync(userQuery, userParams);
 
                     if (userDataTable.Rows.Count > 0)
@@ -426,13 +434,13 @@ namespace StudentHiveServer.Controllers
                         string firstName = userRow.Field<string>("FirstName");
                         string lastName = userRow.Field<string>("LastName");
 
-                        string message = $"Tisztelt {firstName} {lastName},\n\nA következő műszak törölve lett:\n\n" +
+                        string message = $"Tisztelt {lastName} {firstName},\n\nA következő műszak törölve lett:\n\n" +
                                          $"Műszak kezdete: {shiftStart}\n" +
                                          $"Műszak vége: {shiftEnd}\n\n" +
                                          "Kérjük, jelentkezzen be a rendszerbe további információkért.\n\n" +
                                          "Üdvözlettel,\nA StudentHive csapata";
 
-                        SendEmail(email, message, $"{firstName} {lastName}");
+                        SendEmail(email, message, $"{lastName} {firstName}");
                     }
                 }
 

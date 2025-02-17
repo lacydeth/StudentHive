@@ -53,7 +53,6 @@ namespace StudentHiveServer.Controllers
             }
         }
 
-        // GET: api/organization/jobs-created-by-month/{orgId}
         [HttpGet("jobs-created-by-month/{orgId}")]
         public async Task<IActionResult> GetJobsCreatedByMonth(int orgId)
         {
@@ -97,20 +96,30 @@ namespace StudentHiveServer.Controllers
             var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
             if (userIdClaim == null)
             {
-                return Unauthorized(new { message = "User is not authenticated." });
+                return Unauthorized(new { message = "Felhasználó azonosítása sikertelen." });
             }
 
             var loggedInUserId = userIdClaim.Value;
 
-
-            var plainPassword = GenerateRandomPassword();
-            var hashedPassword = BCrypt.Net.BCrypt.HashPassword(plainPassword);
-
             try
             {
+                const string checkEmailQuery = "SELECT COUNT(*) FROM Users WHERE Email = @Email";
+                var checkEmailParam = new MySqlParameter("@Email", request.NewAgentEmail);
+
+                var existingEmailCount = await _dbHelper.ExecuteScalarAsync<int>(checkEmailQuery, new[] { checkEmailParam });
+
+                if (existingEmailCount > 0)
+                {
+                    return BadRequest(new { message = "A megadott email cím már használatban van." });
+                }
+
+
+                var plainPassword = GenerateRandomPassword();
+                var hashedPassword = BCrypt.Net.BCrypt.HashPassword(plainPassword);
 
                 const string insertQuery = @"INSERT INTO Users (FirstName, LastName, Email, PasswordHash, RoleId, OrganizationId) 
-                                            VALUES (@FirstName, @LastName, @Email, @PasswordHash, @RoleId, @OrganizationId)";
+                                     VALUES (@FirstName, @LastName, @Email, @PasswordHash, @RoleId, @OrganizationId)";
+
                 var insertParameters = new MySqlParameter[]
                 {
                     new MySqlParameter("@FirstName", request.FirstName),
@@ -123,15 +132,13 @@ namespace StudentHiveServer.Controllers
 
                 await _dbHelper.ExecuteNonQueryAsync(insertQuery, insertParameters);
 
-                return Ok(new { message = "Agent added successfully." });
+                return Ok(new { message = "Közvetítő sikeresen hozzáadva." });
             }
             catch (Exception ex)
             {
-                return StatusCode(500, new { message = "An error occurred while adding the agent.", details = ex.Message });
+                return StatusCode(500, new { message = "Hiba lépett fel a közvetítő hozzáadása közben.", details = ex.Message });
             }
         }
-
-
 
         [HttpPost("new-job")]
         public async Task<IActionResult> AddJob([FromBody] JobRequest request)
@@ -158,18 +165,17 @@ namespace StudentHiveServer.Controllers
             try
             {
 
-                const string descriptionQuery = @"
-            INSERT INTO Description (OurOffer, MainTaks, JobRequirements, Advantages)
-            VALUES (@OurOffer, @MainTaks, @JobRequirements, @Advantages);
-            SELECT LAST_INSERT_ID();";
+                const string descriptionQuery = @"INSERT INTO Description (OurOffer, MainTaks, JobRequirements, Advantages)
+                                                VALUES (@OurOffer, @MainTaks, @JobRequirements, @Advantages);
+                                                SELECT LAST_INSERT_ID();";
 
                 var descriptionParameters = new[]
                 {
-            new MySqlParameter("@OurOffer", request.OurOffer),
-            new MySqlParameter("@MainTaks", request.MainTaks),
-            new MySqlParameter("@JobRequirements", request.JobRequirements),
-            new MySqlParameter("@Advantages", request.Advantages)
-        };
+                    new MySqlParameter("@OurOffer", request.OurOffer),
+                    new MySqlParameter("@MainTaks", request.MainTaks),
+                    new MySqlParameter("@JobRequirements", request.JobRequirements),
+                    new MySqlParameter("@Advantages", request.Advantages)
+                };
 
 
                 var descriptionId = await _dbHelper.ExecuteScalarAsync<int>(descriptionQuery, descriptionParameters);
@@ -180,21 +186,20 @@ namespace StudentHiveServer.Controllers
                     throw new Exception("Description insert failed, no valid ID returned.");
                 }
 
-                const string jobQuery = @"
-            INSERT INTO Jobs (OrganizationId, CategoryId, DescriptionId, Title, City, Address, HourlyRate, AgentId)
-            VALUES (@OrganizationId, @CategoryId, @DescriptionId, @Title, @City, @Address, @HourlyRate, @AgentId)";
+                const string jobQuery = @"INSERT INTO Jobs (OrganizationId, CategoryId, DescriptionId, Title, City, Address, HourlyRate, AgentId)
+                                        VALUES (@OrganizationId, @CategoryId, @DescriptionId, @Title, @City, @Address, @HourlyRate, @AgentId)";
 
                 var jobParameters = new[]
                 {
-            new MySqlParameter("@OrganizationId", loggedInUserId),
-            new MySqlParameter("@CategoryId", request.CategoryId),
-            new MySqlParameter("@DescriptionId", descriptionId),
-            new MySqlParameter("@Title", request.Title),
-            new MySqlParameter("@City", request.City),
-            new MySqlParameter("@Address", request.Address),
-            new MySqlParameter("@HourlyRate", request.HourlyRate),
-            new MySqlParameter("@AgentId", DBNull.Value)
-        };
+                    new MySqlParameter("@OrganizationId", loggedInUserId),
+                    new MySqlParameter("@CategoryId", request.CategoryId),
+                    new MySqlParameter("@DescriptionId", descriptionId),
+                    new MySqlParameter("@Title", request.Title),
+                    new MySqlParameter("@City", request.City),
+                    new MySqlParameter("@Address", request.Address),
+                    new MySqlParameter("@HourlyRate", request.HourlyRate),
+                    new MySqlParameter("@AgentId", DBNull.Value)
+                };
 
                 var result = await _dbHelper.ExecuteNonQueryAsync(jobQuery, jobParameters);
 
@@ -227,8 +232,8 @@ namespace StudentHiveServer.Controllers
 
                 const string getOrganizationQuery = "SELECT OrganizationId FROM Users WHERE Id = @UserId";
                 var organizationParameters = new[] {
-            new MySqlParameter("@UserId", loggedInUserId)
-        };
+                    new MySqlParameter("@UserId", loggedInUserId)
+                };
 
                 var organizationTable = await _dbHelper.ExecuteQueryAsync(getOrganizationQuery, organizationParameters);
                 if (organizationTable.Rows.Count == 0)
@@ -239,33 +244,25 @@ namespace StudentHiveServer.Controllers
                 var organizationId = organizationTable.Rows[0].Field<int>("OrganizationId");
 
 
-                var query = @"
-            SELECT 
-                j.Id, 
-                j.Title, 
-                j.CategoryId, 
-                c.CategoryName AS CategoryName, 
-                j.City, 
-                j.Address, 
-                j.HourlyRate, 
-                NULL AS AgentId, 
-                j.CreatedAt, 
-                j.IsActive,
-                j.DescriptionId,
-                d.OurOffer, 
-                d.MainTaks, 
-                d.JobRequirements, 
-                d.Advantages,
-                u.FirstName AS AgentFirstName, 
-                u.LastName AS AgentLastName, 
-                o.Name AS OrganizationName 
-            FROM Jobs j
-            LEFT JOIN Categories c ON j.CategoryId = c.Id 
-            LEFT JOIN Users u ON j.AgentId = u.Id 
-            LEFT JOIN Organizations o ON j.OrganizationId = o.Id 
-            LEFT JOIN Description d ON j.DescriptionId = d.Id 
-            WHERE j.OrganizationId = @OrganizationId
-            AND j.DescriptionId IS NOT NULL";
+                var query = @"SELECT 
+                                    j.Id, 
+                                    j.Title, 
+                                    c.CategoryName AS CategoryName, 
+                                    j.City, 
+                                    j.Address, 
+                                    j.HourlyRate, 
+                                    NULL AS AgentId, 
+                                    j.CreatedAt, 
+                                    j.IsActive,
+                                    u.FirstName AS AgentFirstName, 
+                                    u.LastName AS AgentLastName, 
+                                    o.Name AS OrganizationName 
+                                FROM Jobs j
+                                LEFT JOIN Categories c ON j.CategoryId = c.Id 
+                                LEFT JOIN Users u ON j.AgentId = u.Id 
+                                LEFT JOIN Organizations o ON j.OrganizationId = o.Id 
+                                WHERE j.OrganizationId = @OrganizationId
+                                AND j.DescriptionId IS NOT NULL";
 
                 if (isActive.HasValue)
                 {
@@ -273,18 +270,16 @@ namespace StudentHiveServer.Controllers
                 }
 
                 var jobParameters = new[] {
-            new MySqlParameter("@OrganizationId", organizationId),
-            new MySqlParameter("@IsActive", 1)
-        };
+                    new MySqlParameter("@OrganizationId", organizationId),
+                    new MySqlParameter("@IsActive", 1)
+                };
 
                 var dataTable = await _dbHelper.ExecuteQueryAsync(query, jobParameters);
-
 
                 var jobs = dataTable.AsEnumerable().Select(row => new
                 {
                     Id = row.Field<int>("Id"),
                     Title = row.Field<string>("Title"),
-                    CategoryId = row.Field<int>("CategoryId"),
                     CategoryName = row.Field<string>("CategoryName"),
                     City = row.Field<string>("City"),
                     Address = row.Field<string>("Address"),
@@ -292,11 +287,6 @@ namespace StudentHiveServer.Controllers
                     AgentId = (int?)null,
                     CreatedAt = row.Field<DateTime>("CreatedAt").ToString("yyyy-MM-dd"),
                     IsActive = row.Field<bool>("IsActive"),
-                    DescriptionId = row.Field<int>("DescriptionId"),
-                    OurOffer = row.Field<string>("OurOffer"),
-                    MainTaks = row.Field<string>("MainTaks"),
-                    JobRequirements = row.Field<string>("JobRequirements"),
-                    Advantages = row.Field<string>("Advantages"),
                     AgentFirstName = row.Field<string>("AgentFirstName"),
                     AgentLastName = row.Field<string>("AgentLastName"),
                     OrganizationName = row.Field<string>("OrganizationName")
@@ -309,10 +299,6 @@ namespace StudentHiveServer.Controllers
                 return StatusCode(500, new { message = "Error loading data!", details = ex.Message });
             }
         }
-
-
-
-
 
         [HttpGet("categories")]
         public async Task<IActionResult> GetCategories()
@@ -350,7 +336,6 @@ namespace StudentHiveServer.Controllers
             var loggedInUserId = userIdClaim.Value;
             var userRole = roleClaim.Value;
 
-            // Check if the user has the appropriate role (Organization in this case)
             if (userRole != "Organization")
             {
                 return Unauthorized(new { message = "You do not have the required permissions." });
@@ -358,7 +343,6 @@ namespace StudentHiveServer.Controllers
 
             try
             {
-                // Fetch OrganizationId of the logged-in user
                 const string getOrganizationQuery = "SELECT OrganizationId FROM Users WHERE Id = @UserId";
                 var organizationParams = new[] { new MySqlParameter("@UserId", loggedInUserId) };
                 var organizationTable = await _dbHelper.ExecuteQueryAsync(getOrganizationQuery, organizationParams);
@@ -370,14 +354,13 @@ namespace StudentHiveServer.Controllers
 
                 var organizationId = organizationTable.Rows[0].Field<int>("OrganizationId");
 
-                // Update the job with the agentId and organizationId
                 const string updateQuery = "UPDATE Jobs SET AgentId = @AgentId WHERE Id = @JobId";
                 var parameters = new[]
                 {
-            new MySqlParameter("@AgentId", agentId),
-            new MySqlParameter("@JobId", JobId), // Corrected: use JobId directly
-            new MySqlParameter("@OrganizationId", organizationId) // OrganizationId from the logged-in user
-        };
+                    new MySqlParameter("@AgentId", agentId),
+                    new MySqlParameter("@JobId", JobId),
+                    new MySqlParameter("@OrganizationId", organizationId)
+                };
 
                 var result = await _dbHelper.ExecuteNonQueryAsync(updateQuery, parameters);
 
@@ -394,8 +377,6 @@ namespace StudentHiveServer.Controllers
             }
         }
 
-
-
         [HttpGet("agents")]
         public async Task<IActionResult> GetAgents()
         {
@@ -409,7 +390,6 @@ namespace StudentHiveServer.Controllers
 
             try
             {
-
                 const string getOrganizationQuery = "SELECT OrganizationId FROM Users WHERE Id = @UserId";
                 var organizationParameters = new[]
                 {
@@ -424,15 +404,17 @@ namespace StudentHiveServer.Controllers
 
                 var organizationId = organizationTable.Rows[0].Field<int>("OrganizationId");
 
+                const string query = @"
+                                        SELECT Id, FirstName, LastName, Email, IsActive 
+                                        FROM Users 
+                                        WHERE OrganizationId = @OrganizationId AND RoleId = 3";
 
-                const string query = @"SELECT Id, FirstName, LastName, Email FROM Users WHERE OrganizationId = @OrganizationId AND RoleId=3"; ;
                 var jobParameters = new[]
                 {
-            new MySqlParameter("@OrganizationId", organizationId)
-        };
+                    new MySqlParameter("@OrganizationId", organizationId)
+                };
 
                 var dataTable = await _dbHelper.ExecuteQueryAsync(query, jobParameters);
-
 
                 var agents = dataTable.AsEnumerable().Select(row => new
                 {
@@ -440,34 +422,33 @@ namespace StudentHiveServer.Controllers
                     FirstName = row.Field<string>("FirstName"),
                     LastName = row.Field<string>("LastName"),
                     Email = row.Field<string>("Email"),
+                    IsActive = row.Field<bool>("IsActive") ? 1 : 0
                 }).ToList();
 
                 return Ok(agents);
             }
             catch (Exception ex)
             {
-
                 return StatusCode(500, new { message = "Error fetching data", details = ex.Message });
             }
         }
-        [HttpPatch("isactive/{jobId}")]
-        public async Task<IActionResult> UpdateJobStatus(int jobId, [FromBody] JobStatusUpdateRequest request)
+        [HttpPatch("toggle-job-status/{jobId}")]
+        public async Task<IActionResult> UpdateJobStatus(int jobId)
         {
             var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
             var roleClaim = User.FindFirst(ClaimTypes.Role);
 
             if (userIdClaim == null || roleClaim == null)
             {
-                return Unauthorized(new { message = "User is not authenticated." });
+                return Unauthorized(new { message = "Felhasználói hitelesítés szükséges." });
             }
 
             var loggedInUserId = userIdClaim.Value;
             var userRole = roleClaim.Value;
 
-            // Check if the user has the appropriate role (Organization in this case)
             if (userRole != "Organization")
             {
-                return Unauthorized(new { message = "You do not have the required permissions." });
+                return Unauthorized(new { message = "Nincs hozzá megfelelő jogosultságod." });
             }
 
             try
@@ -479,66 +460,97 @@ namespace StudentHiveServer.Controllers
 
                 if (jobTable.Rows.Count == 0)
                 {
-                    return NotFound(new { message = "Job not found." });
+                    return NotFound(new { message = "Munka nem található." });
                 }
 
                 var organizationId = jobTable.Rows[0].Field<int>("OrganizationId");
 
-                // Parse loggedInUserId to integer before comparing
                 if (organizationId != int.Parse(loggedInUserId))
                 {
-                    return Unauthorized(new { message = "You do not have permission to update this job's status." });
+                    return Unauthorized(new { message = "Nincs megfelelő jogosultságod a státusz megváltoztatásához." });
                 }
+
+                const string getStatusQuery = "SELECT IsActive FROM Jobs WHERE Id = @JobId";
+                var currentStatus = await _dbHelper.ExecuteScalarAsync<int>(getStatusQuery, checkParameters);
+
+                int newStatus = currentStatus == 1 ? 0 : 1;
 
                 const string updateQuery = "UPDATE Jobs SET IsActive = @IsActive WHERE Id = @JobId";
                 var updateParameters = new[]
                 {
-            new MySqlParameter("@IsActive", request.IsActive),
-            new MySqlParameter("@JobId", jobId)
-        };
+                    new MySqlParameter("@IsActive", newStatus),
+                    new MySqlParameter("@JobId", jobId)
+                };
 
-                var result = await _dbHelper.ExecuteNonQueryAsync(updateQuery, updateParameters);
+                await _dbHelper.ExecuteNonQueryAsync(updateQuery, updateParameters);
 
-                if (result <= 0)
-                {
-                    return StatusCode(500, new { message = "An error occurred while updating the job status." });
-                }
-
-                return Ok(new { message = "Job status updated successfully." });
+                return Ok(new { message = newStatus == 1 ? "Munka sikeresen aktiválva." : "Munka sikeresen deaktiválva" });
             }
             catch (Exception ex)
             {
-                return StatusCode(500, new { message = "Error occurred while updating job status.", details = ex.Message });
+                return StatusCode(500, new { message = "Hiba a státusz megváltoztatása során.", details = ex.Message });
             }
         }
 
-
-        public class JobStatusUpdateRequest
+        [HttpPatch("toggle-agent-status/{Id}")]
+        public async Task<IActionResult> ToggleAgentStatus(int Id)
         {
-            public bool IsActive { get; set; }
-        }
+            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
+            var roleClaim = User.FindFirst(ClaimTypes.Role);
 
+            if (userIdClaim == null || roleClaim == null)
+            {
+                return Unauthorized(new { message = "Felhasználói hitelesítés szükséges." });
+            }
 
-        [HttpDelete("delete-agent/{Id}")]
-        public async Task<IActionResult> DeleteAgent(int Id)
-        {
+            var loggedInUserId = userIdClaim.Value;
+            var userRole = roleClaim.Value;
+
+            if (userRole != "Organization")
+            {
+                return Unauthorized(new { message = "Nincs hozzá megfelelő jogosultságod." });
+            }
+
             try
             {
+                const string checkQuery = "SELECT OrganizationId FROM users WHERE Id = @Id";
+                var checkParameters = new[] { new MySqlParameter("@Id", Id) };
 
-                const string deleteQuery = "DELETE FROM users WHERE Id = @Id";
-                var deleteParameters = new[] { new MySqlParameter("@Id", Id) };
+                var userTable = await _dbHelper.ExecuteQueryAsync(checkQuery, checkParameters);
 
-                await _dbHelper.ExecuteNonQueryAsync(deleteQuery, deleteParameters);
+                if (userTable.Rows.Count == 0)
+                {
+                    return NotFound(new { message = "Felhasználó nem található." });
+                }
 
-                return Ok(new { message = "Agent deleted successfully." });
+                var organizationId = userTable.Rows[0].Field<int>("OrganizationId");
+
+                if (organizationId != int.Parse(loggedInUserId))
+                {
+                    return Unauthorized(new { message = "Nincs megfelelő jogosultságod a státusz megváltoztatásához." });
+                }
+
+                const string getStatusQuery = "SELECT IsActive FROM users WHERE Id = @Id";
+                var currentStatus = await _dbHelper.ExecuteScalarAsync<int>(getStatusQuery, checkParameters);
+
+                int newStatus = currentStatus == 1 ? 0 : 1;
+
+                const string updateQuery = "UPDATE users SET IsActive = @IsActive WHERE Id = @Id";
+                var updateParameters = new[]
+                {
+                    new MySqlParameter("@IsActive", newStatus),
+                    new MySqlParameter("@Id", Id)
+                };
+
+                await _dbHelper.ExecuteNonQueryAsync(updateQuery, updateParameters);
+
+                return Ok(new { message = newStatus == 1 ? "Közvetítő sikeresen aktiválva." : "Közvetítő sikeresen deaktiválva" });
             }
             catch (Exception ex)
             {
-                return StatusCode(500, new { message = "Error occurred while deleting the Agent.", details = ex.Message });
+                return StatusCode(500, new { message = "Hiba a státusz megváltoztatása során.", details = ex.Message });
             }
         }
-
-
 
         [HttpPut("update-job/{jobId}")]
         public async Task<IActionResult> UpdateJob(int jobId, [FromBody] JobRequest request)
@@ -548,24 +560,22 @@ namespace StudentHiveServer.Controllers
                 return BadRequest("Invalid job data.");
             }
 
-            // First, update the Jobs table
-            var jobQuery = @"
-    UPDATE Jobs 
-    SET Title = @Title, 
-        Address = @Address, 
-        HourlyRate = @HourlyRate, 
-        City = @City,
-        CategoryId = @CategoryId
-    WHERE Id = @JobId";
+            var jobQuery = @"UPDATE Jobs 
+                            SET Title = @Title, 
+                                Address = @Address, 
+                                HourlyRate = @HourlyRate, 
+                                City = @City,
+                                CategoryId = @CategoryId
+                            WHERE Id = @JobId";
 
             var jobParameters = new MySqlParameter[]
             {
-        new MySqlParameter("@Title", request.Title),
-        new MySqlParameter("@Address", request.Address),
-        new MySqlParameter("@HourlyRate", request.HourlyRate),
-        new MySqlParameter("@City", request.City),
-        new MySqlParameter("@CategoryId", request.CategoryId), // Ensure this is included
-        new MySqlParameter("@JobId", jobId)
+                new MySqlParameter("@Title", request.Title),
+                new MySqlParameter("@Address", request.Address),
+                new MySqlParameter("@HourlyRate", request.HourlyRate),
+                new MySqlParameter("@City", request.City),
+                new MySqlParameter("@CategoryId", request.CategoryId),
+                new MySqlParameter("@JobId", jobId)
             };
 
             try
@@ -576,22 +586,20 @@ namespace StudentHiveServer.Controllers
                     return NotFound("Job not found.");
                 }
 
-                // Now update the Description table
-                var descriptionQuery = @"
-        UPDATE Description 
-        SET OurOffer = @OurOffer, 
-            MainTaks = @MainTaks, 
-            JobRequirements = @JobRequirements, 
-            Advantages = @Advantages
-        WHERE Id = (SELECT DescriptionId FROM Jobs WHERE Id = @JobId)";
+                var descriptionQuery = @"UPDATE Description 
+                                        SET OurOffer = @OurOffer, 
+                                            MainTaks = @MainTaks, 
+                                            JobRequirements = @JobRequirements, 
+                                            Advantages = @Advantages
+                                        WHERE Id = (SELECT DescriptionId FROM Jobs WHERE Id = @JobId)";
 
                 var descriptionParameters = new MySqlParameter[]
                 {
-            new MySqlParameter("@OurOffer", request.OurOffer),
-            new MySqlParameter("@MainTaks", request.MainTaks),
-            new MySqlParameter("@JobRequirements", request.JobRequirements),
-            new MySqlParameter("@Advantages", request.Advantages),
-            new MySqlParameter("@JobId", jobId)
+                    new MySqlParameter("@OurOffer", request.OurOffer),
+                    new MySqlParameter("@MainTaks", request.MainTaks),
+                    new MySqlParameter("@JobRequirements", request.JobRequirements),
+                    new MySqlParameter("@Advantages", request.Advantages),
+                    new MySqlParameter("@JobId", jobId)
                 };
 
                 var descriptionRowsAffected = await _dbHelper.ExecuteNonQueryAsync(descriptionQuery, descriptionParameters);
@@ -607,8 +615,6 @@ namespace StudentHiveServer.Controllers
                 return StatusCode(500, $"Internal server error: {ex.Message}");
             }
         }
-
-
 
         [HttpDelete("delete-job/{jobId}")]
         public async Task<IActionResult> DeleteJob(int jobId)
@@ -657,8 +663,6 @@ namespace StudentHiveServer.Controllers
             }
         }
 
-
-
         private static string GenerateRandomPassword(int length = 10)
         {
             const string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
@@ -670,7 +674,10 @@ namespace StudentHiveServer.Controllers
             }
             return new string(password);
         }
-
+        public class JobStatusUpdateRequest
+        {
+            public bool IsActive { get; set; }
+        }
         public class NewAgentRequest
         {
             public string FirstName { get; set; }
