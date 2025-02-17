@@ -2,60 +2,41 @@ import { useState } from "react";
 import axios from "axios";
 import styles from "./AddAgents.module.css";
 import Title from "../../../components/Title/Title";
-import { useNavigate } from "react-router-dom";
-import { jwtDecode } from "jwt-decode";
 import Sidebar from "../../../components/Sidebar/Sidebar";
 import { orgMenuLinks } from "../../../utils/routes";
 import DashboardTitle from "../../../components/DashboardTitle/DashboardTitle";
-
-interface DecodedToken {
-  "http://schemas.microsoft.com/ws/2008/06/identity/claims/role"?: string;
-  "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier"?: string;
-  exp?: number;
-  iss?: string;
-  aud?: string;
-  [key: string]: any;
-}
+import { getUserIdFromToken } from "../../../utils/authUtils";
 
 const AddAgents = () => {
+  const [message, setMessage] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
+
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [newAgentEmail, setNewAgentEmail] = useState("");
-  const [error, setError] = useState<string | null>(null);
   const [isSidebarOpen, setIsSidebarOpen] = useState(window.innerWidth >= 1000);
-  const navigate = useNavigate();
 
   const handleToggleSidebar = () => {
     setIsSidebarOpen(!isSidebarOpen);
   };
 
-  const getUserIdFromToken = (): string | null => {
-    const token = localStorage.getItem("token");
-    if (!token) return null;
-
-    try {
-      const decoded: DecodedToken = jwtDecode(token);
-      return decoded["http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier"] || null;
-    } catch (error) {
-      console.error("Error decoding token:", error);
-      return null;
-    }
-  };
 
   const handleRegister = async () => {
+    setError(null);
+    setMessage(null);
     const loggedInUserId = getUserIdFromToken();
     if (!loggedInUserId) {
-      setError("User is not authenticated.");
+      setError("Nem található felhasználói bejelentkezés.");
       return;
     }
-
+  
+    const token = localStorage.getItem("token");
+    if (!token) {
+      setError("Token nem található.");
+      return;
+    }
+  
     try {
-      const token = localStorage.getItem("token");
-      if (!token) {
-        setError("No authentication token found.");
-        return;
-      }
-
       const response = await axios.post(
         "https://localhost:7067/api/organization/new-agent",
         {
@@ -69,14 +50,17 @@ const AddAgents = () => {
           },
         }
       );
-
-      console.log("Registration successful:", response.data);
-      setError(null);
+  
+      setMessage(response.data.message);
+      setFirstName("");
+      setLastName("");
+      setNewAgentEmail("");
     } catch (error: any) {
-      if (error.response?.data?.message) {
-        setError(error.response.data.message);
+      if (error.response && error.response.data) {
+        const { message } = error.response.data;
+        setError(message || "Ismeretlen hiba lépett fel.");
       } else {
-        setError("An unknown error occurred.");
+        setError("Ismeretlen hiba lépett fel.");
       }
     }
   };
@@ -93,6 +77,7 @@ const AddAgents = () => {
         <div className={styles.addAgentsContent}>
           <Title subTitle="Közvetítő felvétele" title="Adj hozzá új közvetítőt az alapadatok megadásával!" />
           {error && <p style={{ color: "red" }}>{error}</p>}
+          {message && <p style={{ color: "green" }}>{message}</p>}
           <form
             className={styles.addAgentsForm}
             onSubmit={(e) => {

@@ -96,7 +96,7 @@ const JobPatchViewModal: React.FC<JobPatchViewModalProps> = ({ jobId }) => {
 
         <div className={styles.formWrapper}>
           <button type="submit" className={styles.submitButton}>
-            Közvetítő Hozzárendelése
+            közvetítő hozzárendelése
           </button>
         </div>
       </form>

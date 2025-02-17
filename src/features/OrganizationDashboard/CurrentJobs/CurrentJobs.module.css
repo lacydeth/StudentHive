@@ -89,17 +89,12 @@
 }
 
 .actionBtn {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    width: 100px;
-    height: 28px;
-    img {
-        width: 24px;
-        height: 24px;
-        margin: 3px;
-    }
-
+    border: none;
+    cursor: pointer;
+    background: none;
+}
+.actionBtn img {
+    width: 25px;
 }
   
 @media screen and (min-width:820px) {

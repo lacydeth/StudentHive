@@ -1,9 +1,11 @@
 .container {
   display: flex;
   height: 100vh;
+  overflow: visible;
+}
+.container .content.sidebarOpen {
   overflow: hidden;
 }
-
 .content {
   transition: margin-left 0.3s ease;
   width: 100%;
@@ -87,8 +89,18 @@
   top: 13px;
   right: 15px;
 }
-
+.actionBtn {
+  border: none;
+  cursor: pointer;
+  background: none;
+}
+.actionBtn img {
+  width: 25px;
+}
 @media screen and (min-width:820px) {
+  .container .content.sidebarOpen {
+    overflow: visible;
+  }
   .formWrapper {
       display: flex;
       gap: 15px;

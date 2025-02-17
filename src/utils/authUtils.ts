@@ -10,13 +10,11 @@ interface DecodedToken {
   [key: string]: any;
 }
 
-// Helper function to check if the token is expired
 const isTokenExpired = (token: string): boolean => {
   const decoded: any = jwtDecode(token);
   return decoded.exp < Date.now() / 1000;
 };
 
-// Function to refresh the token
 const refreshToken = async (): Promise<string | null> => {
   try {
     const response = await axios.post("https://localhost:7067/api/auth/refresh", {}, { 
@@ -36,12 +34,10 @@ const refreshToken = async (): Promise<string | null> => {
   }
 };
 
-// Create an Axios instance
 const api = axios.create({
   baseURL: "https://localhost:7067/api",
 });
 
-// Add request interceptor to check for expired token
 api.interceptors.request.use(
   async (config) => {
     const token = localStorage.getItem("token");
@@ -54,7 +50,6 @@ api.interceptors.request.use(
         config.headers["Authorization"] = `Bearer ${newToken}`;
       } else {
         console.error("Failed to refresh token.");
-        // Optionally, you can log the user out here
         localStorage.removeItem("token");
         window.location.href = "/login";
         return Promise.reject("Failed to refresh token.");
@@ -70,21 +65,17 @@ api.interceptors.request.use(
   }
 );
 
-// Add response interceptor (optional) to handle token-related errors (like 401)
 api.interceptors.response.use(
   (response) => response,
   async (error) => {
     if (error.response?.status === 401) {
-      // Unauthorized - maybe token expired or invalid
       console.error("Unauthorized, attempting to refresh token...");
       const newToken = await refreshToken();
 
       if (newToken) {
-        // Retry the original request with the new token
         error.config.headers["Authorization"] = `Bearer ${newToken}`;
         return axios(error.config); // Retry the request
       } else {
-        // If refreshing the token fails, log the user out
         localStorage.removeItem("token");
         window.location.href = "/login";
       }
@@ -93,10 +84,8 @@ api.interceptors.response.use(
   }
 );
 
-// Export API instance
 export const apiInstance = api;
 
-// Token-related utility functions
 export const getRoleFromToken = (): string | null => {
   const token = localStorage.getItem("token");
   if (!token) return null;

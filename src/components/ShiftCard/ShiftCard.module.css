@@ -4,6 +4,7 @@
     flex-direction: column;
     background: #fff;
     padding: 15px 25px;
+    width: 270px;
     border-radius: 8px;
 }
 .card h4 {

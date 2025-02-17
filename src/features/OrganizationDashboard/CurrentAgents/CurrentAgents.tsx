@@ -9,17 +9,16 @@ import "ag-grid-community/styles/ag-grid.css";
 import "ag-grid-community/styles/ag-theme-alpine.css";
 import { ClientSideRowModelModule, ModuleRegistry } from "ag-grid-community";
 import "./Table.css";
-import Dialog from "../../../components/Dialog/Dialog";
 import { orgMenuLinks } from "../../../utils/routes";
+import { confirmAlert } from "react-confirm-alert"; 
+import "react-confirm-alert/src/react-confirm-alert.css";
 
 ModuleRegistry.registerModules([ClientSideRowModelModule]);
 
 const CurrentAgents = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(window.innerWidth >= 1000);
-  const [dialogContent, setDialogContent] = useState<React.ReactNode>(null);
   const [rowData, setRowData] = useState<any[]>([]);
   const gridRef = useRef<AgGridReact<any>>(null);
-  const dialogRef = useRef<HTMLDialogElement>(null);
 
   const handleToggleSidebar = () => {
     setIsSidebarOpen(!isSidebarOpen);
@@ -31,7 +30,7 @@ const CurrentAgents = () => {
       if (!token) {
         throw new Error("No token available");
       }
-  
+
       const response = await axios.get("https://localhost:7067/api/organization/agents", {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -39,77 +38,70 @@ const CurrentAgents = () => {
       });
       setRowData(response.data);
     } catch (error) {
-      console.error("Error fetching jobs data:", error);
+      console.error("Error fetching agents data:", error);
     }
   };
 
-  const deleteAgent = async (Id: number) => {
+  const toggleAgentStatus = async (Id: number) => {
     try {
       const token = localStorage.getItem("token");
-      await axios.delete(`https://localhost:7067/api/organization/delete-agent/${Id}`, {
+      await axios.patch(`https://localhost:7067/api/organization/toggle-agent-status/${Id}`, {}, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
       });
       fetchAgents();
-      alert("A közvetytő sikeresen törölve!");
     } catch (error) {
-      console.error("Error deleting job:", error);
-      alert("Hiba történt a munka törlése során.");
+      console.error("Error toggling agent status:", error);
     }
+  };
+
+  const confirmStatusChange = (user: any) => {
+    confirmAlert({
+      title: "Megerősítés",
+      message: `Biztosan meg szeretnéd változtatni a közvetítő státuszát? ${user.lastName} ${user.firstName}`,
+      buttons: [
+        {
+          label: "Igen",
+          onClick: () => toggleAgentStatus(user.id),
+        },
+        {
+          label: "Mégse",
+        },
+      ],
+    });
   };
 
   useEffect(() => {
     fetchAgents();
   }, []);
-  
-  const toggleDialog = (user?: any) => {
-    if (!dialogRef.current) return;
-    setDialogContent(
-      user ? (
-        <div>
-          <p>{`Név: ${user.firstName} ${user.lastName}`}</p>
-          <p>{`Email: ${user.email}`}</p>
-        </div>
-      ) : (
-        <p>Dialog content not available</p>
-      )
-    );
-    dialogRef.current.hasAttribute("open")
-      ? dialogRef.current.close()
-      : dialogRef.current.showModal();
-  };
 
-  function actionCellRenderer(params: any) {
-    const user = params.data; 
+  const actionCellRenderer = (params: any) => {
+    const user = params.data;
 
     return (
       <div style={{ display: "flex", gap: "10px" }}>
-        {/* Törlés gomb */}
         <button
-          onClick={() => {
-            if (window.confirm("Biztosan törölni szeretnéd ezt az ügynököt?")) {
-              deleteAgent(user.id);
-            }
-          }}
-          className={`${styles.actionBtn} ${styles.deleteBtn}`}
+          onClick={() => confirmStatusChange(user)}
+          className={`${styles.actionBtn} ${user.isActive ? styles.deactivateBtn : styles.activateBtn}`}
         >
-          <img src="./delete.png" alt="Delete" />
+          {user.isActive == 1 ? <img src="/onbutton.png" alt="Deaktiválás"></img> : <img src="/offbutton.png" alt="Aktiválás"></img>} 
         </button>
       </div>
     );
-  }
+  };
 
   const columnDefs = useMemo(() => [
     { field: "id", headerName: "Azonosító", flex: 0.5, minWidth: 100 },
-    { field: "firstName", headerName: "Vezetéknév", flex: 0.5, minWidth: 100 },
-    { field: "lastName", headerName: "Keresztnév", flex: 1.5, minWidth: 150 },
-    { field: "email", headerName: "Email", flex: 1, minWidth: 120 },
+    { field: "lastName", headerName: "Vezetéknév", flex: 0.5, minWidth: 100 },
+    { field: "firstName", headerName: "Keresztnév", flex: 0.5, minWidth: 150 },
+    { field: "email", headerName: "Email", flex: 1.5, minWidth: 120 },
+    { field: "isActive", headerName: "Aktív", flex: 0.5, minWidth: 100, valueFormatter: (params: any) => (params.value == 1 ? "Igen" : "Nem") },
     {
       headerName: "Műveletek",
       field: "actions",
-      cellRenderer: actionCellRenderer, 
-      width: 150,
+      cellRenderer: actionCellRenderer,
+      width: 200,
     },
   ], []);
 
@@ -144,9 +136,6 @@ const CurrentAgents = () => {
             />
           </div>
         </div>
-        <Dialog toggleDialog={toggleDialog} ref={dialogRef}>
-          {dialogContent}
-        </Dialog>
       </div>
     </div>
   );

@@ -33,7 +33,7 @@ const ShiftPage = () => {
     const [message, setMessage] = useState<string | null>(null);
     const [error, setError] = useState<string | null>(null);
     const [currentPage, setCurrentPage] = useState(1);
-    const shiftsPerPage = 5; 
+    const shiftsPerPage = 4; 
 
     const handleToggleSidebar = () => {
         setIsSidebarOpen(!isSidebarOpen);
