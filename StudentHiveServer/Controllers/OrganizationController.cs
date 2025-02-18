@@ -3,6 +3,7 @@ using MySql.Data.MySqlClient;
 using StudentHiveServer.Utils;
 using System.Data;
 using System.Net;
+using System.Net.Mail;
 using System.Security.Claims;
 using System.Text.Json;
 
@@ -131,7 +132,7 @@ namespace StudentHiveServer.Controllers
                 };
 
                 await _dbHelper.ExecuteNonQueryAsync(insertQuery, insertParameters);
-
+                SendEmail(request.NewAgentEmail, plainPassword, $"{request.LastName} {request.FirstName}");
                 return Ok(new { message = "Közvetítő sikeresen hozzáadva." });
             }
             catch (Exception ex)
@@ -662,7 +663,36 @@ namespace StudentHiveServer.Controllers
                 return StatusCode(500, new { message = "Error occurred while deleting the job.", details = ex.Message });
             }
         }
+        private void SendEmail(string toEmail, string plainPassword, string name)
+        {
+            try
+            {
+                using (var client = new SmtpClient())
+                {
+                    client.Host = "smtp.gmail.com";
+                    client.Port = 587;
+                    client.DeliveryMethod = SmtpDeliveryMethod.Network;
+                    client.UseDefaultCredentials = false;
+                    client.EnableSsl = true;
+                    client.Credentials = new NetworkCredential("info.studenthive@gmail.com", "nuccijdmnyurqzel");
+                    using (var message = new MailMessage(
+                        from: new MailAddress("info.studenthive@gmail.com", "StudentHive"),
+                        to: new MailAddress(toEmail, name)
+                        ))
+                    {
 
+                        message.Subject = "Köszöntjük a StudentHive diákmunka fórumon!";
+                        message.Body = $"Önt regisztrálták a StudentHive platformra mint közvetítő. \n Bejelentkezési adatok: \n Név: {name} \n Email: {toEmail} \n Jelszó: {plainPassword} \n Kérjük bejelentkezés után változtassa meg jelszavát!";
+
+                        client.Send(message);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error sending email: {ex.Message}");
+            }
+        }
         private static string GenerateRandomPassword(int length = 10)
         {
             const string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
@@ -684,7 +714,6 @@ namespace StudentHiveServer.Controllers
             public string LastName { get; set; }
             public string NewAgentEmail { get; set; }
         }
-
         public class JobRequest
         {
             public string Title { get; set; }

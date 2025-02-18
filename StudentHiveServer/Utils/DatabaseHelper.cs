@@ -24,7 +24,6 @@
                 }
             }
         }
-
         public async Task<DataTable> ExecuteQueryAsync(string query, MySqlParameter[] parameters = null)
         {
             using var connection = new MySqlConnection(_connectionString);
@@ -38,7 +37,6 @@
             dataTable.Load(reader);
             return dataTable;
         }
-
         public async Task<int> ExecuteNonQueryAsync(string query, MySqlParameter[] parameters = null)
         {
             using var connection = new MySqlConnection(_connectionString);

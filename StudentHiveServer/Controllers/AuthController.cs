@@ -5,6 +5,7 @@ using StudentHiveServer.Utils;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
+using System.Text.RegularExpressions;
 
 namespace StudentHiveServer.Controllers
 {
@@ -21,25 +22,37 @@ namespace StudentHiveServer.Controllers
         [HttpPost("register")]
         public async Task<IActionResult> Register([FromBody] RegisterRequest request)
         {
-            const string query = "INSERT INTO Users (FirstName, LastName, Email, PasswordHash, RoleId) VALUES (@FirstName, @LastName, @Email, @PasswordHash, @RoleId)";
+            if (!IsValidEmail(request.Email))
+            {
+                return BadRequest(new { message = "Hibás email formátum!" });
+            }
+
+            if (!IsValidPassword(request.Password))
+            {
+                return BadRequest(new { message = "A jelszónak tartalmaznia kell legalább egy nagybetűt, egy számot, és 8-15 karakter hosszúnak kell lennie!" });
+            }
+
+            const string checkEmailQuery = "SELECT COUNT(*) FROM Users WHERE Email = @Email";
+            var checkEmailParams = new MySqlParameter("@Email", request.Email);
+            var emailCount = Convert.ToInt32(await _dbHelper.ExecuteScalarAsync<int>(checkEmailQuery, new[] { checkEmailParams }));
+
+            if (emailCount > 0)
+            {
+                return Conflict(new { message = "Ez az emailcím már foglalt!" });
+            }
+
+            const string insertQuery = "INSERT INTO Users (FirstName, LastName, Email, PasswordHash, RoleId) VALUES (@FirstName, @LastName, @Email, @PasswordHash, @RoleId)";
             var parameters = new MySqlParameter[]
             {
                 new MySqlParameter("@FirstName", request.FirstName),
                 new MySqlParameter("@LastName", request.LastName),
                 new MySqlParameter("@Email", request.Email),
                 new MySqlParameter("@PasswordHash", BCrypt.Net.BCrypt.HashPassword(request.Password)),
-                new MySqlParameter("@RoleId", 4) 
+                new MySqlParameter("@RoleId", 4)
             };
 
-            try
-            {
-                await _dbHelper.ExecuteNonQueryAsync(query, parameters);
-                return Ok(new { message = "Sikeres regisztráció!" });
-            }
-            catch (MySqlException ex) when (ex.Number == 1062)
-            {
-                return Conflict(new { message = "Ez az emailcím már foglalt!" });
-            }
+            await _dbHelper.ExecuteNonQueryAsync(insertQuery, parameters);
+            return Ok(new { message = "Sikeres regisztráció!" });
         }
 
         [HttpPost("login")]
@@ -102,6 +115,17 @@ namespace StudentHiveServer.Controllers
                 signingCredentials: creds);
 
             return new JwtSecurityTokenHandler().WriteToken(token);
+        }
+        private bool IsValidEmail(string email)
+        {
+            var pattern = @"^[\w\.-]+@[a-zA-Z\d-]+\.[a-zA-Z]{2,}$";
+            return Regex.IsMatch(email, pattern);
+        }
+
+        private bool IsValidPassword(string password)
+        {
+            var pattern = @"^(?=.*[A-Z])(?=.*\d).{8,15}$";
+            return Regex.IsMatch(password, pattern);
         }
 
         public class LoginRequest
