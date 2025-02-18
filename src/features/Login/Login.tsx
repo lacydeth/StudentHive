@@ -7,14 +7,18 @@ import Navbar from '../../components/Navbar/Navbar';
 import { roleRoutes, routes } from '../../utils/routes';
 
 const Login = () => {
+  const [error, setError] = useState<string | null>(null);
+  const [message, setMessage] = useState<string | null>(null);
+
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [error, setError] = useState<string | null>(null);
   const [stayLoggedIn, setStayLoggedIn] = useState(false);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-  
+    setError(null);
+    setMessage(null);
+
     try {
       const response = await axios.post('https://localhost:7067/api/auth/login', {
         email,
@@ -32,9 +36,9 @@ const Login = () => {
     } catch (error: any) {
       if (error.response && error.response.data) {
         const { message } = error.response.data;
-        setError(message || 'An error occurred during login.');
+        setError(message || 'Hiba lépett fel a bejelentkezés során.');
       } else {
-        setError('An unknown error occurred.');
+        setError('Váratlan hiba lépett fel.');
       }
     }
   };
@@ -44,7 +48,8 @@ const Login = () => {
       <Navbar />
       <div className={styles.loginContent}>
         <Title subTitle="Bejelentkezés" title="Lépj be a StudentHive fiókodba!" />
-        {error && <p style={{ color: 'red' }}>{error}</p>}
+        {error && <p style={{ color: "red" }}>{error}</p>}
+        {message && <p style={{ color: "green" }}>{message}</p>}
         <form
           className={styles.loginForm}
           onSubmit={handleLogin}

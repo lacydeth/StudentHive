@@ -7,17 +7,18 @@ import Navbar from '../../components/Navbar/Navbar';
 import { routes } from '../../utils/routes';
 
 const Register = () => {
+  const [error, setError] = useState<string | null>(null);
+
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
-  const [error, setError] = useState<string | null>(null);
   const navigate = useNavigate();
 
   const handleRegister = async () => {
     if (password !== confirmPassword) {
-      setError('Passwords do not match.');
+      setError('A jelszavak nem egyeznek.');
       return;
     }
   
@@ -29,17 +30,16 @@ const Register = () => {
         password,
       });
   
-      console.log('Registration successful:', response.data);
       localStorage.setItem('authToken', response.data.token);
       navigate('/login');
       setError(null);
 
     } catch (error: any) {
       if (error.response && error.response.data) {
-        const { code, description } = error.response.data;
-        setError(`${code}: ${description}`);
+        const { message } = error.response.data;
+        setError(message || 'Hiba lépett fel a regisztráció során.');
       } else {
-        setError('An unknown error occurred.');
+        setError('Ismeretlen hiba lépett fel.');
       }
     }
   };
