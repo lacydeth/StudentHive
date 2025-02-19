@@ -1,5 +1,7 @@
 import { useState } from "react";
 import axios from "axios";
+import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 import styles from "./AddAgents.module.css";
 import Title from "../../../components/Title/Title";
 import Sidebar from "../../../components/Sidebar/Sidebar";
@@ -8,9 +10,6 @@ import DashboardTitle from "../../../components/DashboardTitle/DashboardTitle";
 import { getUserIdFromToken } from "../../../utils/authUtils";
 
 const AddAgents = () => {
-  const [message, setMessage] = useState<string | null>(null);
-  const [error, setError] = useState<string | null>(null);
-
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [newAgentEmail, setNewAgentEmail] = useState("");
@@ -20,47 +19,37 @@ const AddAgents = () => {
     setIsSidebarOpen(!isSidebarOpen);
   };
 
-
   const handleRegister = async () => {
-    setError(null);
-    setMessage(null);
     const loggedInUserId = getUserIdFromToken();
     if (!loggedInUserId) {
-      setError("Nem található felhasználói bejelentkezés.");
+      toast.error("Nem található felhasználói bejelentkezés.");
       return;
     }
-  
+
     const token = localStorage.getItem("token");
     if (!token) {
-      setError("Token nem található.");
+      toast.error("Token nem található.");
       return;
     }
-  
+
     try {
       const response = await axios.post(
         "https://localhost:7067/api/organization/new-agent",
+        { firstName, lastName, newAgentEmail },
         {
-          firstName,
-          lastName,
-          newAgentEmail,
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
+          headers: { Authorization: `Bearer ${token}` },
         }
       );
-  
-      setMessage(response.data.message);
+
+      toast.success(response.data.message || "Sikeres regisztráció!");
       setFirstName("");
       setLastName("");
       setNewAgentEmail("");
     } catch (error: any) {
-      if (error.response && error.response.data) {
-        const { message } = error.response.data;
-        setError(message || "Ismeretlen hiba lépett fel.");
+      if (error.response?.data?.message) {
+        toast.error(error.response.data.message);
       } else {
-        setError("Ismeretlen hiba lépett fel.");
+        toast.error("Ismeretlen hiba lépett fel.");
       }
     }
   };
@@ -68,16 +57,10 @@ const AddAgents = () => {
   return (
     <div className={styles.container}>
       <Sidebar isOpen={isSidebarOpen} toggleSidebar={handleToggleSidebar} topLinks={orgMenuLinks} />
-      <div
-        className={`${styles.content} ${
-          isSidebarOpen ? styles.sidebarOpen : styles.sidebarClosed
-        }`}
-      >
-        <DashboardTitle title="Közvetítő felvétele" icon="./realtor.png" subTitle="Közvetítő felvétele"/>
+      <div className={`${styles.content} ${isSidebarOpen ? styles.sidebarOpen : styles.sidebarClosed}`}>
+        <DashboardTitle title="Közvetítő felvétele" icon="./realtor.png" subTitle="Közvetítő felvétele" />
         <div className={styles.addAgentsContent}>
           <Title subTitle="Közvetítő felvétele" title="Adj hozzá új közvetítőt az alapadatok megadásával!" />
-          {error && <p style={{ color: "red" }}>{error}</p>}
-          {message && <p style={{ color: "green" }}>{message}</p>}
           <form
             className={styles.addAgentsForm}
             onSubmit={(e) => {
@@ -116,9 +99,8 @@ const AddAgents = () => {
               <img src="./mail.png" alt="email icon" />
             </div>
 
-            <div className={styles.inputBox}></div>
             <button type="submit" className={styles.registerBtn}>
-              közvetítő felvétele
+              Közvetítő felvétele
             </button>
           </form>
         </div>

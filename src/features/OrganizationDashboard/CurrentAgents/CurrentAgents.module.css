@@ -22,9 +22,6 @@
 .sidebarClosed {
   margin-left: 0;
 }
-.registerContainer {
-  background: #F4F4F4;
-}
 
 .newOrgContent {
   display: flex;
@@ -36,66 +33,13 @@
   flex-direction: column;
 }
 
-.newOrgForm {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 25px;
-}
-.formWrapper {
-  display: flex;
-  gap: 15px;
-  flex-direction: column;
-}
-.formColumn {
-  display: flex;
-  flex-direction: column;
-  gap: 15px;
-}
-.newOrgBtn {
-  background: var(--smoothGreen);
-  color: var(--white);
-  border-radius: 8px;
-  width: 280px;
-  height: 50px;
-  font-weight: 600;
-  border: 0;
-  outline: 0;
-  margin-bottom: 15px;
-}
-
-.inputBox {
-  position: relative;
-  width: 280px;
-}
-
-.inputBox input {
-  border: none;
-  padding: 15px 20px;
-  background-color: #fff;
-  display: block;
-  width: 100%;
-  border-radius: 8px;
-}
-
-.inputBox input:focus {
-  outline: 2px solid #99BC85;
-}
-
-.inputBox img {
-  width: 24px;
-  position: absolute;
-  top: 13px;
-  right: 15px;
-}
 .actionBtn {
   border: none;
   cursor: pointer;
   background: none;
 }
 .actionBtn img {
-  width: 25px;
+  width: 24px;
 }
 @media screen and (min-width:820px) {
   .container .content.sidebarOpen {

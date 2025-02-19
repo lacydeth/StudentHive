@@ -1,15 +1,16 @@
 .container {
-    display: flex;
-    height: 100vh;
-    overflow: hidden;
-  }
-  
+  display: flex;
+  height: 100vh;
+  overflow: visible;
+}
+.container .content.sidebarOpen {
+  overflow: hidden;
+}
 .content {
   transition: margin-left 0.3s ease;
   width: 100%;
   padding: 20px;
 }
-
 .sidebarOpen {
   margin-left: 300px;
 }
@@ -53,6 +54,11 @@
   border: 0;
   outline: 0;
   margin-bottom: 15px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+.registerBtn:hover {
+  background: var(--hoverGreen);
 }
 .inputBox {
   position: relative;
@@ -73,6 +79,21 @@
   position: absolute;
   top: 13px;
   right: 15px;
+}
+.faq {
+  cursor: pointer;
+}
+.textarea {
+  width: 100%;
+  padding: 15px 20px;
+  background-color: #fff;
+  border: none;
+  border-radius: 8px;
+  resize: vertical; 
+  min-height: 60px;
+}
+.textarea:focus {
+  outline: 2px solid #99BC85;
 }
 .faqElement {
   .faqTitle {
@@ -105,6 +126,9 @@
 }
 
 @media screen and (min-width:820px) {
+  .container .content.sidebarOpen {
+    overflow: visible;
+  }
   .formWrapper {
       display: flex;
       flex-direction: column;

@@ -8,17 +8,20 @@ import { AgGridReact } from "ag-grid-react";
 import "ag-grid-community/styles/ag-grid.css";
 import "ag-grid-community/styles/ag-theme-alpine.css";
 import { ClientSideRowModelModule, ModuleRegistry } from "ag-grid-community";
-import "./Table.css";
 import { orgMenuLinks } from "../../../utils/routes";
 import { confirmAlert } from "react-confirm-alert"; 
 import "react-confirm-alert/src/react-confirm-alert.css";
+import OrgPasswordModal from "../../../components/Modals/OrgPasswordModal";
+import Dialog from "../../../components/Dialog/Dialog";
 
 ModuleRegistry.registerModules([ClientSideRowModelModule]);
 
 const CurrentAgents = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(window.innerWidth >= 1000);
   const [rowData, setRowData] = useState<any[]>([]);
+  const [dialogContent, setDialogContent] = useState<React.ReactNode>(null)
   const gridRef = useRef<AgGridReact<any>>(null);
+  const dialogRef = useRef<HTMLDialogElement>(null);
 
   const handleToggleSidebar = () => {
     setIsSidebarOpen(!isSidebarOpen);
@@ -87,10 +90,26 @@ const CurrentAgents = () => {
         >
           {user.isActive == 1 ? <img src="/onbutton.png" alt="Deaktiválás"></img> : <img src="/offbutton.png" alt="Aktiválás"></img>} 
         </button>
+        <button
+          onClick={() => {
+            toggleDialog();
+            setDialogContent(<OrgPasswordModal organizationId={user.id} />);
+          }}
+          className={styles.actionBtn}
+        >
+          <img src="./key.png" alt="Key" />
+        </button>
       </div>
     );
   };
 
+  const toggleDialog = () => {
+    if(!dialogRef.current) {
+      return;
+    }
+    return dialogRef.current.hasAttribute("open") ? dialogRef.current.close() : dialogRef.current.showModal()
+  };
+  
   const columnDefs = useMemo(() => [
     { field: "id", headerName: "Azonosító", flex: 0.5, minWidth: 100 },
     { field: "lastName", headerName: "Vezetéknév", flex: 0.5, minWidth: 100 },
@@ -133,9 +152,13 @@ const CurrentAgents = () => {
               pagination={true}
               paginationPageSize={10}
               suppressCellFocus={false}
+              rowHeight={35}
             />
           </div>
         </div>
+        <Dialog toggleDialog={toggleDialog} ref={dialogRef}>
+          {dialogContent}
+        </Dialog>
       </div>
     </div>
   );

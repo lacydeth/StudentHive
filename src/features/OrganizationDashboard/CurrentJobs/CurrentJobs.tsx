@@ -8,7 +8,6 @@ import { AgGridReact } from "ag-grid-react";
 import "ag-grid-community/styles/ag-grid.css";
 import "ag-grid-community/styles/ag-theme-alpine.css";
 import { ClientSideRowModelModule, ModuleRegistry } from "ag-grid-community";
-import "./Table.css";
 import Dialog from "../../../components/Dialog/Dialog";
 import { orgMenuLinks } from "../../../utils/routes";
 import JobViewModal from "../../../components/Modals/JobViewModal";
@@ -196,7 +195,7 @@ const CurrentJobs = () => {
               pagination={true}
               paginationPageSize={10}
               suppressCellFocus={false}
-              getRowHeight={() =>30}
+              rowHeight={35}
             />
           </div>
         </div>

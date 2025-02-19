@@ -8,7 +8,6 @@ import { AgGridReact } from "ag-grid-react";
 import "ag-grid-community/styles/ag-grid.css";
 import "ag-grid-community/styles/ag-theme-alpine.css";
 import { ClientSideRowModelModule, ModuleRegistry } from "ag-grid-community";
-import "./Table.css"
 import OrgViewModal from "../../../components/Modals/OrgViewModal";
 import OrgPasswordModal from "../../../components/Modals/OrgPasswordModal";
 import Dialog from "../../../components/Dialog/Dialog";
@@ -18,7 +17,7 @@ ModuleRegistry.registerModules([ClientSideRowModelModule]);
 
 const ExistingOrg = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(window.innerWidth >= 1000);
-  const [dialogContent, setDialogContent] = useState<React.ReactNode>(null)
+  const [dialogContent, setDialogContent] = useState<React.ReactNode>(null);
   const [rowData, setRowData] = useState<any[]>([]);
   const gridRef = useRef<AgGridReact<any>>(null);
   const dialogRef = useRef<HTMLDialogElement>(null);
@@ -113,7 +112,9 @@ const ExistingOrg = () => {
                 columnDefs={columnDefs}
                 domLayout="autoHeight"
                 pagination={true}
-                paginationPageSize={10} suppressCellFocus={false}
+                paginationPageSize={10}
+                suppressCellFocus={false}
+                rowHeight={35}
               />
           </div>
         </div>

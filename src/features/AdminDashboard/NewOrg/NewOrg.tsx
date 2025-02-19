@@ -1,5 +1,7 @@
 import { useState } from "react";
 import axios from "axios";
+import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 import styles from "./NewOrg.module.css";
 import Sidebar from "../../../components/Sidebar/Sidebar";
 import Title from "../../../components/Title/Title";
@@ -7,9 +9,6 @@ import DashboardTitle from "../../../components/DashboardTitle/DashboardTitle";
 import { adminTopLinks } from "../../../utils/routes";
 
 const NewOrg = () => {
-  const [message, setMessage] = useState<string | null>(null);
-  const [error, setError] = useState<string | null>(null);
-
   const [isSidebarOpen, setIsSidebarOpen] = useState(window.innerWidth >= 1000);
 
   const [orgName, setOrgName] = useState("");
@@ -22,46 +21,35 @@ const NewOrg = () => {
   };
 
   const handleNewOrganization = async () => {
-    setMessage(null);
-    setError(null);
     try {
       const response = await axios.post("https://localhost:7067/api/admin/new-organization", {
         orgName,
         email,
         phoneNumber,
         address,
-        
       });
-      setMessage(response.data.message);
+      toast.success(response.data.message || "Szövetkezet sikeresen hozzáadva!");
       setOrgName("");
       setEmail("");
       setPhoneNumber("");
       setAddress("");
     } catch (error: any) {
       if (error.response && error.response.data) {
-          const { message } = error.response.data; 
-          setError(message || "Ismeretlen hiba lépett fel."); 
+        const { message } = error.response.data;
+        toast.error(message || "Ismeretlen hiba lépett fel.");
       } else {
-          setError("Ismeretlen hiba lépett fel.");
+        toast.error("Ismeretlen hiba lépett fel.");
       }
     }
   };
+
   return (
     <div className={styles.container}>
-    <Sidebar isOpen={isSidebarOpen} toggleSidebar={handleToggleSidebar} topLinks={adminTopLinks} />
-      <div
-        className={`${styles.content} ${
-          isSidebarOpen ? styles.sidebarOpen : styles.sidebarClosed
-        }`}
-      >
-        <DashboardTitle title="Szövetkezet felvétele" icon="./more.png" subTitle="Szövetkezet felvétele"/>
+      <Sidebar isOpen={isSidebarOpen} toggleSidebar={handleToggleSidebar} topLinks={adminTopLinks} />
+      <div className={`${styles.content} ${isSidebarOpen ? styles.sidebarOpen : styles.sidebarClosed}`}>
+        <DashboardTitle title="Szövetkezet felvétele" icon="./more.png" subTitle="Szövetkezet felvétele" />
         <div className={styles.newOrgContent}>
-          <Title
-            subTitle="Szövetkezet felvétele"
-            title="Add meg a szövetkezet alapvető adatait!"
-          />
-          {error && <p style={{ color: "red" }}>{error}</p>}
-          {message && <p style={{ color: "green" }}>{message}</p>}
+          <Title subTitle="Szövetkezet felvétele" title="Add meg a szövetkezet alapvető adatait!" />
           <form
             className={styles.newOrgForm}
             onSubmit={(e) => {
@@ -115,7 +103,7 @@ const NewOrg = () => {
                 </div>
               </div>
             </div>
-          
+
             <button type="submit" className={styles.newOrgBtn}>
               szövetkezet felvétele
             </button>

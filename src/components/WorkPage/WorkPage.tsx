@@ -5,8 +5,7 @@ import Navbar from "../Navbar/Navbar";
 import { routes } from "../../utils/routes";
 import { apiInstance } from "../../utils/authUtils"; 
 import { getUserIdFromToken } from "../../utils/authUtils"; 
-import { ToastContainer, toast } from 'react-toastify';  // Importáld a szükséges komponenseket
-import 'react-toastify/dist/ReactToastify.css';  // Importáld a stílusokat
+import {  toast } from 'react-toastify';
 import axios from "axios";
 
 type WorkDetails = {
@@ -41,14 +40,14 @@ const WorkPage = () => {
     try {
       const userId = getUserIdFromToken();
       if (!userId) {
-        toast.error("Nem sikerült azonosítani a felhasználót.");  // Hiba üzenet
+        toast.error("Nem sikerült azonosítani a felhasználót."); 
         setIsApplying(false);
         return;
       }
   
       const token = localStorage.getItem("token");
       if (!token) {
-        toast.error("Nincs bejelentkezve felhasználó.");  // Hiba üzenet
+        toast.error("Nincs bejelentkezve felhasználó."); 
         setIsApplying(false);
         return;
       }
@@ -67,9 +66,9 @@ const WorkPage = () => {
         }
       );
   
-      toast.success(response.data.message);  // Sikeres jelentkezés üzenet
+      toast.success(response.data.message);  
     } catch (error: any) {
-      toast.error("Már jelentkezett a munkára!");  // Hiba üzenet
+      toast.error("Már jelentkezett a munkára!"); 
     } finally {
       setIsApplying(false);
     }
@@ -142,9 +141,6 @@ const WorkPage = () => {
                 </div>
             </div>
         </div>
-
-        {/* ToastContainer a popup értesítésekhez */}
-        <ToastContainer />
     </div>
   );
 };
