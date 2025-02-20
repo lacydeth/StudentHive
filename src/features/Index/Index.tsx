@@ -15,13 +15,10 @@ const IndexPage = () => {
       });
     };
 
-    // Initial call to set the AOS attributes
     updateAOS();
 
-    // Update AOS attributes on resize
     window.addEventListener("resize", updateAOS);
 
-    // Cleanup event listener on component unmount
     return () => {
       window.removeEventListener("resize", updateAOS);
     };
@@ -31,25 +28,55 @@ const IndexPage = () => {
     <div className="home-page">
       <Navbar />
       <section className="welcome-section">
-        <div className="title">
-          <h1>StudentHive</h1>
-          <h3>Álommunka. Könnyedén. Azonnal.</h3>
-        </div>
-        <div className="search">
-          <h1>Kezdj neki a keresésnek!</h1>
-          <div className="job-search">
-            <h4>Munkakör</h4>
-            <select className="search-select">
-              <option value="" disabled selected>
-                Elérhető munkakörök
-              </option>
-            </select>
+          <div className="welcome-content">
+              <div className="hero-text" data-aos="fade-right">
+                  <h1>Összekapcsoljuk a tehetséget a lehetőségekkel</h1>
+                  <p>
+                      Találd meg a tökéletes diákmunkát, vagy alkalmazz képzett jelölteket gyorsan és hatkékonyan. 
+                      Csatlakozz több ezer diákhoz és munkaadóhoz, akik már megtalálták a megfelelő állást a StudentHive-on.
+                  </p>
+                  
+                  <ul className="hero-features">
+                      <li>
+                          <img src="/checkmark.png" alt="Checkmark" />
+                          <span>500+ Diákmunka elérhető</span>
+                      </li>
+                      <li>
+                          <img src="/checkmark.png" alt="Checkmark" />
+                          <span>Több, mint 100 megbízható cég</span>
+                      </li>
+                      <li>
+                          <img src="/checkmark.png" alt="Checkmark" />
+                          <span>Villámgyors jelentkezési folyamat</span>
+                      </li>
+                  </ul>
+              </div>
+
+              <div className="search-container" data-aos="fade-left">
+                  <h2>Kezdj bele az álláskeresésbe</h2>
+                  <div className="job-search">
+                      <label>Kategória</label>
+                      <select className="search-select">
+                          <option selected disabled value="">Válassz egy kategóriát..</option>
+                      </select>
+                      
+                      <label>Város</label>
+                      <select className="search-select">
+                          <option selected disabled value="">Válassz egy várost..</option>
+                      </select>
+                  </div>
+                  
+                  <div className="cta-buttons">
+                      <button className="search-btn">
+                          Keresés
+                          <img src="/loupe.png" alt="Search" />
+                      </button>
+                      <a href="/employers" className="secondary-btn">
+                          Iskolaszövetkezet vagyok
+                      </a>
+                  </div>
+              </div>
           </div>
-          <button className="search-btn">
-            keresés
-            <img src="./loupe.png" alt="Kép egy nagyítóról."></img>
-          </button>
-        </div>
       </section>
       <section className="benefits-section">
         <Title subTitle="Funkcióink" title="Modern álláskeresés" />

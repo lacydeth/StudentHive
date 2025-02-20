@@ -50,17 +50,17 @@
 }
 .menu-list li .btn{
     color: #000;
-    font-size: 1.2rem;
+    text-transform: uppercase;
+    font-size: 1.3rem;
     width: 22px;
     font-weight: 300;
-    font-weight: 400;
     margin-left: 65px;
     text-decoration: none;
     cursor: pointer;
     transition: all 0.3s ease;
 }
 .menu-list li .btn:hover, .menu-list li .login-btn:hover{
-    color: var(--smoothGreen)!important;
+    color: var(--hoverGreen)!important;
 }
 .icon{
     color: var(--white);

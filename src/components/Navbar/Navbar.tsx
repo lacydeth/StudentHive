@@ -4,7 +4,6 @@ import { Link } from "react-router-dom";
 import { getRoleFromToken, handleLogout } from "../../utils/authUtils";
 import { roleRoutes, routes } from "../../utils/routes";
 import websiteLogo from "/logo.png"
-import logout from "/logout.png"
 
 const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -76,7 +75,7 @@ const Navbar = () => {
               </li>
 
               <li>
-                <img onClick={handleLogout} className="btn" src={logout}></img>
+                <i onClick={handleLogout} className="btn ri-logout-box-r-line"></i>
               </li>
             </>
           ) : (
