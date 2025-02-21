@@ -157,6 +157,7 @@
     font-weight: 600;
     text-transform: uppercase;
     cursor: pointer;
+    text-decoration: none;
 }
 
 .secondary-btn:hover {
@@ -166,7 +167,6 @@
     box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
 }
 
-/* Benefits Section */
 .benefits-section {
     text-align: center;
     background: #F4F4F4;
@@ -195,8 +195,6 @@
     height: 180px;
     box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
 }
-
-/* About Section */
 .about-section {
     padding: 0 10%;
     margin: 60px 20px;
@@ -238,7 +236,6 @@
     margin-bottom: 15px;
 }
 
-/* ===== Media Queries for Larger Screens ===== */
 @media screen and (min-width: 480px) {
     .hero-text h1 {
         font-size: 2.5rem;

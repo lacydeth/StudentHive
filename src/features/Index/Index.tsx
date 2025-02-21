@@ -1,10 +1,21 @@
+import Aos from "aos";
 import Footer from "../../components/Footer/Footer";
 import Navbar from "../../components/Navbar/Navbar";
 import Title from "../../components/Title/Title";
 import "./Index.css";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
+import axios from "axios";
+import { Link, useNavigate } from "react-router-dom";
+import { routes } from "../../utils/routes";
 
 const IndexPage = () => {
+  const [categories, setCategories] = useState([]);
+  const [locations, setLocations] = useState([]);
+  const [selectedCategory, setSelectedCategory] = useState("");
+  const [selectedLocation, setSelectedLocation] = useState("");
+  
+  const navigate = useNavigate(); // Hook to handle navigation
+
   useEffect(() => {
     const updateAOS = () => {
       const elements = document.querySelectorAll("[data-aos]");
@@ -13,6 +24,16 @@ const IndexPage = () => {
           el.setAttribute("data-aos", "fade-up");
         }
       });
+      Aos.refresh();
+      axios
+        .get("https://localhost:7067/api/organization/categories")
+        .then((response) => setCategories(response.data))
+        .catch((error) => console.error("Error fetching categories:", error));
+
+      axios
+        .get("https://localhost:7067/api/general/cities")
+        .then((response) => setLocations(response.data))
+        .catch((error) => console.error("Error fetching locations:", error));
     };
 
     updateAOS();
@@ -24,59 +45,82 @@ const IndexPage = () => {
     };
   }, []);
 
+  const handleSearch = () => {
+    // Create the query parameters based on selected category and location
+    const queryParams = new URLSearchParams();
+    if (selectedCategory) queryParams.append("category", selectedCategory);
+    if (selectedLocation) queryParams.append("location", selectedLocation);
+
+    // Redirect to /works with the query string
+    navigate(`/works?${queryParams.toString()}`);
+  };
+
   return (
     <div className="home-page">
       <Navbar />
       <section className="welcome-section">
-          <div className="welcome-content">
-              <div className="hero-text" data-aos="fade-right">
-                  <h1>Összekapcsoljuk a tehetséget a lehetőségekkel</h1>
-                  <p>
-                      Találd meg a tökéletes diákmunkát, vagy alkalmazz képzett jelölteket gyorsan és hatkékonyan. 
-                      Csatlakozz több ezer diákhoz és munkaadóhoz, akik már megtalálták a megfelelő állást a StudentHive-on.
-                  </p>
-                  
-                  <ul className="hero-features">
-                      <li>
-                          <img src="/checkmark.png" alt="Checkmark" />
-                          <span>500+ Diákmunka elérhető</span>
-                      </li>
-                      <li>
-                          <img src="/checkmark.png" alt="Checkmark" />
-                          <span>Több, mint 100 megbízható cég</span>
-                      </li>
-                      <li>
-                          <img src="/checkmark.png" alt="Checkmark" />
-                          <span>Villámgyors jelentkezési folyamat</span>
-                      </li>
-                  </ul>
-              </div>
-
-              <div className="search-container" data-aos="fade-left">
-                  <h2>Kezdj bele az álláskeresésbe</h2>
-                  <div className="job-search">
-                      <label>Kategória</label>
-                      <select className="search-select">
-                          <option selected disabled value="">Válassz egy kategóriát..</option>
-                      </select>
-                      
-                      <label>Város</label>
-                      <select className="search-select">
-                          <option selected disabled value="">Válassz egy várost..</option>
-                      </select>
-                  </div>
-                  
-                  <div className="cta-buttons">
-                      <button className="search-btn">
-                          Keresés
-                          <img src="/loupe.png" alt="Search" />
-                      </button>
-                      <a href="/employers" className="secondary-btn">
-                          Iskolaszövetkezet vagyok
-                      </a>
-                  </div>
-              </div>
+        <div className="welcome-content">
+          <div className="hero-text" data-aos="fade-right">
+            <h1>Összekapcsoljuk a tehetséget a lehetőségekkel</h1>
+            <p>
+              Találd meg a tökéletes diákmunkát, vagy alkalmazz képzett jelölteket gyorsan és hatkékonyan.
+              Csatlakozz több ezer diákhoz és munkaadóhoz, akik már megtalálták a megfelelő állást a StudentHive-on.
+            </p>
+            <ul className="hero-features">
+              <li>
+                <img src="/checkmark.png" alt="Checkmark" />
+                <span>500+ Diákmunka elérhető</span>
+              </li>
+              <li>
+                <img src="/checkmark.png" alt="Checkmark" />
+                <span>Több, mint 100 megbízható cég</span>
+              </li>
+              <li>
+                <img src="/checkmark.png" alt="Checkmark" />
+                <span>Villámgyors jelentkezési folyamat</span>
+              </li>
+            </ul>
           </div>
+
+          <div className="search-container" data-aos="fade-left">
+            <h2>Kezdj bele az álláskeresésbe</h2>
+            <div className="job-search">
+              <label>Kategória</label>
+              <select className="search-select" value={selectedCategory} onChange={(e) => setSelectedCategory(e.target.value)}>
+                  <option value="">Kategória</option>
+                  {categories.map((category: { id: number; categoryName: string }) => (
+                    <option key={category.id} value={category.id}>
+                      {category.categoryName}
+                    </option>
+                  ))}
+                </select>
+
+              <label>Város</label>
+              <select
+                className="search-select"
+                value={selectedLocation}
+                onChange={(e) => setSelectedLocation(e.target.value)}
+              >
+                <option value="">Válassz egy várost..</option>
+                {locations.map((location: { city: string }) => (
+                  <option key={location.city} value={location.city}>
+                    {location.city}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <div className="cta-buttons">
+              <button className="search-btn" onClick={handleSearch}>
+                Keresés
+                <img src="/loupe.png" alt="Search" />
+              </button>
+              <Link className="secondary-btn" to={routes.loginPage.path}>
+                Iskolaszövetkezet vagyok
+              </Link>
+            </div>
+          </div>
+        </div>
       </section>
       <section className="benefits-section">
         <Title subTitle="Funkcióink" title="Modern álláskeresés" />
@@ -131,22 +175,14 @@ const IndexPage = () => {
         <div className="about-right" data-aos="fade-left" data-aos-duration="1500">
           <h3>StudentHive története</h3>
           <h2>Miért alapult meg a StudentHive diákmunka fórum?</h2>
-          <p>
-            Lorem ipsum dolor sit amet consectetur adipisicing elit. Porro sunt dolorum
-            temporibus atque rem aliquam adipisci nemo natus, modi dolorem. Molestias
-            odio eaque quis enim neque temporibus placeat provident distinctio!
-          </p>
-          <p>
-            Lorem ipsum dolor sit amet consectetur adipisicing elit. Molestias odio eaque
-            quis enim neque temporibus placeat provident distinctio!
-          </p>
-          <p>
-            Lorem ipsum dolor sit amet consectetur adipisicing elit. Molestias odio eaque
-            quis enim neque temporibus placeat provident distinctio!
-          </p>
+            <p>The <strong>StudentHive</strong> diákmunka fórum azzal a céllal jött létre, hogy összekösse a fiatalokat a legjobb munkalehetőségekkel egy könnyen átlátható, modern platformon.</p>
+
+            <p>Az alapítók felismerték, hogy sok diák számára kihívást jelent a megfelelő munka megtalálása, miközben a cégeknek is nehéz elérni a megbízható fiatal munkaerőt. A StudentHive egy olyan közösségi tér, ahol a diákok egyszerűen böngészhetnek az állásajánlatok között, megoszthatják tapasztalataikat, és közvetlenül kapcsolatba léphetnek a munkaadókkal.</p>
+
+            <p>A platform célja, hogy átlátható, gyors és biztonságos lehetőséget nyújtson a diákoknak a munkavállalásra.</p>
         </div>
       </section>
-      <Footer/>
+      <Footer />
     </div>
   );
 };

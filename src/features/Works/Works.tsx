@@ -1,10 +1,10 @@
-"use client";
 import { useState, useEffect } from "react";
 import axios from "axios";
 import Navbar from "../../components/Navbar/Navbar";
 import WorkCard from "../../components/WorkCard/WorkCard";
 import styles from "./Works.module.css";
 import Title from "../../components/Title/Title";
+import Footer from "../../components/Footer/Footer";
 
 type WorkCardData = {
   id: number;
@@ -14,7 +14,7 @@ type WorkCardData = {
   category: string;
   image: string;
   hourlyRate: number;
-  createdAt: string; 
+  createdAt: string;
 };
 
 const Works = () => {
@@ -28,6 +28,8 @@ const Works = () => {
   const [selectedCategory, setSelectedCategory] = useState("");
   const [selectedLocation, setSelectedLocation] = useState("");
   const [sortOption, setSortOption] = useState<string>("");
+  const [currentPage, setCurrentPage] = useState(1);
+  const shiftsPerPage = 8;
 
   useEffect(() => {
     const handleResize = () => setIsMobile(window.innerWidth < 820);
@@ -60,16 +62,16 @@ const Works = () => {
     const sortData = [...filteredWorkCards];
 
     switch (sortOption) {
-      case 'hourlyRateAsc':
+      case "hourlyRateAsc":
         sortData.sort((a, b) => a.hourlyRate - b.hourlyRate);
         break;
-      case 'hourlyRateDesc':
+      case "hourlyRateDesc":
         sortData.sort((a, b) => b.hourlyRate - a.hourlyRate);
         break;
-      case 'createdAtAsc':
+      case "createdAtAsc":
         sortData.sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime());
         break;
-      case 'createdAtDesc':
+      case "createdAtDesc":
         sortData.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
         break;
       default:
@@ -87,6 +89,7 @@ const Works = () => {
       return matchesTitle && matchesCategory && matchesLocation;
     });
     setFilteredWorkCards(filtered);
+    setCurrentPage(1);
   };
 
   const handleClearFilters = () => {
@@ -94,6 +97,24 @@ const Works = () => {
     setSelectedCategory("");
     setSelectedLocation("");
     setFilteredWorkCards(workCards);
+    setCurrentPage(1); 
+  };
+
+  const indexOfLastShift = currentPage * shiftsPerPage;
+  const indexOfFirstShift = indexOfLastShift - shiftsPerPage;
+  const currentShifts = filteredWorkCards.slice(indexOfFirstShift, indexOfLastShift);
+  const totalPages = Math.ceil(filteredWorkCards.length / shiftsPerPage);
+
+  const nextPage = () => {
+    if (currentPage < totalPages) {
+      setCurrentPage(currentPage + 1);
+    }
+  };
+
+  const prevPage = () => {
+    if (currentPage > 1) {
+      setCurrentPage(currentPage - 1);
+    }
   };
 
   return (
@@ -118,10 +139,7 @@ const Works = () => {
                 />
               </div>
               <div className={styles.inputBox}>
-                <select
-                  value={selectedCategory}
-                  onChange={(e) => setSelectedCategory(e.target.value)}
-                >
+                <select value={selectedCategory} onChange={(e) => setSelectedCategory(e.target.value)}>
                   <option value="">Kategória</option>
                   {categories.map((category: { id: number; categoryName: string }) => (
                     <option key={category.id} value={category.categoryName}>
@@ -131,10 +149,7 @@ const Works = () => {
                 </select>
               </div>
               <div className={styles.inputBox}>
-                <select
-                  value={selectedLocation}
-                  onChange={(e) => setSelectedLocation(e.target.value)}
-                >
+                <select value={selectedLocation} onChange={(e) => setSelectedLocation(e.target.value)}>
                   <option value="">Lokáció</option>
                   {locations.map((location: { city: string }) => (
                     <option key={location.city} value={location.city}>
@@ -147,10 +162,7 @@ const Works = () => {
             <hr className={styles.line} />
             <div className={styles.row}>
               <div className={styles.inputBox}>
-                <select
-                  value={sortOption}
-                  onChange={(e) => setSortOption(e.target.value)}
-                >
+                <select value={sortOption} onChange={(e) => setSortOption(e.target.value)}>
                   <option value="" disabled>
                     Rendezés
                   </option>
@@ -173,13 +185,23 @@ const Works = () => {
         )}
 
         <div className={styles.workCards}>
-          {filteredWorkCards.length > 0 ? (
-            filteredWorkCards.map((work) => <WorkCard key={work.id} {...work} />)
+          {currentShifts.length > 0 ? (
+            currentShifts.map((work) => <WorkCard key={work.id} {...work} />)
           ) : (
             <p className={styles.noData}>Nincs elérhető munka.</p>
           )}
         </div>
+        <div className={styles.pagination}>
+          <button onClick={prevPage} disabled={currentPage === 1}>
+            Előző
+          </button>
+          <span>Oldal {currentPage} / {totalPages}</span>
+          <button onClick={nextPage} disabled={currentPage === totalPages || totalPages == 0}>
+            Következő
+          </button>
+        </div>
       </div>
+      <Footer/>
     </div>
   );
 };

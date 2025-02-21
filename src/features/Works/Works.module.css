@@ -4,7 +4,7 @@
     flex-direction: column;
 }
 .content {
-    min-height: 100vh;
+    min-height: 120vh;
     padding-left: 10%;
     padding-top: 25%;
     padding-right: 10%;
@@ -90,7 +90,38 @@
     gap: 15px;
     flex-direction: column;
 }
+.pagination {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 20px 0;
+}
+
+.pagination button {
+    margin: 0 10px;
+    padding: 5px 10px;
+    background-color: var(--smoothGreen);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+.pagination button:disabled {
+    background-color: #ccc;
+    cursor: not-allowed;
+}
+
+.pagination span {
+    margin: 0 10px;
+}
 @media screen and (min-width: 820px) {
+    .content {
+        padding-left: 10%;
+        padding-right: 10%;
+        padding-top: 30%;
+        min-height: 150vh;
+    }
     .filterOptions select, .filterOptions input {
         padding: 15px 25px;
         height: 55px;

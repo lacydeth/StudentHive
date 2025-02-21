@@ -65,12 +65,13 @@
   color: #ffffff;
   font-size: 0.9rem;
   transition: color 0.3s ease;
+  cursor: pointer;
 }
 .socialLink img {
   width: 22px;
 }
 .socialLink:hover {
-  color: #4CAF50;
+  color: var(--smoothGreen);
 }
 
 .footerBottom {
