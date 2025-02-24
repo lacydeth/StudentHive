@@ -19,6 +19,7 @@ namespace StudentHiveServer.Controllers
         {
             _dbHelper = new DatabaseHelper(configuration.GetConnectionString("DefaultConnection"));
         }
+        //POST: új fiók regisztrálása - public
         [HttpPost("register")]
         public async Task<IActionResult> Register([FromBody] RegisterRequest request)
         {
@@ -54,7 +55,7 @@ namespace StudentHiveServer.Controllers
             await _dbHelper.ExecuteNonQueryAsync(insertQuery, parameters);
             return Ok(new { message = "Sikeres regisztráció!" });
         }
-
+        //POST: bejelentkezés meglévő fiókkal - public
         [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody] LoginRequest request)
         {
@@ -87,7 +88,7 @@ namespace StudentHiveServer.Controllers
             return Ok(new { token, role });
         }
 
-
+        //POST: kijelentkezés - public
         [HttpPost("logout")]
         public IActionResult Logout()
         {

@@ -16,7 +16,7 @@ namespace StudentHiveServer.Controllers
             _dbHelper = new DatabaseHelper(configuration.GetConnectionString("DefaultConnection"));
         }
 
-        // GET: All available work cards
+        // GET: minden elérhető munka kilistázása - public
         [HttpGet("workcards")]
         public async Task<IActionResult> GetWorkCards([FromQuery] string? search, [FromQuery] int? categoryId, [FromQuery] string? city)
         {
@@ -74,7 +74,7 @@ namespace StudentHiveServer.Controllers
             }
         }
 
-        // GET: Single work card by ID
+        // GET: munka részletes adatai - public
         [HttpGet("workcards/{id}")]
         public async Task<IActionResult> GetWorkCardById(int id)
         {
@@ -131,7 +131,7 @@ namespace StudentHiveServer.Controllers
                 return StatusCode(500, new { message = "Hiba történt a munka lekérdezése közben.", details = ex.Message });
             }
         }
-        // GET: list all the cities
+        // GET: minden város kilistázása - public
         [HttpGet("cities")]
         public async Task<IActionResult> GetCities()
         {

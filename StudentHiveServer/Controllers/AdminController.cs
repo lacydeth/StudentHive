@@ -18,6 +18,7 @@ namespace StudentHiveServer.Controllers
         {
             _dbHelper = new DatabaseHelper(configuration.GetConnectionString("DefaultConnection"));
         }
+        //GET: minden regisztrált felhasználó havi bontásban - public
         [HttpGet("users-by-month")]
         public async Task<IActionResult> GetUsersByMonth()
         {
@@ -43,7 +44,7 @@ namespace StudentHiveServer.Controllers
                 return StatusCode(500, new { message = "Hiba történt a felhasználók lekérdezése közben.", details = ex.Message });
             }
         }
-
+        //GET: minden regisztrált felhasználó és iskolaszövetkezet - public
         [HttpGet("total-organizations-and-users")]
         public async Task<IActionResult> GetTotalOrganizationsAndUsers()
         {
@@ -66,7 +67,7 @@ namespace StudentHiveServer.Controllers
                 return StatusCode(500, new { message = "Hiba történt a szervezetek és felhasználók lekérdezése közben.", details = ex.Message });
             }
         }
-
+        //GET: minden iskolaszövetkezet kilistázása - protected 
         [HttpGet("organizations")]
         public async Task<IActionResult> GetOrganizations()
         {
@@ -92,6 +93,7 @@ namespace StudentHiveServer.Controllers
                 return StatusCode(500, new { message = "Hiba az adatok betöltése során!", details = ex.Message });
             }
         }
+        //PUT: jelszóváltoztatás az iskolaszövetkezetnek - protected
         [HttpPut("organization/{organizationId}/password")]
         public async Task<IActionResult> ChangeOrganizationPassword(int organizationId, [FromBody] ChangePasswordRequest request)
         {
@@ -131,7 +133,7 @@ namespace StudentHiveServer.Controllers
                 return StatusCode(500, new { message = "Hiba történt a jelszó módosítása közben.", details = ex.Message });
             }
         }
-
+        //POST: új szövetkezet létrehozása - protected
         [HttpPost("new-organization")]
         public async Task<IActionResult> CreateNewOrganization([FromBody] NewOrganizationRequest request)
         {
@@ -193,6 +195,7 @@ namespace StudentHiveServer.Controllers
                 return StatusCode(500, new { message = "Hiba lépett fel a szövetkezet létrehozása közben!", details = ex.Message });
             }
         }
+        //PUT: admin fiók adatmódosítás - protected
         [HttpPut("settings/{userId}")]
         public async Task<IActionResult> UpdateAdminSettings(int userId, [FromBody] UpdateAdminSettingsRequest request)
         {
@@ -251,6 +254,7 @@ namespace StudentHiveServer.Controllers
                 return StatusCode(500, new { message = "Hiba történt a profil frissítése közben.", details = ex.Message });
             }
         }
+        //PUT: iskolaszövetkezet adatmódosítás - protected
         [HttpPut("organization/{organizationId}")]
         public async Task<IActionResult> UpdateOrganizationDetails(int organizationId, [FromBody] UpdateOrganizationRequest request)
         {

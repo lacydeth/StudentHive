@@ -18,6 +18,7 @@ namespace StudentHiveServer.Controllers
         {
             _dbHelper = new DatabaseHelper(configuration.GetConnectionString("DefaultConnection"));
         }
+        //GET: összes munka név - public
         [HttpGet("work-titles")]
         public async Task<IActionResult> GetTitles()
         {
@@ -40,6 +41,7 @@ namespace StudentHiveServer.Controllers
                 return StatusCode(500, new { message = "Hiba történt a munkák lekérdezése közben.", details = ex.Message });
             }
         }
+        //GET: közvetítőhöz rendelt munkák kilistázása - protected
         [HttpGet("agent-work-cards")]
         public async Task<IActionResult> GetAgentWorkCards([FromQuery] int agentId)
         {
@@ -83,6 +85,7 @@ namespace StudentHiveServer.Controllers
                 return StatusCode(500, new { message = "Hiba történt a munkák lekérdezése közben.", details = ex.Message });
             }
         }
+        //GET: munka részletes adatai - public
         [HttpGet("work-details/{id}")]
         public async Task<IActionResult> GetWorkDetailsById(int id)
         {
@@ -134,6 +137,7 @@ namespace StudentHiveServer.Controllers
                 return StatusCode(500, new { message = "Hiba történt a munka lekérdezése közben.", details = ex.Message });
             }
         }
+        //GET: műszakok kilistázása - protected
         [HttpGet("manage-shifts/{jobId}")]
         public async Task<IActionResult> GetShiftsByJobId(int jobId)
         {
@@ -180,7 +184,7 @@ namespace StudentHiveServer.Controllers
                 return StatusCode(500, new { message = "Hiba történt a műszakok lekérdezése közben.", details = ex.Message });
             }
         }
-
+        //GET: jelentkezések kilistázása - protected
         [HttpGet("applications")]
         public async Task<IActionResult> GetApplications([FromQuery] int agentId, [FromQuery] string? title = null, [FromQuery] int? status = null)
         {
@@ -233,7 +237,7 @@ namespace StudentHiveServer.Controllers
                 return StatusCode(500, new { message = "Hiba a jelentkezések betöltése során!", details = ex.Message });
             }
         }
-
+        //PATCH: jelentkezés elfogadása: protected
         [HttpPatch("applications/{id}/accept")]
         public async Task<IActionResult> AcceptApplication(int id)
         {
@@ -283,7 +287,7 @@ namespace StudentHiveServer.Controllers
                 return StatusCode(500, new { message = "Hiba a jelentkezés elfogadása során!", details = ex.Message });
             }
         }
-
+        //GET: közvetítőhöz tartozó diákok kilistázása - protected
         [HttpGet("student-list")]
         public async Task<IActionResult> GetStudents()
         {
@@ -334,6 +338,7 @@ namespace StudentHiveServer.Controllers
                 return StatusCode(500, new { message = "Error loading students!", details = ex.Message });
             }
         }
+        //POST: műszak hozzáadása - protected
         [HttpPost("add-shift")]
         public async Task<IActionResult> AddShift([FromBody] ShiftRequest shiftRequest)
         {
@@ -389,6 +394,7 @@ namespace StudentHiveServer.Controllers
                 return StatusCode(500, new { message = "Hiba a műszak hozzáadása során!", details = ex.Message });
             }
         }
+        //DELETE: műszak törlése - protected
         [HttpDelete("delete-shift/{id}")]
         public async Task<IActionResult> DeleteShift(int id)
         {
@@ -451,6 +457,7 @@ namespace StudentHiveServer.Controllers
                 return StatusCode(500, new { message = "Hiba a műszak törlése során!", details = ex.Message });
             }
         }
+        //PATCH: jelentkezés elutasítása - protected
         [HttpPatch("applications/{id}/decline")]
         public async Task<IActionResult> DeclineApplication(int id)
         {

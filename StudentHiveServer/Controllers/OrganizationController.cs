@@ -19,7 +19,7 @@ namespace StudentHiveServer.Controllers
         {
             _dbHelper = new DatabaseHelper(configuration.GetConnectionString("DefaultConnection"));
         }
-
+        //GET: létrehozott munkák és szövetkezethez tartozó diákok listázása - public
         [HttpGet("total-students-and-jobs/{orgId}")]
         public async Task<IActionResult> GetTotalStudentsAndJobs(int orgId)
         {
@@ -53,7 +53,7 @@ namespace StudentHiveServer.Controllers
                 });
             }
         }
-
+        //GET: létrehozott munkák az iskolaszövetkezet által - public
         [HttpGet("jobs-created-by-month/{orgId}")]
         public async Task<IActionResult> GetJobsCreatedByMonth(int orgId)
         {
@@ -90,7 +90,7 @@ namespace StudentHiveServer.Controllers
                 });
             }
         }
-
+        //POST: új közvetítő hozzáadása - protected
         [HttpPost("new-agent")]
         public async Task<IActionResult> AddAgent([FromBody] NewAgentRequest request)
         {
@@ -140,7 +140,7 @@ namespace StudentHiveServer.Controllers
                 return StatusCode(500, new { message = "Hiba lépett fel a közvetítő hozzáadása közben.", details = ex.Message });
             }
         }
-
+        //POST: új munka hozzáadása - protected
         [HttpPost("new-job")]
         public async Task<IActionResult> AddJob([FromBody] JobRequest request)
         {
@@ -216,7 +216,7 @@ namespace StudentHiveServer.Controllers
                 return StatusCode(500, new { message = "Hiba történt az adatok feldolgozása során.", error = ex.Message });
             }
         }
-
+        //GET: szövetkezethez tartozó munkák - protected
         [HttpGet("jobs")]
         public async Task<IActionResult> GetJobs([FromQuery] bool? isActive)
         {
@@ -300,7 +300,7 @@ namespace StudentHiveServer.Controllers
                 return StatusCode(500, new { message = "Error loading data!", details = ex.Message });
             }
         }
-
+        //GET: elérhető kategóriák listázása - public
         [HttpGet("categories")]
         public async Task<IActionResult> GetCategories()
         {
@@ -322,7 +322,7 @@ namespace StudentHiveServer.Controllers
                 return StatusCode(500, new { message = "An error occurred while fetching categories.", details = ex.Message });
             }
         }
-
+        //PATCH: közvetítő munkához rendelése - protected
         [HttpPatch("assign-agent/{agentId}/{JobId}")]
         public async Task<IActionResult> PatchJobs(int agentId, int JobId)
         {
@@ -377,7 +377,7 @@ namespace StudentHiveServer.Controllers
                 return StatusCode(500, new { message = "Error occurred while assigning agent.", details = ex.Message });
             }
         }
-
+        //GET: iskolaszövetkezethez tartozó közvetítők - protected
         [HttpGet("agents")]
         public async Task<IActionResult> GetAgents()
         {
@@ -433,6 +433,7 @@ namespace StudentHiveServer.Controllers
                 return StatusCode(500, new { message = "Error fetching data", details = ex.Message });
             }
         }
+        //PATCH: munka státuszának változtatása - protected
         [HttpPatch("toggle-job-status/{jobId}")]
         public async Task<IActionResult> UpdateJobStatus(int jobId)
         {
@@ -492,7 +493,7 @@ namespace StudentHiveServer.Controllers
                 return StatusCode(500, new { message = "Hiba a státusz megváltoztatása során.", details = ex.Message });
             }
         }
-
+        //GET: közvetítő státuszának változtatása - protected
         [HttpPatch("toggle-agent-status/{Id}")]
         public async Task<IActionResult> ToggleAgentStatus(int Id)
         {
@@ -552,7 +553,7 @@ namespace StudentHiveServer.Controllers
                 return StatusCode(500, new { message = "Hiba a státusz megváltoztatása során.", details = ex.Message });
             }
         }
-
+        //PUT: munka adatainak módosítása - protected
         [HttpPut("update-job/{jobId}")]
         public async Task<IActionResult> UpdateJob(int jobId, [FromBody] JobRequest request)
         {
@@ -616,7 +617,7 @@ namespace StudentHiveServer.Controllers
                 return StatusCode(500, $"Internal server error: {ex.Message}");
             }
         }
-
+        //DELETE: munka törlése - protected
         [HttpDelete("delete-job/{jobId}")]
         public async Task<IActionResult> DeleteJob(int jobId)
         {

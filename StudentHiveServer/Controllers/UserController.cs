@@ -17,7 +17,7 @@ namespace StudentHiveServer.Controllers
         {
             _dbHelper = new DatabaseHelper(configuration.GetConnectionString("DefaultConnection"));
         }
-
+        //POST: jelentkezés leadása - protected
         [HttpPost("apply")]
         public async Task<IActionResult> Apply([FromBody] ApplicationRequest request)
         {
@@ -39,8 +39,8 @@ namespace StudentHiveServer.Controllers
                 string checkQuery = "SELECT COUNT(*) FROM Applications WHERE JobId = @JobId AND StudentId = @StudentId";
                 var checkParams = new MySqlParameter[]
                 {
-            new MySqlParameter("@JobId", request.JobId),
-            new MySqlParameter("@StudentId", loggedInUserId)
+                    new MySqlParameter("@JobId", request.JobId),
+                    new MySqlParameter("@StudentId", loggedInUserId)
                 };
 
                 int existingApplications = await _dbHelper.ExecuteScalarAsync<int>(checkQuery, checkParams);
