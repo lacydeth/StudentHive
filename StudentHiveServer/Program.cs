@@ -5,22 +5,19 @@ using Microsoft.Extensions.Hosting;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
 builder.Services.AddControllers();
 
-// Configure CORS - allows your React frontend to make requests to the backend
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowReactApp", builder =>
     {
-        builder.WithOrigins("http://localhost:3000") // URL of your React app (change as needed)
-               .AllowAnyMethod() // Allow any HTTP method (GET, POST, etc.)
-               .AllowAnyHeader() // Allow any headers
-               .AllowCredentials(); // Allow credentials like cookies or HTTP authentication
+        builder.WithOrigins("http://localhost:3000")
+               .AllowAnyMethod()
+               .AllowAnyHeader()
+               .AllowCredentials();
     });
 });
 
-// Add Authentication services for JWT Bearer Tokens
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
     {
@@ -36,7 +33,6 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
         };
     });
 
-// Add Authorization services
 builder.Services.AddAuthorization();
 builder.Services.AddSwaggerGen();
 
@@ -47,11 +43,11 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 app.UseHttpsRedirection();
-// Configure the HTTP request pipeline.
-app.UseCors("AllowReactApp"); // Apply the CORS policy
 
-app.UseAuthentication(); // Add authentication middleware
-app.UseAuthorization();  // Add authorization middleware
+app.UseCors("AllowReactApp"); 
+
+app.UseAuthentication(); 
+app.UseAuthorization();
 
 app.MapControllers();
 
