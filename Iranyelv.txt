@@ -45,6 +45,34 @@ Saját munkáim megjelenítése -> get kérés
 beállitasok -> adatok modositasa
 
 
+var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
+var roleClaim = User.FindFirst(ClaimTypes.Role);
+
+if (userIdClaim == null || roleClaim == null)
+{
+    return Unauthorized(new { message = "User is not authenticated." });
+}
+
+var loggedInUserId = userIdClaim.Value;
+var userRole = roleClaim.Value;
+
+var organizationParams = new[] { new MySqlParameter("@UserId", loggedInUserId) };
+var organizationTable = await _dbHelper.ExecuteQueryAsync(getOrganizationQuery, organizationParams);
+
+
+
+if (userRole != "Organization")
+{
+    return Unauthorized(new { message = "You do not have the required permissions." });
+}
+
+
+{
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        }
+
 
 
 
