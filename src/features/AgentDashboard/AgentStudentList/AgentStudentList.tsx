@@ -5,10 +5,24 @@ import { agentMenuLinks } from "../../../utils/routes";
 import styles from "./AgentStudentList.module.css";
 import Title from "../../../components/Title/Title";
 import { AgGridReact } from "ag-grid-react";
+import "ag-grid-community/styles/ag-grid.css";
+import "ag-grid-community/styles/ag-theme-alpine.css";
+import {
+  ClientSideRowModelModule,
+  ModuleRegistry,
+  PaginationModule,
+  ValidationModule
+} from "ag-grid-community";
 import Dialog from "../../../components/Dialog/Dialog";
 import AgentStudentListViewModal from "../../../components/Modals/AgentStudentListViewModal";
-import { apiInstance } from "../../../utils/authUtils"; // Import the Axios instance with the interceptor
+import { apiInstance } from "../../../utils/authUtils";
 import { getUserIdFromToken } from "../../../utils/authUtils";
+
+ModuleRegistry.registerModules([
+  ClientSideRowModelModule,
+  PaginationModule,
+  ValidationModule
+]);
 
 const AgentStudentList = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(window.innerWidth >= 1000);
@@ -116,7 +130,7 @@ const AgentStudentList = () => {
                 columnDefs={columnDefs}
                 domLayout="autoHeight"
                 pagination={true}
-                paginationPageSize={10}
+                paginationAutoPageSize={true} 
                 suppressCellFocus={false}
               />
             </div>

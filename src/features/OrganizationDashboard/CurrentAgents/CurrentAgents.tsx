@@ -7,14 +7,23 @@ import axios from "axios";
 import { AgGridReact } from "ag-grid-react";
 import "ag-grid-community/styles/ag-grid.css";
 import "ag-grid-community/styles/ag-theme-alpine.css";
-import { ClientSideRowModelModule, ModuleRegistry } from "ag-grid-community";
+import {
+  ClientSideRowModelModule,
+  ModuleRegistry,
+  PaginationModule,
+  ValidationModule
+} from "ag-grid-community";
 import { orgMenuLinks } from "../../../utils/routes";
 import { confirmAlert } from "react-confirm-alert"; 
 import "react-confirm-alert/src/react-confirm-alert.css";
 import OrgPasswordModal from "../../../components/Modals/OrgPasswordModal";
 import Dialog from "../../../components/Dialog/Dialog";
 
-ModuleRegistry.registerModules([ClientSideRowModelModule]);
+ModuleRegistry.registerModules([
+  ClientSideRowModelModule,
+  PaginationModule,
+  ValidationModule
+]);
 
 const CurrentAgents = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(window.innerWidth >= 1000);
@@ -150,7 +159,7 @@ const CurrentAgents = () => {
               columnDefs={columnDefs}
               domLayout="autoHeight"
               pagination={true}
-              paginationPageSize={10}
+              paginationAutoPageSize={true} 
               suppressCellFocus={false}
               rowHeight={35}
             />

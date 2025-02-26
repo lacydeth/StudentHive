@@ -79,6 +79,7 @@
   position: absolute;
   top: 13px;
   right: 15px;
+  width: 24px;
 }
 .faq {
   cursor: pointer;
@@ -97,6 +98,7 @@
 }
 .faqElement {
   .faqTitle {
+    cursor: pointer;
     display: flex;
     width: 280px;
     padding: 15px 20px;

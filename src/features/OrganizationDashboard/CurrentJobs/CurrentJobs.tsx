@@ -7,7 +7,12 @@ import axios from "axios";
 import { AgGridReact } from "ag-grid-react";
 import "ag-grid-community/styles/ag-grid.css";
 import "ag-grid-community/styles/ag-theme-alpine.css";
-import { ClientSideRowModelModule, ModuleRegistry } from "ag-grid-community";
+import {
+  ClientSideRowModelModule,
+  ModuleRegistry,
+  PaginationModule,
+  ValidationModule
+} from "ag-grid-community";
 import Dialog from "../../../components/Dialog/Dialog";
 import { orgMenuLinks } from "../../../utils/routes";
 import JobViewModal from "../../../components/Modals/JobViewModal";
@@ -15,7 +20,11 @@ import JobPatchViewModal from "../../../components/Modals/JobPatchViewModal";
 import { confirmAlert } from "react-confirm-alert";
 import "react-confirm-alert/src/react-confirm-alert.css";
 
-ModuleRegistry.registerModules([ClientSideRowModelModule]);
+ModuleRegistry.registerModules([
+  ClientSideRowModelModule,
+  PaginationModule,
+  ValidationModule
+]);
 
 const CurrentJobs = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(window.innerWidth >= 1000);
@@ -185,15 +194,14 @@ const CurrentJobs = () => {
           />
           <div
             className="ag-theme-alpine"
-            style={{ width: "100%", overflowX: "auto" }}
+            style={{ width: "100%", overflowX: "auto", height: "500px" }}
           >
             <AgGridReact
               ref={gridRef}
               rowData={activeJobs}
-              columnDefs={columnDefs}
-              domLayout="autoHeight"
-              pagination={true}
-              paginationPageSize={10}
+              columnDefs={columnDefs} 
+              pagination={true} 
+              paginationAutoPageSize={true} 
               suppressCellFocus={false}
               rowHeight={35}
             />

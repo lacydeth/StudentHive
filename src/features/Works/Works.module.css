@@ -4,7 +4,7 @@
     flex-direction: column;
 }
 .content {
-    min-height: 120vh;
+    min-height: 100vh;
     padding-left: 10%;
     padding-top: 25%;
     padding-right: 10%;
@@ -119,8 +119,8 @@
     .content {
         padding-left: 10%;
         padding-right: 10%;
-        padding-top: 30%;
-        min-height: 150vh;
+        padding-top: 15%;
+        min-height: 110vh;
     }
     .filterOptions select, .filterOptions input {
         padding: 15px 25px;

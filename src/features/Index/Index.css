@@ -6,7 +6,7 @@
 
 .welcome-section {
     padding: 15% 5%;
-    background: linear-gradient(to top, rgba(0, 0, 0, 0.2), rgba(0, 0, 0, 0.6)), url('/background2.jpg');
+    background: linear-gradient(to top, rgba(0, 0, 0, 0.2), rgba(87, 87, 87, 0.322)), url('/background2.jpg');
     background-size: cover;
     background-position: center;
     min-height: 130vh;

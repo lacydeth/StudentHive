@@ -87,7 +87,7 @@ const IndexPage = () => {
             <div className="job-search">
               <label>Kategória</label>
               <select className="search-select" value={selectedCategory} onChange={(e) => setSelectedCategory(e.target.value)}>
-                  <option value="">Kategória</option>
+                  <option value="">Válassz egy kategóriát..</option>
                   {categories.map((category: { id: number; categoryName: string }) => (
                     <option key={category.id} value={category.id}>
                       {category.categoryName}

@@ -110,7 +110,7 @@ const NewJob = () => {
                     onChange={(e) => setTitle(e.target.value)}
                     required
                   />
-                  <img src="./id-card.png" alt="last name icon" />
+                  <img src="./job-description.png" alt="last name icon" />
                 </div>
                 <div className={styles.inputBox}>
                   <select
@@ -133,10 +133,10 @@ const NewJob = () => {
               <div className={styles.row}>
                 {/* FAQ 1 */}
                 <div className={styles.faqElement}>
-                  <div className={styles.faqTitle}>
+                  <div onClick={() => setIsFaq1Open(!isFaq1Open)} className={styles.faqTitle}>
                     <h2>Munkavégzés helye</h2>
                     <img
-                      onClick={() => setIsFaq1Open(!isFaq1Open)} className={styles.faq}
+                      className={styles.faq}
                       src={isFaq1Open ? "./src/assets/minus-sign.png" : "./src/assets/plus-sign.png"}
                     />
                   </div>
@@ -150,7 +150,7 @@ const NewJob = () => {
                           onChange={(e) => setCity(e.target.value)}
                           required
                         />
-                        <img src="./mail.png" alt="city icon" />
+                        <img src="./location.png" alt="city icon" />
                       </div>
                       <div className={styles.inputBox}>
                         <input
@@ -160,7 +160,7 @@ const NewJob = () => {
                           onChange={(e) => setAddress(e.target.value)}
                           required
                         />
-                        <img src="./mail.png" alt="address icon" />
+                        <img src="./location.png" alt="address icon" />
                       </div>
                     </div>
                   )}
@@ -168,10 +168,10 @@ const NewJob = () => {
 
                 {/* FAQ 2 */}
                 <div className={styles.faqElement}>
-                  <div className={`${styles.faqTitle} ${isFaq2Open ? "open" : ""}`}>
+                  <div onClick={() => setIsFaq2Open(!isFaq2Open)} className={`${styles.faqTitle} ${isFaq2Open ? "open" : ""}`}>
                     <h2>Leírás megadása</h2>
                     <img
-                      onClick={() => setIsFaq2Open(!isFaq2Open)} className={styles.faq}
+                      className={styles.faq}
                       src={isFaq2Open ? "./src/assets/minus-sign.png" : "./src/assets/plus-sign.png"}
                     />
                   </div>

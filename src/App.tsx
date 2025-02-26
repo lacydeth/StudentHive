@@ -26,7 +26,6 @@ import NotFound from './pages/NotFound/NotFound';
 import UserDashboard from './features/UserDashboard/UserDashboardView/UserDashboard';
 import StudentApplications from './features/AgentDashboard/StudentApplications/StudentApplications';
 import AgentSettings from './features/AgentDashboard/AgentSettings/AgentSettings';
-import AgentShift from './features/AgentDashboard/AgentShift/AgentShift';
 import AgentStudentList from './features/AgentDashboard/AgentStudentList/AgentStudentList';
 import AgentJobs from './features/AgentDashboard/AgentJobs/AgentJobs';
 import ShiftPage from './components/ShiftPage/ShiftPage';
@@ -52,7 +51,7 @@ const App = () => {
 
           {/* User protected routes */}
           <Route
-            path={routes.protectedPage.path}
+            path={routes.userPage.path}
             element={
               <ProtectedRoute allowedRoles={["User"]}>
                 <UserDashboard />
@@ -170,14 +169,6 @@ const App = () => {
             element={
               <ProtectedRoute allowedRoles={["Agent"]}>
                 <ShiftPage/>
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path={routes.agentShift.path}
-            element={
-              <ProtectedRoute allowedRoles={["Agent"]}>
-                <AgentShift/>
               </ProtectedRoute>
             }
           />

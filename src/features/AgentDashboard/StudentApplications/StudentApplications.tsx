@@ -3,7 +3,14 @@ import Sidebar from "../../../components/Sidebar/Sidebar";
 import { agentMenuLinks } from "../../../utils/routes";
 import styles from "./StudentApplications.module.css";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { ClientSideRowModelModule, ModuleRegistry } from "ag-grid-community";
+import "ag-grid-community/styles/ag-grid.css";
+import "ag-grid-community/styles/ag-theme-alpine.css";
+import {
+  ClientSideRowModelModule,
+  ModuleRegistry,
+  PaginationModule,
+  ValidationModule
+} from "ag-grid-community";
 import axios from "axios";
 import Title from "../../../components/Title/Title";
 import { AgGridReact } from "ag-grid-react";
@@ -11,7 +18,11 @@ import { getUserIdFromToken } from "../../../utils/authUtils";
 import { confirmAlert } from "react-confirm-alert"; 
 import "react-confirm-alert/src/react-confirm-alert.css";
 
-ModuleRegistry.registerModules([ClientSideRowModelModule]);
+ModuleRegistry.registerModules([
+  ClientSideRowModelModule,
+  PaginationModule,
+  ValidationModule
+]);
 
 const StudentApplications = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(window.innerWidth >= 1000);
@@ -175,7 +186,7 @@ const StudentApplications = () => {
               columnDefs={columnDefs}
               domLayout="autoHeight"
               pagination={true}
-              paginationPageSize={10}
+              paginationAutoPageSize={true} 
               suppressCellFocus={false}
             />
           </div>

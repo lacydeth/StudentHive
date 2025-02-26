@@ -40,7 +40,7 @@ const AgentCard = ({ id, title, agentName, location, category, image }: WorkCard
                 Műszak hozzáadása
             </button>
             <button className={styles.btn} onClick={(e) => { e.stopPropagation(); handleShiftApplications(); }}>
-                Jelentkezések
+                Műszak jelentkezések
             </button>
         </div>
       </div>

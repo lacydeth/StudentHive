@@ -8,7 +8,7 @@ const NotFound = () => {
     <div className={styles.unauthorized}>
         <Navbar/>
         <div className={styles.content}>
-            <img src="./warning.png"></img>
+            <img src="/warning.png"></img>
             <h1>Hiba</h1>
             <p>Az oldal amit keresel nem található!</p>
             <Link className={styles.back} to={routes.homePage.path}>

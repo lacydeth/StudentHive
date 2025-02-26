@@ -4,7 +4,7 @@ export const routes = {
     registerPage: { path: '/register', title: 'Register' },
     worksPage: { path: '/works', title: 'Works'},
     unauthorized: { path: '/unauthorized', title: 'Unauthorized' },
-    protectedPage: { path: '/user', title: 'User Dashboard' },
+    userPage: { path: '/user', title: 'User Dashboard' },
     adminPage: { path: '/admin', title: 'Admin Dashboard' },
     newOrgPage: { path: '/new-organization', title: 'Add New Organization' },
     existingOrgPage: { path: '/existing-organizations', title: 'Existing Organizations' },
@@ -15,7 +15,6 @@ export const routes = {
     currentJobs: { path: '/current-jobs', title: 'Current Jobs' },
     orgSettings: { path: '/organization-settings', title: 'Organization Settings' },
     agentPage: { path: '/agent', title: 'Agent Dashboard' },
-    agentShift: {path: '/agent-shift', title: 'Agent Shift'},
     agentStudentList: {path: '/agent-student-list', title: 'Agent Student List'},
     studentApplications: { path: '/applications', title: 'Student Applications'},
     agentSettings: { path: '/agent-settings', title: 'Agent Settings'},
@@ -42,7 +41,6 @@ export const orgMenuLinks = [
 export const agentMenuLinks = [
   { path: routes.agentPage.path, icon: "/dashboard.png", label: "Kezelőpult"},
   { path: routes.agentJobs.path, icon: "/job-description.png", label: "Munkák"},
-  { path: routes.agentShift.path, icon: "/timetable.png", label: "Műszak"},
   { path: routes.studentApplications.path, icon: "/resume.png", label: "Jelentkezések"},
   { path: routes.agentSettings.path, icon: "/settings.png", label: "Beállítások"},
   { path: routes.agentStudentList.path, icon: "/realtor.png", label: "Diákok listázása"}
@@ -52,7 +50,7 @@ export const userMenuLinks = [
 ];
 export const roleRoutes: Record<string, string> = {
   Admin: routes.adminPage.path,
-  User: routes.protectedPage.path,
+  User: routes.userPage.path,
   Organization: routes.orgPage.path,
   Agent: routes.agentPage.path
 };
