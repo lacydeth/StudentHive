@@ -1,0 +1,155 @@
+.container {
+    width: 100%;
+    min-height: 150vh;
+    display: flex;
+    gap: 50px;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    background: url("/waves.svg");
+    background-size: cover;
+    background-position: center;
+}
+
+.user {
+    display: flex;
+    gap: 15px;
+    align-items: center;
+    background: var(--white);
+    padding: 10px 15px;
+    border-radius: 8px;
+    box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
+}
+.userBtn{
+    background: none;
+    outline: 0;
+    border: 0;
+}
+.userBtn img {
+    padding-top: 4px;
+    width: 22px;
+}
+.profile {
+    width: 42px;
+}
+
+.user h2 {
+    font-weight: 400;
+    font-size: 1.2rem;
+}
+
+.cards {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    max-width: 400px;
+}
+.welcomeCard {
+    width: 300px;
+    height: 350px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 10px;
+    padding: 15px;
+    border-radius: 8px;
+    background: #fff;
+    box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
+    position: relative;
+    overflow: hidden;
+    transition: all 0.4s ease;
+}
+.welcomeCard:hover {
+    transform: scale(1.05);
+}
+.imageWrapper {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 45%;
+}
+
+.imageWrapper::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to top, rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0));
+}
+
+.imageWrapper img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.content {
+    z-index: 999;
+    text-align: center;
+    color: #fff;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.content h3 {
+    font-size: 1.8rem;
+    color: #525252;
+    text-transform: uppercase;
+}
+
+.content p {
+    color: #747474;
+    max-width: 300px;
+}
+
+.content .next {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    text-decoration: none;
+    background: var(--smoothGreen);
+    color: #fff;
+    padding: 10px 15px;
+    border-radius: 6px;
+    text-transform: uppercase;
+}
+
+.next img {
+    width: 22px;
+}
+
+@media screen and (min-width: 768px) {
+    .cards {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 20px;
+        justify-content: center;
+        max-width: 800px;
+    }
+    .welcomeCard {
+        width: 100%;
+        height: 350px;
+    }
+    .content {
+        gap: 15px;
+    }
+    .container {
+        gap: 100px;
+        min-height: 100vh;
+        justify-content: flex-start;
+        padding-top: 5%;
+    }
+}
+
+@media screen and (min-width: 1200px) {
+    .cards {
+        grid-template-columns: repeat(3, 1fr);
+        max-width: 1200px;
+        justify-items: center;
+        align-items: center;
+        gap: 50px;
+    }
+}
