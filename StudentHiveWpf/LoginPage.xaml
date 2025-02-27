@@ -1,0 +1,19 @@
+﻿<Window x:Class="StudentHiveWpf.Views.LoginPage"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Bejelentkezés" Height="300" Width="400">
+    <Grid>
+        <StackPanel Margin="20">
+            <TextBlock Text="Email:"/>
+            <TextBox x:Name="EmailTextBox" />
+
+            <TextBlock Text="Jelszó:" Margin="0,10,0,0"/>
+            <PasswordBox x:Name="PasswordBox" />
+
+            <CheckBox x:Name="StayLoggedInCheckBox" Content="Maradjak bejelentkezve" Margin="0,10,0,0"/>
+
+            <Button Content="Bejelentkezés" Click="LoginButton_Click" Margin="0,10,0,0"/>
+            <Button Content="Regisztráció" Click="RegisterButton_Click"/>
+        </StackPanel>
+    </Grid>
+</Window>
