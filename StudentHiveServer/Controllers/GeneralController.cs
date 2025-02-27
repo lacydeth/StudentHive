@@ -155,5 +155,34 @@ namespace StudentHiveServer.Controllers
             }
         }
 
+        [HttpGet("alluser")]
+        public async Task<IActionResult> GetUsers()
+        {
+            try
+            {
+                const string query = "SELECT Id,OrganizationId,RoleId,FirstName,LastName,Email,CreatedAt FROM Users";
+                var usersTable = await _dbHelper.ExecuteQueryAsync(query);
+
+                var users = usersTable.AsEnumerable()
+                    .Select(row => new
+                    {
+                        Id = row.Field<int>("Id"),
+                        OrganizationId = row.Field<int?>("OrganizationId"),
+                        RoleId = row.Field<int?>("RoleId"),
+                        FirstName = row.Field<string>("FirstName"),
+                        LastName = row.Field<string>("LastName"),
+                        Email = row.Field<string>("Email"),
+                        CreatedAt = row.Field<DateTime>("CreatedAt").ToString("yyyy-MM-dd")
+                    })
+                    .ToList();
+
+                return Ok(users);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "Hiba történt a felhasználók lekérdezése közben.", details = ex.Message });
+            }
+        }
+
     }
 }

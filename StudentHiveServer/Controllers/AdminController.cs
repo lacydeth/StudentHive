@@ -5,7 +5,7 @@ using System;
 using System.Data;
 using System.Net.Mail;
 using System.Net;
-
+  
 namespace StudentHiveServer.Controllers
 {
     [ApiController]
