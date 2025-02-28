@@ -29,5 +29,26 @@ namespace StudentHiveWpf.Services
             var json = await response.Content.ReadAsStringAsync();
             return JsonConvert.DeserializeObject<List<User>>(json);
         }
+
+        public async Task ToggleUserStatusAsync(int userId)
+        {
+            var response = await _httpClient.PatchAsync($"update-user-status/{userId}", null);
+
+            if (!response.IsSuccessStatusCode)
+                throw new Exception($"Hiba történt a felhasználó státuszának frissítésekor: {response.StatusCode}");
+        }
+
+        public async Task<HttpResponseMessage> UpdateUserPasswordAsync(int userId, string newPassword)
+        {
+            var requestBody = new { NewPassword = newPassword };
+            var content = new StringContent(JsonConvert.SerializeObject(requestBody), Encoding.UTF8, "application/json");
+
+            var response = await _httpClient.PatchAsync($"update-user-password/{userId}", content);
+
+            return response;
+        }
+
+
+
     }
 }

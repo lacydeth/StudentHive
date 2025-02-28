@@ -1,46 +1,104 @@
-﻿using StudentHiveWpf.Models;
+﻿using MaterialDesignThemes.Wpf;
+using StudentHiveWpf.Models;
 using StudentHiveWpf.Services;
-using System.Text;
+using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
+using System.Windows.Controls.Primitives;
 using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
+
 
 namespace StudentHiveWpf
 {
-    /// <summary>
-    /// Interaction logic for MainWindow.xaml
-    /// </summary>
     public partial class MainWindow : Window
     {
         private readonly ApiService _apiService;
+
         public MainWindow()
         {
             InitializeComponent();
             _apiService = new ApiService();
+            Loaded += MainWindow_Loaded;
         }
 
-        private async void LoadUsers_Click(object sender, RoutedEventArgs e)
+        private async void MainWindow_Loaded(object sender, RoutedEventArgs e)
+        {
+            await LoadDataAsync(); 
+        }
+
+        private async Task LoadDataAsync()
         {
             try
             {
                 List<User> users = await _apiService.GetAllUsersAsync();
-                foreach (var item in users)
-                {
                 UserListBox.ItemsSource = users;
-
-                    Console.WriteLine(item);
-                }
             }
             catch (Exception ex)
             {
                 MessageBox.Show("Hiba történt: " + ex.Message);
             }
         }
+
+        private void btnClose_Click(object sender, RoutedEventArgs e)
+        {
+            this.Close();
+        }
+
+        
+
+        private async void ToggleButton_Checked(object sender, RoutedEventArgs e)
+        {
+            if (UserListBox.SelectedItem is User selectedUser)
+            {
+                try
+                {
+                    // Frissítjük a felhasználó állapotát
+                    await _apiService.ToggleUserStatusAsync(selectedUser.Id);
+                    MessageBox.Show($"A felhasználó státusza sikeresen frissítve!");
+                    await LoadDataAsync();
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show("Hiba történt: " + ex.Message);
+                }
+            }
+        }
+
+        private async void ToggleButton_Unchecked(object sender, RoutedEventArgs e)
+        {
+            if (UserListBox.SelectedItem is User selectedUser)
+            {
+                try
+                {
+                    // Frissítjük a felhasználó állapotát
+                    await _apiService.ToggleUserStatusAsync(selectedUser.Id);
+                    MessageBox.Show($"A felhasználó státusza sikeresen frissítve!");
+                    await LoadDataAsync();
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show("Hiba történt: " + ex.Message);
+                }
+            }
+        }
+        private void btnedit_Click(object sender, RoutedEventArgs e)
+        {
+            var selectedUser = UserListBox.SelectedItem as User;
+
+            if (selectedUser != null)
+            {
+                UserModifyPage modifyPage = new UserModifyPage(selectedUser);
+                modifyPage.ShowDialog();  
+            }
+        }
+
+        private void btnPassword_Click(object sender, RoutedEventArgs e)
+        {
+            PasswordChangePage passwordChangePage = new PasswordChangePage();
+            passwordChangePage.Show();
+        }
+
     }
 }

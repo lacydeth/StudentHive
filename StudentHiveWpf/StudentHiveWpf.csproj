@@ -9,7 +9,30 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="icons\key.png" />
+    <None Remove="icons\keyblack.png" />
+    <None Remove="icons\offbutton.png" />
+    <None Remove="icons\onbutton.png" />
+    <None Remove="icons\user.png" />
+    <None Remove="icons\view.png" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="MaterialDesignColors" Version="5.2.1" />
+    <PackageReference Include="MaterialDesignThemes" Version="5.2.1" />
+    <PackageReference Include="MaterialDesignThemes.MahApps" Version="5.2.1" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Resource Include="icons\key.png" />
+    <Resource Include="icons\keyblack.png" />
+    <Resource Include="icons\offbutton.png" />
+    <Resource Include="icons\onbutton.png" />
+    <Resource Include="icons\user.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="icons\view.png" />
   </ItemGroup>
 
 </Project>

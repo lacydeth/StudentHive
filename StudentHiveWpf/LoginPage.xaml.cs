@@ -23,7 +23,6 @@ namespace StudentHiveWpf.Views
             {
                 Email = EmailTextBox.Text,
                 Password = PasswordBox.Password,
-                StayLoggedIn = StayLoggedInCheckBox.IsChecked ?? false
             };
 
             var json = JsonConvert.SerializeObject(request);
@@ -41,10 +40,8 @@ namespace StudentHiveWpf.Views
                     string role = result.role;
 
                     new MainWindow().Show();
-
-
-                    MessageBox.Show($"Sikeres bejelentkezés!\nSzerepkör: {role}");
                     this.Close();
+
                 }
                 else
                 {
@@ -55,11 +52,10 @@ namespace StudentHiveWpf.Views
             {
                 MessageBox.Show($"Hiba történt: {ex.Message}");
             }
-        }
 
-        private void RegisterButton_Click(object sender, RoutedEventArgs e)
+        }
+        private void btnClose_Click(object sender, RoutedEventArgs e)
         {
-            new RegisterPage().Show(); // Open the registration page
             this.Close();
         }
     }

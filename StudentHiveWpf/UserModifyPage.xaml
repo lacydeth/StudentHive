@@ -1,0 +1,33 @@
+﻿<Window x:Class="StudentHiveWpf.UserModifyPage"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:StudentHiveWpf"
+        mc:Ignorable="d"
+        Title="UserModifyPage" Height="500" Width="300">
+    <Grid>
+        <StackPanel Orientation="Vertical" Width="300" HorizontalAlignment="Left" Margin="10">
+            <TextBlock Text="Felhasználó Adatai" FontSize="16" FontWeight="Bold" Margin="0,0,0,10"/>
+            <TextBlock Text="Vezekét név" FontSize="12" Margin="25,0,0,0"/>
+            <TextBox Name="FirstNameInput" Width="250" Margin="5"  IsEnabled="False"/>
+            <TextBlock Text="Kereszt név" FontSize="12" Margin="25,0,0,0"/>
+            <TextBox Name="LastNameInput" Width="250" Margin="5" IsEnabled="False"/>
+            <TextBlock Text="Email" FontSize="12" Margin="25,0,0,0"/>
+            <TextBox Name="EmailInput" Width="250" Margin="5"  IsEnabled="False"/>
+            <TextBlock Text="Azonisító" FontSize="12" Margin="25,0,0,0"/>
+            <TextBox Name="IdInput" Width="250" Margin="5"  IsEnabled="False"/>
+            <TextBlock Text="Szerepkör Azonosító" FontSize="12" Margin="25,0,0,0"/>
+            <TextBox Name="RoleIdInput" Width="250" Margin="5"  IsEnabled="False"/>
+            <TextBlock Text="Szövetkezet Azonositó" FontSize="12" Margin="25,0,0,0"/>
+            <TextBox Name="OrganizationIdInput" Width="250" Margin="5" IsEnabled="False"/>
+            <TextBlock Text="Fiók lérehozása dátuma" FontSize="12" Margin="25,0,0,0"/>
+            <TextBox Name="CreatedAtInput" Width="250" Margin="5" IsEnabled="False"/>
+            <TextBlock Text="Fiók Aktivitása" FontSize="12" Margin="25,0,0,0"/>
+            <TextBox Name="IsActiveInput" Width="250" Margin="5" IsEnabled="False"/>
+
+            <Button Content="Adatok módosítása" Width="150" Margin="5" Click="UpdateProfile"/>
+            <Button Content="Bezárás" Width="100" Margin="5" Click="Cancel_Click"/>
+        </StackPanel>
+    </Grid>
+</Window>
