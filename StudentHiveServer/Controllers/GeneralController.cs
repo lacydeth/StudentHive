@@ -160,7 +160,7 @@ namespace StudentHiveServer.Controllers
         {
             try
             {
-                const string query = "SELECT Id,OrganizationId,RoleId,FirstName,LastName,Email,CreatedAt FROM Users";
+                const string query = "SELECT Id,OrganizationId,RoleId,FirstName,LastName,Email,IsActive,CreatedAt FROM Users";
                 var usersTable = await _dbHelper.ExecuteQueryAsync(query);
 
                 var users = usersTable.AsEnumerable()
@@ -172,6 +172,7 @@ namespace StudentHiveServer.Controllers
                         FirstName = row.Field<string>("FirstName"),
                         LastName = row.Field<string>("LastName"),
                         Email = row.Field<string>("Email"),
+                        IsActive = row.Field<Boolean>("IsActive"),
                         CreatedAt = row.Field<DateTime>("CreatedAt").ToString("yyyy-MM-dd")
                     })
                     .ToList();
@@ -183,6 +184,84 @@ namespace StudentHiveServer.Controllers
                 return StatusCode(500, new { message = "Hiba történt a felhasználók lekérdezése közben.", details = ex.Message });
             }
         }
+
+        [HttpPatch("update-user-status/{id}")]
+        public async Task<IActionResult> UpdateUserStatus(int id)
+        {
+            try
+            {
+                const string checkUserQuery = "SELECT IsActive FROM Users WHERE Id = @Id";
+                var checkParams = new MySqlParameter[] { new("@Id", id) };
+                var userTable = await _dbHelper.ExecuteQueryAsync(checkUserQuery, checkParams);
+
+                if (userTable.Rows.Count == 0)
+                    return NotFound(new { message = "A felhasználó nem található." });
+
+                bool currentStatus = userTable.Rows[0].Field<bool>("IsActive");
+                bool newStatus = !currentStatus;
+
+                const string updateQuery = "UPDATE Users SET IsActive = @NewStatus WHERE Id = @Id";
+                var updateParams = new MySqlParameter[]
+                {
+            new("@NewStatus", newStatus),
+            new("@Id", id)
+                };
+
+                await _dbHelper.ExecuteNonQueryAsync(updateQuery, updateParams);
+
+                return Ok(new { message = "A felhasználó státusza sikeresen frissítve.", isActive = newStatus });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "Hiba történt a frissítés során.", details = ex.Message });
+            }
+        }
+
+        [HttpPatch("update-user-password/{id}")]
+        public async Task<IActionResult> UpdateUserPassword(int id, [FromBody] PasswordUpdateRequest request)
+        {
+            try
+            {
+                // Validate the user exists
+                const string checkUserQuery = "SELECT * FROM Users WHERE Id = @Id";
+                var checkParams = new MySqlParameter[] { new("@Id", id) };
+                var userTable = await _dbHelper.ExecuteQueryAsync(checkUserQuery, checkParams);
+
+                if (userTable.Rows.Count == 0)
+                    return NotFound(new { message = "User not found." });
+
+                // Hash the new password
+                var hashedPassword = BCrypt.Net.BCrypt.HashPassword(request.NewPassword);
+
+                // Update the password in the database
+                const string updateQuery = "UPDATE Users SET PasswordHash = @Password WHERE Id = @Id";
+                var updateParams = new MySqlParameter[]
+                {
+            new("@Password", hashedPassword),
+            new("@Id", id)
+                };
+
+                await _dbHelper.ExecuteNonQueryAsync(updateQuery, updateParams);
+
+                return Ok(new { message = "Password successfully updated." });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "An error occurred while updating the password.", details = ex.Message });
+            }
+        }
+
+        public class PasswordUpdateRequest
+        {
+            public string NewPassword { get; set; }
+        }
+
+
+        public class UpdatePasswordRequest
+        {
+            public string NewPassword { get; set; }
+        }
+
 
     }
 }

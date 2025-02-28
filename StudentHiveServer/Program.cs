@@ -11,7 +11,7 @@ builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowSpecificOrigins", builder =>
     {
-        builder.WithOrigins("https://localhost:3000", "https://localhost:7067")  // Itt engedélyezheted mindkét origin-t
+        builder.WithOrigins("https://localhost:3000", "https://localhost:7067") 
                .AllowAnyMethod()
                .AllowAnyHeader()
                .AllowCredentials();
