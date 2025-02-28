@@ -5,6 +5,8 @@ export const routes = {
     worksPage: { path: '/works', title: 'Works'},
     unauthorized: { path: '/unauthorized', title: 'Unauthorized' },
     userPage: { path: '/user', title: 'User Dashboard' },
+    userJobs: { path: '/user-jobs', title: 'User Jobs' },
+    userProfile: { path: '/user-profile', title: 'User Profile' },
     adminPage: { path: '/admin', title: 'Admin Dashboard' },
     newOrgPage: { path: '/new-organization', title: 'Add New Organization' },
     existingOrgPage: { path: '/existing-organizations', title: 'Existing Organizations' },
@@ -44,9 +46,6 @@ export const agentMenuLinks = [
   { path: routes.studentApplications.path, icon: "/resume.png", label: "Jelentkezések"},
   { path: routes.agentSettings.path, icon: "/settings.png", label: "Beállítások"},
   { path: routes.agentStudentList.path, icon: "/realtor.png", label: "Diákok listázása"}
-];
-export const userMenuLinks = [
-
 ];
 export const roleRoutes: Record<string, string> = {
   Admin: routes.adminPage.path,

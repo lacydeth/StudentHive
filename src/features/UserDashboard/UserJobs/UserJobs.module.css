@@ -1,0 +1,62 @@
+.container {
+    width: 100%;
+    min-height: 100vh;
+    background: url("/blob-mobile.svg");
+    background-size: cover;
+    background-position: center;
+}
+.content {
+    padding-top: 30%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    min-height: 80vh;
+    flex-direction: column;
+}
+.cardHolder {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+.pagination {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 20px 0;
+}
+
+.pagination button {
+    margin: 0 10px;
+    padding: 5px 10px;
+    background-color: var(--smoothGreen);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+.pagination button:disabled {
+    background-color: #ccc;
+    cursor: not-allowed;
+}
+
+.pagination span {
+    margin: 0 10px;
+}
+@media screen and (min-width: 768px) {
+    .container {
+        background: url("/blob.svg");
+        background-size: cover;
+        background-position: center;
+    }
+    .content {
+        padding-top: 10%;
+    }
+    .cardHolder {
+        flex-direction: row;
+        flex-wrap: wrap;
+        justify-content: center;
+        align-items: center;
+    }
+}

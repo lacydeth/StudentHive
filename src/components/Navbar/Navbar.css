@@ -1,7 +1,24 @@
 .content{
-    max-width: 1250px;
+    max-width: 1350px;
     padding: 0 5px;
     margin: auto;
+}
+.user {
+    display: flex;
+    gap: 15px;
+    align-items: center;
+    background: var(--white);
+    padding: 10px 15px;
+    border-radius: 8px;
+    box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
+    margin-right: 50px;
+}
+.profile {
+    width: 42px;
+}
+.user h2 {
+    font-weight: 400;
+    font-size: 1.2rem;
 }
 .navbar{
     position: fixed;
@@ -105,7 +122,6 @@
     .icon.hide{
       display: none;
 }
-
 .navbar .menu-list{
       position: fixed;
       height: 100%;

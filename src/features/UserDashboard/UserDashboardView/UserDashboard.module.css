@@ -28,6 +28,7 @@
 .userBtn img {
     padding-top: 4px;
     width: 22px;
+    cursor: pointer;
 }
 .profile {
     width: 42px;
