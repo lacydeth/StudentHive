@@ -17,6 +17,17 @@ namespace StudentHiveServer.Controllers
         {
             _dbHelper = new DatabaseHelper(configuration.GetConnectionString("DefaultConnection"));
         }
+        //[HttpGet("profile")]
+        //public async Task<IActionResult> GetProfileName()
+        //{
+        //    var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
+        //    if (userIdClaim == null)
+        //    {
+        //        return Unauthorized(new { message = "A felhasználó " });
+        //    }
+
+        //    var loggedInUserId = userIdClaim.Value;
+        //}
         //POST: jelentkezés leadása - protected
         [HttpPost("apply")]
         public async Task<IActionResult> Apply([FromBody] ApplicationRequest request)
