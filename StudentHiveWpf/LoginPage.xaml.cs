@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json;
+using StudentHiveWpf.Services;
 using System;
 using System.Net.Http;
 using System.Text;
@@ -39,21 +40,31 @@ namespace StudentHiveWpf.Views
                     string token = result.token;
                     string role = result.role;
 
-                    new MainWindow().Show();
-                    this.Close();
+                    SessionManager.Role = role; 
 
+                    if (role.ToLower() == "admin")
+                    {
+                        new MainWindow().Show();
+                        this.Close();
+                    }
+                    else
+                    {
+                        MessageBox.Show("Nincs jogosultságod a belépéshez!", "Hozzáférés megtagadva", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    }
                 }
                 else
                 {
-                    MessageBox.Show("Hibás email vagy jelszó!");
+                    MessageBox.Show("Hibás email vagy jelszó!", "Hiba", MessageBoxButton.OK, MessageBoxImage.Error);
                 }
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Hiba történt: {ex.Message}");
+                MessageBox.Show($"Hiba történt: {ex.Message}", "Hiba", MessageBoxButton.OK, MessageBoxImage.Error);
             }
-
         }
+
+
+
         private void btnClose_Click(object sender, RoutedEventArgs e)
         {
             this.Close();

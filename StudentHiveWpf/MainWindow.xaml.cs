@@ -30,6 +30,12 @@ namespace StudentHiveWpf
 
         private async Task LoadDataAsync()
         {
+            if (SessionManager.Role.ToLower() != "admin")
+            {
+                MessageBox.Show("Nincs jogosultságod ehhez a művelethez!", "Hiba", MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
+
             try
             {
                 List<User> users = await _apiService.GetAllUsersAsync();
@@ -50,11 +56,16 @@ namespace StudentHiveWpf
 
         private async void ToggleButton_Checked(object sender, RoutedEventArgs e)
         {
+            if (SessionManager.Role.ToLower() != "admin")
+            {
+                MessageBox.Show("Nincs jogosultságod ehhez a művelethez!", "Hiba", MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
+
             if (UserListBox.SelectedItem is User selectedUser)
             {
                 try
                 {
-                    // Frissítjük a felhasználó állapotát
                     await _apiService.ToggleUserStatusAsync(selectedUser.Id);
                     MessageBox.Show($"A felhasználó státusza sikeresen frissítve!");
                     await LoadDataAsync();
@@ -68,11 +79,16 @@ namespace StudentHiveWpf
 
         private async void ToggleButton_Unchecked(object sender, RoutedEventArgs e)
         {
+            if (SessionManager.Role.ToLower() != "admin")
+            {
+                MessageBox.Show("Nincs jogosultságod ehhez a művelethez!", "Hiba", MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
+
             if (UserListBox.SelectedItem is User selectedUser)
             {
                 try
                 {
-                    // Frissítjük a felhasználó állapotát
                     await _apiService.ToggleUserStatusAsync(selectedUser.Id);
                     MessageBox.Show($"A felhasználó státusza sikeresen frissítve!");
                     await LoadDataAsync();
@@ -83,22 +99,81 @@ namespace StudentHiveWpf
                 }
             }
         }
-        private void btnedit_Click(object sender, RoutedEventArgs e)
+        private async void btnedit_Click(object sender, RoutedEventArgs e)
         {
+            if (SessionManager.Role.ToLower() != "admin")
+            {
+                MessageBox.Show("Nincs jogosultságod ehhez a művelethez!", "Hiba", MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
+
             var selectedUser = UserListBox.SelectedItem as User;
 
             if (selectedUser != null)
             {
                 UserModifyPage modifyPage = new UserModifyPage(selectedUser);
-                modifyPage.ShowDialog();  
+                modifyPage.ShowDialog(); 
+
+                await LoadDataAsync();
             }
         }
 
-        private void btnPassword_Click(object sender, RoutedEventArgs e)
+
+        private async void btnPassword_Click(object sender, RoutedEventArgs e)
         {
-            PasswordChangePage passwordChangePage = new PasswordChangePage();
-            passwordChangePage.Show();
+            if (SessionManager.Role.ToLower() != "admin")
+            {
+                MessageBox.Show("Nincs jogosultságod ehhez a művelethez!", "Hiba", MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
+
+          
+            var selectedUser = UserListBox.SelectedItem as User;
+            if (selectedUser == null)
+            {
+                MessageBox.Show("Kérlek válassz egy felhasználót!", "Hiba", MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
+
+         
+            var result = MessageBox.Show("Biztos meg akarod változtatni a jelszót?", "Megerősítés", MessageBoxButton.YesNo, MessageBoxImage.Question);
+
+            if (result == MessageBoxResult.No)
+            {
+                return; 
+            }
+
+          
+            string newPassword = _apiService.GenerateRandomPassword();
+            string confirmPassword = newPassword; 
+
+            if (string.IsNullOrEmpty(confirmPassword))
+            {
+                MessageBox.Show("Please confirm the new password.");
+                return;
+            }
+
+            if (newPassword != confirmPassword)
+            {
+                MessageBox.Show("Passwords do not match.");
+                return;
+            }
+
+            try
+            {
+                int userId = selectedUser.Id; 
+                string userEmail = selectedUser.Email;
+
+                await _apiService.ResetUserPasswordAsync(userId, newPassword, userEmail);
+
+                MessageBox.Show("A jelszó sikeresen frissítve, és az új jelszót emailben elküldtük!", "Siker", MessageBoxButton.OK, MessageBoxImage.Information);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Hiba történt a jelszó frissítésekor: {ex.Message}", "Hiba", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
         }
+
 
     }
 }

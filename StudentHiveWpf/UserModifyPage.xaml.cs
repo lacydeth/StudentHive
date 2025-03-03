@@ -1,38 +1,70 @@
-﻿using StudentHiveWpf.Models;
+﻿using Newtonsoft.Json;
+using StudentHiveWpf.Models;
+using StudentHiveWpf.Services;
 using System;
-using System.Collections.Generic;
-using System.Linq;
+using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Shapes;
 
 namespace StudentHiveWpf
 {
-    /// <summary>
-    /// Interaction logic for UserModifyPage.xaml
-    /// </summary>
     public partial class UserModifyPage : Window
     {
+        private readonly HttpClient _httpClient;
+        private readonly int _userId;
+
         public UserModifyPage(User user)
         {
             InitializeComponent();
+            _httpClient = new HttpClient { BaseAddress = new Uri("https://localhost:7067/api/general/") };
+            _userId = user.Id;
 
-            FirstNameInput.Text = user.FirstName;    // Editable
-            LastNameInput.Text = user.LastName;      // Editable
-            EmailInput.Text = user.Email;            // Editable
-            IdInput.Text = user.Id.ToString();       // Read-only
-            RoleIdInput.Text = user.RoleId.ToString(); // Read-only
-            OrganizationIdInput.Text = user.OrganizationId.ToString(); // Read-only
-            CreatedAtInput.Text = user.CreatedAt.ToString();  // Read-only
-            IsActiveInput.Text = user.IsActive.ToString(); // Read-only
+            FirstNameInput.Text = user.FirstName;
+            LastNameInput.Text = user.LastName;
+            EmailInput.Text = user.Email;
+            IdInput.Text = user.Id.ToString();
+            RoleIdInput.Text = user.RoleId.ToString();
+            OrganizationIdInput.Text = user.OrganizationId.ToString();
+            CreatedAtInput.Text = user.CreatedAt.ToString();
+            IsActiveInput.Text = user.IsActive.ToString();
         }
+
+        private async void UpdateProfile(object sender, RoutedEventArgs e)
+        {
+            if (SessionManager.Role.ToLower() != "admin")
+            {
+                MessageBox.Show("Nincs jogosultságod ehhez a művelethez!", "Hiba", MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
+
+            var apiService = new ApiService();
+
+            try
+            {
+                var response = await apiService.UpdateUserProfileAsync(
+                    _userId,
+                    FirstNameInput.Text,
+                    LastNameInput.Text,
+                    EmailInput.Text
+                );
+
+                if (response.IsSuccessStatusCode)
+                {
+                    MessageBox.Show("Profil sikeresen frissítve!", "Siker", MessageBoxButton.OK, MessageBoxImage.Information);
+                    this.Close();
+                }
+                else
+                {
+                    MessageBox.Show("Hiba történt a frissítés során.", "Hiba", MessageBoxButton.OK, MessageBoxImage.Error);
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Hálózati hiba: {ex.Message}", "Hiba", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
+
 
         private void Cancel_Click(object sender, RoutedEventArgs e)
         {
@@ -41,11 +73,6 @@ namespace StudentHiveWpf
             {
                 this.Close();
             }
-        }
-
-        private void UpdateProfile(object sender, RoutedEventArgs e)
-        {
-
         }
     }
 }
