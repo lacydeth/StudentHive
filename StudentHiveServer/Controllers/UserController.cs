@@ -4,6 +4,7 @@ using Microsoft.Extensions.Configuration;
 using StudentHiveServer.Utils;
 using System.Security.Claims;
 using System.Threading.Tasks;
+using System.Data;
 
 namespace StudentHiveServer.Controllers
 {
@@ -17,17 +18,87 @@ namespace StudentHiveServer.Controllers
         {
             _dbHelper = new DatabaseHelper(configuration.GetConnectionString("DefaultConnection"));
         }
-        //[HttpGet("profile")]
-        //public async Task<IActionResult> GetProfileName()
-        //{
-        //    var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
-        //    if (userIdClaim == null)
-        //    {
-        //        return Unauthorized(new { message = "A felhasználó " });
-        //    }
+        [HttpGet("user-jobs")]
+        public async Task<IActionResult> GetUserJobs()
+        {
+            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
+            if (userIdClaim == null)
+            {
+                return Unauthorized(new { message = "A felhasználói azonosítás sikertelen!" });
+            }
+            var loggedInUserId = userIdClaim.Value;
 
-        //    var loggedInUserId = userIdClaim.Value;
-        //}
+            string query = @"SELECT 
+                                j.Id AS JobId,
+                                j.Title,
+                                j.City,
+                                j.Address,
+                                j.HourlyRate,
+                                o.Name AS OrganizationName,
+                                c.ImagePath,
+                                c.CategoryName,
+                                CONCAT(a.LastName, ' ', a.FirstName) AS AgentName
+                            FROM JobAssignments ja
+                            JOIN Jobs j ON ja.JobId = j.Id
+                            JOIN Organizations o ON j.OrganizationId = o.Id
+                            JOIN Categories c ON j.CategoryId = c.Id
+                            LEFT JOIN Users a ON j.AgentId = a.Id
+                            WHERE ja.UserId = @Id AND j.IsActive = 1";
+            var parameters = new MySqlParameter[]
+            {
+                new MySqlParameter("@Id", loggedInUserId),
+            };
+            var result = await _dbHelper.ExecuteQueryAsync(query, parameters);
+            if (result.Rows.Count == 0)
+            {
+                return NotFound(new { message = "Nem található hozzárendelt munka." });
+            }
+            var jobs = new List<object>();
+            foreach (DataRow row in result.Rows)
+            {
+                jobs.Add(new
+                {
+                    JobId = row["JobId"],
+                    Title = row["Title"],
+                    City = row["City"],
+                    Address = row["Address"],
+                    HourlyRate = row["HourlyRate"],
+                    ImagePath = row["ImagePath"],
+                    OrganizationName = row["OrganizationName"],
+                    CategoryName = row["CategoryName"],
+                    AgentName = row["AgentName"] != DBNull.Value ? row["AgentName"] : "Nincs kijelölt közvetítő."
+                });
+            }
+            return Ok(jobs);
+        }
+        //GET: felhasználói profil nevének lekérése - protected
+        [HttpGet("profile")]
+        public async Task<IActionResult> GetProfileName()
+        {
+            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
+            if (userIdClaim == null)
+            {
+                return Unauthorized(new { message = "A felhasználói azonosítás sikertelen!" });
+            }
+
+            var loggedInUserId = userIdClaim.Value;
+
+            string query = "SELECT FirstName, LastName FROM Users WHERE Id = @Id";
+            var parameters = new MySqlParameter[]
+            {
+                new MySqlParameter("@Id", loggedInUserId)
+            };
+            var result = await _dbHelper.ExecuteQueryAsync(query, parameters);
+            if (result.Rows.Count == 0)
+            {
+                return NotFound(new { message = "Felhasználó nem található!" });
+            }
+            return Ok(new
+            {
+                firstName = result.Rows[0]["FirstName"],
+                lastName = result.Rows[0]["LastName"]
+            });
+        }
         //POST: jelentkezés leadása - protected
         [HttpPost("apply")]
         public async Task<IActionResult> Apply([FromBody] ApplicationRequest request)
