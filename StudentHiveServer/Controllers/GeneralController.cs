@@ -203,8 +203,8 @@ namespace StudentHiveServer.Controllers
                 const string updateQuery = "UPDATE Users SET IsActive = @NewStatus WHERE Id = @Id";
                 var updateParams = new MySqlParameter[]
                 {
-            new("@NewStatus", newStatus),
-            new("@Id", id)
+                    new("@NewStatus", newStatus),
+                    new("@Id", id)
                 };
 
                 await _dbHelper.ExecuteNonQueryAsync(updateQuery, updateParams);
@@ -232,8 +232,8 @@ namespace StudentHiveServer.Controllers
                 const string updateQuery = "UPDATE Users SET PasswordHash = @Password WHERE Id = @Id";
                 var updateParams = new MySqlParameter[]
                 {
-            new("@Password", hashedPassword),
-            new("@Id", id)
+                    new("@Password", hashedPassword),
+                    new("@Id", id)
                 };
 
                 await _dbHelper.ExecuteNonQueryAsync(updateQuery, updateParams);

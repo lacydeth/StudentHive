@@ -161,8 +161,9 @@ namespace StudentHiveServer.Controllers
             {
                 DateTime selectedDate = DateTime.Parse(date);
 
-                string query = @"SELECT s.Id, s.ShiftStart, s.ShiftEnd
+                string query = @"SELECT s.Id, s.ShiftStart, s.ShiftEnd, j.Title, j.Id AS JobId
                                 FROM Shifts s
+                                INNER JOIN Jobs j ON s.JobId = j.Id
                                 WHERE s.JobId = @JobId AND DATE(s.ShiftStart) = @SelectedDate
                                 ORDER BY s.ShiftStart";
 
@@ -185,8 +186,10 @@ namespace StudentHiveServer.Controllers
                     shifts.Add(new
                     {
                         Id = row["Id"],
-                        StartTime = ((DateTime)row["ShiftStart"]).ToString("HH:mm"),
-                        EndTime = ((DateTime)row["ShiftEnd"]).ToString("HH:mm")
+                        StartTime = ((DateTime)row["ShiftStart"]).ToString("yyyy-MM-dd HH:mm"),
+                        EndTime = ((DateTime)row["ShiftEnd"]).ToString("yyyy-MM-dd HH:mm"),
+                        Title = row["Title"],
+                        jobId = row["JobId"]
                     });
                 }
 
