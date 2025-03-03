@@ -10,7 +10,6 @@ const ProtectedRoute = ({ children, allowedRoles }) => {
   }
 
   if (!allowedRoles.includes(role)) {
-    // Redirect to home or an error page if the role is not allowed
     return <Navigate to="/unauthorized" />;
   }
 
