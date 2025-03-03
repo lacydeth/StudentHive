@@ -222,18 +222,13 @@ namespace StudentHiveServer.Controllers
         {
             try
             {
-                // Validate the user exists
                 const string checkUserQuery = "SELECT * FROM Users WHERE Id = @Id";
                 var checkParams = new MySqlParameter[] { new("@Id", id) };
                 var userTable = await _dbHelper.ExecuteQueryAsync(checkUserQuery, checkParams);
 
                 if (userTable.Rows.Count == 0)
                     return NotFound(new { message = "User not found." });
-
-                // Hash the new password
                 var hashedPassword = BCrypt.Net.BCrypt.HashPassword(request.NewPassword);
-
-                // Update the password in the database
                 const string updateQuery = "UPDATE Users SET PasswordHash = @Password WHERE Id = @Id";
                 var updateParams = new MySqlParameter[]
                 {
@@ -249,6 +244,45 @@ namespace StudentHiveServer.Controllers
             {
                 return StatusCode(500, new { message = "An error occurred while updating the password.", details = ex.Message });
             }
+        }
+
+        [HttpPatch("update-user-profile/{id}")]
+        public async Task<IActionResult> UpdateUserProfile(int id, [FromBody] UpdateUserProfileRequest request)
+        {
+            try
+            {
+                const string checkUserQuery = "SELECT * FROM Users WHERE Id = @Id";
+                var checkParams = new MySqlParameter[] { new("@Id", id) };
+                var userTable = await _dbHelper.ExecuteQueryAsync(checkUserQuery, checkParams);
+
+                if (userTable.Rows.Count == 0)
+                    return NotFound(new { message = "User not found." });
+
+                const string updateQuery = "UPDATE Users SET FirstName = @FirstName, LastName = @LastName, Email = @Email WHERE Id = @Id";
+                var updateParams = new MySqlParameter[]
+                {
+                    new("@FirstName", request.FirstName),
+                    new("@LastName", request.LastName),
+                    new("@Email", request.Email),
+                    new("@Id", id)
+                };
+
+                await _dbHelper.ExecuteNonQueryAsync(updateQuery, updateParams);
+
+                return Ok(new { message = "User profile successfully updated." });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "An error occurred while updating the profile.", details = ex.Message });
+            }
+
+        }
+
+        public class UpdateUserProfileRequest
+        {
+            public string FirstName { get; set; }
+            public string LastName { get; set; }
+            public string Email { get; set; }
         }
 
         public class PasswordUpdateRequest

@@ -61,7 +61,6 @@ namespace StudentHiveServer.Controllers
         {
             const string query = "SELECT Id, PasswordHash, RoleId FROM Users WHERE Email = @Email";
             var parameters = new MySqlParameter[] { new MySqlParameter("@Email", request.Email) };
-
             var result = await _dbHelper.ExecuteQueryAsync(query, parameters);
             if (result.Rows.Count == 0)
                 return Unauthorized(new { message = "Hibás felhasználónév vagy jelszó!" });
@@ -132,6 +131,7 @@ namespace StudentHiveServer.Controllers
         public class LoginRequest
         {
             public string Email { get; set; }
+            public int RoleId { get; set; }
             public string Password { get; set; }
             public bool StayLoggedIn { get; set; }
         }
