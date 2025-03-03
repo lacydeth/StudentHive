@@ -23,7 +23,8 @@ export const routes = {
     agentJobs: { path: '/agent-jobs', title: 'Agent Jobs'},
     adminSettings: { path: '/admin-settings', title: 'Admin Settings'},
     workPage: { path: '/works/:id', title: 'Work page'},
-    shiftPage: { path: '/shift/:id', title: 'Shift page'}
+    shiftPage: { path: '/shift/:id', title: 'Shift page'},
+    manageShiftsPage: { path: '/manage-shifts/:id', title: 'Manage shifts page'}
 };
 
 export const adminTopLinks = [

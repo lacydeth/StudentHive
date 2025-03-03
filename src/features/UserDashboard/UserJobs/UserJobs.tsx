@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-import Title from "../../../components/Title/Title";
 import UserCard, { UserCardProps } from "../../../components/UserCard/UserCard";
 import UserNavbar from "../../../components/UserNavbar/UserNavbar";
 import styles from "./UserJobs.module.css";
@@ -47,7 +46,9 @@ const UserJobs = () => {
     <div className={styles.container}>
       <UserNavbar />
       <div className={styles.content}>
-        <Title subTitle="Munkahelyeim" title="Tekintsd meg a munkahelyeidet és vállalj műszakokat." />
+        <div className={styles.jobTitle}>
+          <h1>Munkahelyeim</h1>
+        </div>
         <div className={styles.cardHolder}>
           {currentJobs.length > 0 ? (
             currentJobs.map((job) => <UserCard key={job.jobId} {...job} />)

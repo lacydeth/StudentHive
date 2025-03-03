@@ -1,3 +1,4 @@
+import { useNavigate } from "react-router-dom";
 import styles from "./UserCard.module.css";
 
 export type UserCardProps = {
@@ -12,7 +13,12 @@ export type UserCardProps = {
   agentName: string;
 };
 
-const UserCard = ({title, city,address,imagePath,categoryName, agentName,}: UserCardProps) => {
+const UserCard = ({jobId, title, city,address,imagePath,categoryName, agentName,}: UserCardProps) => {
+  const navigate = useNavigate();
+
+  const handleShifts = () => {
+    navigate(`/manage-shifts/${jobId}`);
+  };
   return (
     <div className={styles.card}>
       <div className={styles.top}>
@@ -30,7 +36,7 @@ const UserCard = ({title, city,address,imagePath,categoryName, agentName,}: User
           <img src="/list.png" alt="Category icon" /> {categoryName}
         </div>
         <div className={styles.bottomEnd}>
-          <button className={styles.btn} onClick={(e) => e.stopPropagation()}>
+          <button className={styles.btn} onClick={(e) => {e.stopPropagation(); handleShifts();}}>
             Műszakok kezelése
           </button>
         </div>
