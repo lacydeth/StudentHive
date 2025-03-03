@@ -154,7 +154,49 @@ namespace StudentHiveServer.Controllers
                 return StatusCode(500, new { message = "Belső hiba: " + ex.Message });
             }
         }
+        [HttpGet("list-shifts/{jobId}/date/{date}")]
+        public async Task<IActionResult> GetShiftsForJobByDate(int jobId, string date)
+        {
+            try
+            {
+                DateTime selectedDate = DateTime.Parse(date);
 
+                string query = @"SELECT s.Id, s.ShiftStart, s.ShiftEnd
+                                FROM Shifts s
+                                WHERE s.JobId = @JobId AND DATE(s.ShiftStart) = @SelectedDate
+                                ORDER BY s.ShiftStart";
+
+                var parameters = new MySqlParameter[]
+                {
+                    new MySqlParameter("@JobId", jobId),
+                    new MySqlParameter("@SelectedDate", selectedDate.ToString("yyyy-MM-dd"))
+                };
+
+                var result = await _dbHelper.ExecuteQueryAsync(query, parameters);
+
+                if (result.Rows.Count == 0)
+                {
+                    return NotFound(new { message = "Nincs elérhető műszak a kiválasztott időpontban." });
+                }
+
+                var shifts = new List<object>();
+                foreach (DataRow row in result.Rows)
+                {
+                    shifts.Add(new
+                    {
+                        Id = row["Id"],
+                        StartTime = ((DateTime)row["ShiftStart"]).ToString("HH:mm"),
+                        EndTime = ((DateTime)row["ShiftEnd"]).ToString("HH:mm")
+                    });
+                }
+
+                return Ok(shifts);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "Hiba a lekérdezés közben: " + ex.Message });
+            }
+        }
     }
 
     public class ApplicationRequest
