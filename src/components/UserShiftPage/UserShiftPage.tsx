@@ -76,7 +76,6 @@ const UserShiftPage = () => {
   
       const payload = {
         ShiftId: shiftId,
-        StudentId: parseInt(userId),
       };
   
       const response = await axios.post("https://localhost:7067/api/user/apply-shift", payload, {
@@ -113,7 +112,7 @@ const UserShiftPage = () => {
                 <h4><img src="/calendar.png" alt="calendar icon" />{shift.startTime}</h4>
                 <h3>Műszak vége</h3>
                 <h4><img src="/calendar.png" alt="calendar icon" />{shift.endTime}</h4>
-                <button onClick={() => handleApply(shift.jobId)}>Jelentkezés</button>
+                <button onClick={() => handleApply(shift.id)}>Jelentkezés</button>
               </div>
             ))
           ) : (

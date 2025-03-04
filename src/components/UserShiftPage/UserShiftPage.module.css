@@ -31,33 +31,60 @@
 }
 .shifts .shiftItem {
     background: #fff;
-    border-radius: 8px;
-    padding: 15px;
+    border-radius: 12px;
+    padding: 20px;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    gap: 5px;
-    width: 250px;
+    gap: 10px;
+    width: 280px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.shifts .shiftItem:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+}
+
+.shiftItem h1 {
+    font-size: 1.4rem;
+    font-weight: 600;
+    color: #333;
+}
+
+.shiftItem h3 {
+    font-size: 1.1rem;
+    font-weight: 500;
+    color: #555;
+}
+.shiftItem button img {
+    width: 22px;
 }
 .shiftItem h4 {
     display: flex;
     align-items: center;
     gap: 5px;
-    font-size: 1.1rem;
+    font-size: 1rem;
     font-weight: 400;
+    color: #777;
 }
+
 .shiftItem button {
-    margin-top: 10px;
+    margin-top: 15px;
     outline: 0;
     border: 0;
     border-radius: 8px;
     background: var(--smoothGreen);
-    padding: 10px 15px;
+    padding: 10px 20px;
     color: #fff;
     cursor: pointer;
     transition: all 0.4s ease;
+    font-size: 1rem;
+    font-weight: 500;
 }
+
 .shiftItem button:hover {
     background: var(--hoverGreen);
 }
