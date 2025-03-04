@@ -189,7 +189,7 @@ namespace StudentHiveServer.Controllers
                         StartTime = ((DateTime)row["ShiftStart"]).ToString("yyyy-MM-dd HH:mm"),
                         EndTime = ((DateTime)row["ShiftEnd"]).ToString("yyyy-MM-dd HH:mm"),
                         Title = row["Title"],
-                        jobId = row["JobId"]
+                        JobId = row["JobId"],
                     });
                 }
 
@@ -200,14 +200,73 @@ namespace StudentHiveServer.Controllers
                 return StatusCode(500, new { message = "Hiba a lekérdezés közben: " + ex.Message });
             }
         }
-    }
+        //POST: műszakra jelentkezés leadása - protected
+        [HttpPost("apply-shift")]
+        public async Task<IActionResult> ApplyToShift([FromBody] UserShiftRequest request)
+        {
+            try
+            {
+                var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
+                if (userIdClaim == null)
+                {
+                    return Unauthorized(new { message = "Felhasználói azonosítás sikertelen." });
+                }
 
+                var loggedInUserId = int.Parse(userIdClaim.Value);
+
+                if (request.ShiftId <= 0)
+                {
+                    return BadRequest(new { message = "Érvénytelen műszak." });
+                }
+
+                string checkQuery = "SELECT COUNT(*) FROM StudentShifts WHERE ShiftId = @ShiftId AND StudentId = @StudentId";
+                var checkParams = new MySqlParameter[]
+                {
+                    new MySqlParameter("@ShiftId", request.ShiftId),
+                    new MySqlParameter("@StudentId", loggedInUserId)
+                };
+
+                int existingApplications = await _dbHelper.ExecuteScalarAsync<int>(checkQuery, checkParams);
+                if (existingApplications > 0)
+                {
+                    return Conflict(new { message = "Már jelentkeztél erre a műszakra." });
+                }
+
+                string insertQuery = "INSERT INTO StudentShifts (StudentId, ShiftId, Approved) VALUES (@StudentId, @ShiftId, @Approved)";
+                var insertParams = new MySqlParameter[]
+                {
+                    new MySqlParameter("@ShiftId", request.ShiftId),
+                    new MySqlParameter("@StudentId", loggedInUserId),
+                    new MySqlParameter("@Approved", request.Status)
+                };
+
+                int rowsAffected = await _dbHelper.ExecuteNonQueryAsync(insertQuery, insertParams);
+                if (rowsAffected > 0)
+                {
+                    return Ok(new { message = "Sikeres jelentkezés!" });
+                }
+                else
+                {
+                    return StatusCode(500, new { message = "Hiba történt a jelentkezés során." });
+                }
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "Belső hiba: " + ex.Message });
+            }
+        }
+    }
+    public class UserShiftRequest
+    { 
+        public int ShiftId { get; set; }
+        public int Status { get; set; } = 0;
+    }
     public class ApplicationRequest
     {
-            public int JobId { get; set; }
+        public int JobId { get; set; }
             
-            public int StudentId { get; set; }
+        public int StudentId { get; set; }
 
-            public int Status { get; set; } = 0;
+        public int Status { get; set; } = 0;
     }
 }
