@@ -7,7 +7,9 @@ using System.Net;
 using System.Net.Http;
 using System.Net.Mail;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using System.Text.RegularExpressions;
 
 namespace StudentHiveWpf.Services
 {
@@ -52,6 +54,12 @@ namespace StudentHiveWpf.Services
 
         public async Task<HttpResponseMessage> UpdateUserProfileAsync(int userId, string firstName, string lastName, string email)
         {
+            if (!IsValidName(firstName) || !IsValidName(lastName))
+                throw new Exception("A név csak betűket és szóközt tartalmazhat, és legfeljebb 64 karakter lehet.");
+
+            if (!IsValidEmail(email))
+                throw new Exception("Érvénytelen email cím formátum.");
+
             var requestBody = new
             {
                 FirstName = firstName,
@@ -66,18 +74,19 @@ namespace StudentHiveWpf.Services
             return response;
         }
 
+
         public async Task ResetUserPasswordAsync(int userId, string newPassword, string userEmail)
-{
-    var requestBody = new { NewPassword = newPassword };
-    var content = new StringContent(JsonConvert.SerializeObject(requestBody), Encoding.UTF8, "application/json");
+        {
+            var requestBody = new { NewPassword = newPassword };
+            var content = new StringContent(JsonConvert.SerializeObject(requestBody), Encoding.UTF8, "application/json");
 
-    var response = await _httpClient.PatchAsync($"update-user-password/{userId}", content);
+            var response = await _httpClient.PatchAsync($"update-user-password/{userId}", content);
 
-    if (!response.IsSuccessStatusCode)
-        throw new Exception($"Hiba történt a jelszó frissítésekor: {response.StatusCode}");
+            if (!response.IsSuccessStatusCode)
+                throw new Exception($"Hiba történt a jelszó frissítésekor: {response.StatusCode}");
 
-    SendEmail(userEmail, $"A jelszavad helyre lett állítva. Itt az új jelszó: {newPassword}", "StudentHive");
-}
+            SendEmail(userEmail, $"A jelszavad helyre lett állítva. Itt az új jelszó: {newPassword}", "StudentHive");
+        }
 
 
         private void SendEmail(string toEmail, string emailBody, string name)
@@ -124,6 +133,19 @@ namespace StudentHiveWpf.Services
 
             return password.ToString();
         }
+
+        private bool IsValidEmail(string email)
+        {
+            var pattern = @"^[\w\.-]+@[a-zA-Z\d-]+\.[a-zA-Z]{2,}$";
+            return Regex.IsMatch(email, pattern);
+        }
+
+        private bool IsValidName(string name)
+        {
+            var pattern = @"^[a-zA-ZáéíóöőúüűÁÉÍÓÖŐÚÜŰ\s]{1,64}$";
+            return Regex.IsMatch(name, pattern);
+        }
+
 
     }
 }
