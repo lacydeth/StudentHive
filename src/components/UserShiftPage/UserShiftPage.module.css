@@ -29,6 +29,11 @@
     flex-direction: column;
     gap: 25px;
 }
+.shiftContainer {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
 .shifts .shiftItem {
     background: #fff;
     border-radius: 12px;
@@ -123,6 +128,9 @@
         padding-top: 10%;
         flex-direction: row;
         justify-content: space-evenly;
+    }
+    .shiftContainer {
+        flex-direction: row;
     }
 }
 :global(.react-calendar) {

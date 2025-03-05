@@ -17,7 +17,7 @@ const AgentCard = ({ id, title, agentName, location, category, image }: WorkCard
     navigate(`/shift/${id}`);
   };
   const handleShiftApplications = () => {
-    navigate(`/shift-application/${id}`);
+    navigate(`/shift-applications/${id}`);
   };
   return (
     <div className={styles.card}>

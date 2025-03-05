@@ -40,6 +40,14 @@ const UserShiftPage = () => {
 
   const handleDateChange = (value: Value) => {
     if (value instanceof Date) {
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+  
+      if (value < today) {
+        toast.error("Nem választhatsz múltbeli dátumot!");
+        return;
+      }
+  
       setDate(value);
       setCurrentPage(1);
       fetchShifts(value);
@@ -66,16 +74,18 @@ const UserShiftPage = () => {
     }
   };
 
-  const handleApply = async (shiftId: number) => {
-    try {
-      const userId = getUserIdFromToken();
-      if (!userId) {
-        toast.error("Felhasználó nincs bejelentkezve!");
-        return;
-      }
+  const handleApply = async (shift: ShiftCardProps) => {
+    const shiftStartDate = new Date(shift.startTime);
+    const now = new Date();
   
+    if (shiftStartDate <= now) {
+      toast.error("Nem jelentkezhetsz múltbeli műszakra!");
+      return;
+    }
+
+    try {
       const payload = {
-        ShiftId: shiftId,
+        ShiftId: shift.id,
       };
   
       const response = await axios.post("https://localhost:7067/api/user/apply-shift", payload, {
@@ -104,20 +114,22 @@ const UserShiftPage = () => {
         </div>
         <div className={styles.shifts}>
           <h3>Elérhető műszakok:</h3>
-          {currentShifts.length > 0 ? (
-            currentShifts.map((shift: ShiftCardProps) => (
-              <div key={shift.id} className={styles.shiftItem}>
-                <h1>{shift.title}</h1>
-                <h3>Műszak kezdete</h3>
-                <h4><img src="/calendar.png" alt="calendar icon" />{shift.startTime}</h4>
-                <h3>Műszak vége</h3>
-                <h4><img src="/calendar.png" alt="calendar icon" />{shift.endTime}</h4>
-                <button onClick={() => handleApply(shift.id)}>Jelentkezés</button>
-              </div>
-            ))
-          ) : (
-            <p>Nincs elérhető műszak ezen a napon.</p>
-          )}
+          <div className={styles.shiftContainer}>
+            {currentShifts.length > 0 ? (
+              currentShifts.map((shift: ShiftCardProps) => (
+                <div key={shift.id} className={styles.shiftItem}>
+                  <h1>{shift.title}</h1>
+                  <h3>Műszak kezdete</h3>
+                  <h4><img src="/calendar.png" alt="calendar icon" />{shift.startTime}</h4>
+                  <h3>Műszak vége</h3>
+                  <h4><img src="/calendar.png" alt="calendar icon" />{shift.endTime}</h4>
+                  <button onClick={() => handleApply(shift)}>Jelentkezés</button>
+                </div>
+              ))
+            ) : (
+              <p>Nincs elérhető műszak ezen a napon.</p>
+            )}
+          </div>
           <div className={styles.pagination}>
             <button onClick={prevPage} disabled={currentPage === 1}>
               Előző
