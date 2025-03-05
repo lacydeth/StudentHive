@@ -184,6 +184,191 @@ namespace StudentHiveServer.Controllers
                 return StatusCode(500, new { message = "Hiba történt a műszakok lekérdezése közben.", details = ex.Message });
             }
         }
+        [HttpGet("job-title/{jobId}")]
+        public async Task<IActionResult> JobTitle(int jobId)
+        {
+            string query = @"SELECT title from Jobs WHERE Id = @jobId";
+            try
+            {
+                var parameter = new MySqlParameter[]
+                {
+                    new MySqlParameter("@JobId", jobId),
+                };
+
+
+                var dataTable = await _dbHelper.ExecuteQueryAsync(query, parameter);
+
+                var applications = dataTable.AsEnumerable().Select(row => new
+                {
+                    Title = row.Field<string>("Title")
+                }).ToList();
+
+                return Ok(applications);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "Hiba a pozíció betöltése során!", details = ex.Message });
+            }
+
+        }
+        // Get distinct shiftStart values after the current date
+        [HttpGet("shift-starts/{jobId}")]
+        public async Task<IActionResult> GetDistinctShiftStarts(int jobId)
+        {
+            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
+            if (userIdClaim == null)
+            {
+                return Unauthorized(new { message = "A felhasználói azonosítás sikertelen!" });
+            }
+
+            var loggedInUserId = userIdClaim.Value;
+
+            string query = @"SELECT DISTINCT s.ShiftStart
+                            FROM StudentShifts ss
+                            JOIN Shifts s ON ss.ShiftId = s.Id
+                            JOIN Jobs j ON s.JobId = j.Id
+                            WHERE j.Id = @JobId AND j.AgentId = @AgentId AND s.ShiftStart > NOW()";
+
+            try
+            {
+                var parameters = new List<MySqlParameter>
+                {
+                    new MySqlParameter("@JobId", jobId),
+                    new MySqlParameter("@AgentId", loggedInUserId)
+                };
+
+                var dataTable = await _dbHelper.ExecuteQueryAsync(query, parameters.ToArray());
+
+                var shiftStarts = dataTable.AsEnumerable().Select(row => row.Field<DateTime>("ShiftStart").ToString("yyyy-MM-dd HH:mm")).ToList();
+
+                return Ok(shiftStarts);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "Hiba a műszakok betöltése során!", details = ex.Message });
+            }
+        }
+
+        // GET: műszak jelentkezések kilistázása - protected, modified to check future dates
+        [HttpGet("shift-applications/{jobId}")]
+        public async Task<IActionResult> GetApplications(int jobId, [FromQuery] int? status = null, [FromQuery] DateTime? shiftStartFilter = null)
+        {
+            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
+            if (userIdClaim == null)
+            {
+                return Unauthorized(new { message = "A felhasználói azonosítás sikertelen!" });
+            }
+
+            var loggedInUserId = userIdClaim.Value;
+
+            string query = @"SELECT 
+                                ss.Id AS ApplicationId,
+                                s.ShiftStart,
+                                s.ShiftEnd,
+                                CONCAT(u.FirstName, ' ', u.LastName) AS StudentName,
+                                ss.Approved AS ApprovedStatus,
+                                j.Title AS JobTitle
+                            FROM StudentShifts ss
+                            JOIN Shifts s ON ss.ShiftId = s.Id
+                            JOIN Jobs j ON s.JobId = j.Id
+                            JOIN Users u ON ss.StudentId = u.Id
+                            WHERE j.Id = @JobId AND j.AgentId = @AgentId AND s.ShiftStart > NOW()";
+
+            if (status.HasValue)
+                query += " AND ss.Approved = @Approved";
+
+            if (shiftStartFilter.HasValue)
+                query += " AND s.ShiftStart = @ShiftStartFilter";
+
+            try
+            {
+                var parameters = new List<MySqlParameter>
+                {
+                    new MySqlParameter("@JobId", jobId),
+                    new MySqlParameter("@AgentId", loggedInUserId)
+                };
+
+                if (status.HasValue)
+                    parameters.Add(new MySqlParameter("@Approved", status));
+
+                if (shiftStartFilter.HasValue)
+                    parameters.Add(new MySqlParameter("@ShiftStartFilter", shiftStartFilter));
+
+                var dataTable = await _dbHelper.ExecuteQueryAsync(query, parameters.ToArray());
+
+                var applications = dataTable.AsEnumerable().Select(row => new
+                {
+                    ApplicationId = row.Field<int>("ApplicationId"),
+                    StudentName = row.Field<string>("StudentName"),
+                    ShiftStart = row.Field<DateTime>("ShiftStart").ToString("yyyy-MM-dd HH:mm"),
+                    ShiftEnd = row.Field<DateTime>("ShiftEnd").ToString("yyyy-MM-dd HH:mm"),
+                    ApprovedStatus = row.Field<int>("ApprovedStatus"),
+                    JobTitle = row.Field<string>("JobTitle")
+                }).ToList();
+
+                return Ok(applications);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "Hiba a jelentkezések betöltése során!", details = ex.Message });
+            }
+        }
+
+
+        //PATCH: műszakra jelentkezés elfogadása: protected
+        [HttpPatch("shift-applications/{id}/accept")]
+        public async Task<IActionResult> AcceptShiftApplication(int id)
+        {
+            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
+            if (userIdClaim == null)
+            {
+                return Unauthorized(new { message = "A felhasználói azonosítás sikertelen!" });
+            }
+
+            const string updateQuery = "UPDATE StudentShifts SET Approved = 1 WHERE Id = @Id";
+
+            try
+            {
+                var updateParams = new MySqlParameter[] { new("@Id", id) };
+                int rowsAffected = await _dbHelper.ExecuteNonQueryAsync(updateQuery, updateParams);
+
+                if (rowsAffected == 0)
+                    return NotFound(new { message = "Jelentkezés nem található!" });
+
+                return Ok(new { message = "Jelentkezés sikeresen elfogadva!" });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "Hiba a jelentkezés elfogadása során!", details = ex.Message });
+            }
+        }
+        //PATCH: műszakra jelentkezés elutasítása: protected
+        [HttpPatch("shift-applications/{id}/decline")]
+        public async Task<IActionResult> DeclineShiftApplication(int id)
+        {
+            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
+            if (userIdClaim == null)
+            {
+                return Unauthorized(new { message = "A felhasználói azonosítás sikertelen!" });
+            }
+
+            const string updateQuery = "UPDATE StudentShifts SET Approved = 2 WHERE Id = @Id";
+
+            try
+            {
+                var updateParams = new MySqlParameter[] { new("@Id", id) };
+                int rowsAffected = await _dbHelper.ExecuteNonQueryAsync(updateQuery, updateParams);
+
+                if (rowsAffected == 0)
+                    return NotFound(new { message = "Jelentkezés nem található!" });
+
+                return Ok(new { message = "Jelentkezés sikeresen elutasítva!" });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "Hiba a jelentkezés elutasítása során!", details = ex.Message });
+            }
+        }
         //GET: jelentkezések kilistázása - protected
         [HttpGet("applications")]
         public async Task<IActionResult> GetApplications([FromQuery] int agentId, [FromQuery] string? title = null, [FromQuery] int? status = null)
