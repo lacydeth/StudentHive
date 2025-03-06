@@ -5,6 +5,9 @@ using StudentHiveServer.Utils;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using System.Data;
+using Org.BouncyCastle.Asn1.X509;
+using System.Diagnostics.Metrics;
+using System.Reflection;
 
 namespace StudentHiveServer.Controllers
 {
@@ -336,18 +339,117 @@ namespace StudentHiveServer.Controllers
                 return StatusCode(500, new { message = "Belső hiba: " + ex.Message });
             }
         }
-    }
-    public class UserShiftRequest
-    { 
-        public int ShiftId { get; set; }
-        public int Status { get; set; } = 0;
-    }
-    public class ApplicationRequest
-    {
-        public int JobId { get; set; }
-            
-        public int StudentId { get; set; }
+        [HttpPost("student-details")]
+        public async Task<IActionResult> UpsertStudentDetails([FromBody] StudentDetails request)
+        {
+            try
+            {
+                string checkQuery = "SELECT COUNT(*) FROM StudentDetails WHERE UserId = @UserId";
+                var checkParam = new MySqlParameter("@UserId", request.UserId);
+                int count = Convert.ToInt32(await _dbHelper.ExecuteScalarAsync<int>(checkQuery, new MySqlParameter[] { checkParam }));
 
-        public int Status { get; set; } = 0;
+                string query;
+                if (count == 0)
+                {
+                    query = @"
+                INSERT INTO StudentDetails 
+                (UserId, PhoneNumber, DateOfBirth, BirthName, MothersName, CountryOfBirth, PlaceOfBirth, Gender, Citizenship, 
+                 StudentCardNumber, BankAccountNumber, Country, PostalCode, City, Address, SchoolName, StudyStartDate, StudyEndDate)
+                VALUES 
+                (@UserId, @PhoneNumber, @DateOfBirth, @BirthName, @MothersName, @CountryOfBirth, @PlaceOfBirth, @Gender, @Citizenship, 
+                 @StudentCardNumber, @BankAccountNumber, @Country, @PostalCode, @City, @Address, @SchoolName, @StudyStartDate, @StudyEndDate)";
+                }
+                else
+                {
+                    query = @"
+                UPDATE StudentDetails 
+                SET PhoneNumber = @PhoneNumber,
+                    DateOfBirth = @DateOfBirth,
+                    BirthName = @BirthName,
+                    MothersName = @MothersName,
+                    CountryOfBirth = @CountryOfBirth,
+                    PlaceOfBirth = @PlaceOfBirth,
+                    Gender = @Gender,
+                    Citizenship = @Citizenship,
+                    StudentCardNumber = @StudentCardNumber,
+                    BankAccountNumber = @BankAccountNumber,
+                    Country = @Country,
+                    PostalCode = @PostalCode,
+                    City = @City,
+                    Address = @Address,
+                    SchoolName = @SchoolName,
+                    StudyStartDate = @StudyStartDate,
+                    StudyEndDate = @StudyEndDate
+                WHERE UserId = @UserId";
+                }
+
+                var parameters = new MySqlParameter[]
+                {
+            new MySqlParameter("@UserId", request.UserId),
+            new MySqlParameter("@PhoneNumber", (object?)request.PhoneNumber ?? DBNull.Value),
+            new MySqlParameter("@DateOfBirth", (object?)request.DateOfBirth ?? DBNull.Value),
+            new MySqlParameter("@BirthName", (object?)request.BirthName ?? DBNull.Value),
+            new MySqlParameter("@MothersName", (object?)request.MothersName ?? DBNull.Value),
+            new MySqlParameter("@CountryOfBirth", (object?)request.CountryOfBirth ?? DBNull.Value),
+            new MySqlParameter("@PlaceOfBirth", (object?)request.PlaceOfBirth ?? DBNull.Value),
+            new MySqlParameter("@Gender", (object?)request.Gender ?? DBNull.Value),
+            new MySqlParameter("@Citizenship", (object?)request.Citizenship ?? DBNull.Value),
+            new MySqlParameter("@StudentCardNumber", (object?)request.StudentCardNumber ?? DBNull.Value),
+            new MySqlParameter("@BankAccountNumber", (object?)request.BankAccountNumber ?? DBNull.Value),
+            new MySqlParameter("@Country", (object?)request.Country ?? DBNull.Value),
+            new MySqlParameter("@PostalCode", (object?)request.PostalCode ?? DBNull.Value),
+            new MySqlParameter("@City", (object?)request.City ?? DBNull.Value),
+            new MySqlParameter("@Address", (object?)request.Address ?? DBNull.Value),
+            new MySqlParameter("@SchoolName", (object?)request.SchoolName ?? DBNull.Value),
+            new MySqlParameter("@StudyStartDate", (object?)request.StudyStartDate ?? DBNull.Value),
+            new MySqlParameter("@StudyEndDate", (object?)request.StudyEndDate ?? DBNull.Value)
+                };
+
+                int rowsAffected = await _dbHelper.ExecuteNonQueryAsync(query, parameters);
+
+                return Ok(new { message = count == 0 ? "Felhasználói adatok létrehozva!" : "Felhasználói adatok frissítve!" });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "Hiba történt: " + ex.Message });
+            }
+        }
+
+
+
+        public class StudentDetails 
+        { 
+            public int UserId { get; set; }
+            public int PhoneNumber { get; set; }
+            public int DateOfBirth { get; set; }
+            public string BirthName { get; set; }
+            public string MothersName { get; set; }
+            public string CountryOfBirth { get; set; }
+            public string PlaceOfBirth { get; set; }
+            public string Gender { get; set; }
+            public string Citizenship { get; set; }
+            public int StudentCardNumber { get; set; }
+            public int BankAccountNumber { get; set; }
+            public string Country { get; set; }
+            public int PostalCode { get; set; }
+            public string City { get; set; }
+            public string Address { get; set; }
+            public string SchoolName { get; set; }
+            public DateTime StudyStartDate { get; set; }
+            public DateTime StudyEndDate { get; set; }
+        }
+        public class UserShiftRequest
+        {
+            public int ShiftId { get; set; }
+            public int Status { get; set; } = 0;
+        }
+        public class ApplicationRequest
+        {
+            public int JobId { get; set; }
+
+            public int StudentId { get; set; }
+
+            public int Status { get; set; } = 0;
+        }
     }
 }

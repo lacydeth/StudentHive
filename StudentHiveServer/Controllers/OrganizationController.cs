@@ -6,6 +6,7 @@ using System.Net;
 using System.Net.Mail;
 using System.Security.Claims;
 using System.Text.Json;
+using static StudentHiveServer.Controllers.AdminController;
 
 namespace StudentHiveServer.Controllers
 {
@@ -664,6 +665,166 @@ namespace StudentHiveServer.Controllers
                 return StatusCode(500, new { message = "Error occurred while deleting the job.", details = ex.Message });
             }
         }
+        //PUT: Szövetkezet fiók adatmódosítás - protected
+        [HttpPut("orgsettings")]
+        public async Task<IActionResult> UpdateOrganizationSettings([FromBody] UpdateOrganizationProfileRequest request)
+        {
+            if (string.IsNullOrEmpty(request.Password) && string.IsNullOrEmpty(request.Email))
+            {
+                return BadRequest(new { message = "Legalább egy mezőnek (email vagy jelszó) meg kell változnia." });
+            }
+
+            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
+            if (userIdClaim == null)
+            {
+                return Unauthorized(new { message = "User is not authenticated." });
+            }
+            var loggedInUserId = userIdClaim.Value;
+
+            try
+            {
+                const string selectQuery = "SELECT Id, Email, PasswordHash FROM Users WHERE Id = @UserId";
+                var parameters = new[] { new MySqlParameter("@UserId", loggedInUserId) };
+                var result = await _dbHelper.ExecuteQueryAsync(selectQuery, parameters);
+
+                if (result.Rows.Count == 0)
+                {
+                    return NotFound(new { message = "Felhasználó nem található!" });
+                }
+
+                if (!string.IsNullOrEmpty(request.Email))
+                {
+                    const string checkEmailQuery = "SELECT COUNT(1) FROM Users WHERE Email = @Email AND Id != @UserId";
+                    var checkEmailParams = new[] {
+                        new MySqlParameter("@Email", request.Email),
+                        new MySqlParameter("@UserId", loggedInUserId)
+                    };
+                    var emailExists = await _dbHelper.ExecuteScalarAsync<int>(checkEmailQuery, checkEmailParams);
+                    if (emailExists > 0)
+                    {
+                        return BadRequest(new { message = "Ez az email cím már foglalt!" });
+                    }
+
+                    const string updateEmailQuery = "UPDATE Users SET Email = @Email WHERE Id = @UserId";
+                    var emailParams = new[] {
+                        new MySqlParameter("@Email", request.Email),
+                        new MySqlParameter("@UserId", loggedInUserId)
+                    };
+                    await _dbHelper.ExecuteNonQueryAsync(updateEmailQuery, emailParams);
+                }
+
+                if (!string.IsNullOrEmpty(request.Password))
+                {
+                    var hashedPassword = BCrypt.Net.BCrypt.HashPassword(request.Password);
+                    const string updatePasswordQuery = "UPDATE Users SET PasswordHash = @PasswordHash WHERE Id = @UserId";
+                    var passwordParams = new[] {
+                        new MySqlParameter("@PasswordHash", hashedPassword),
+                        new MySqlParameter("@UserId", loggedInUserId)
+                    };
+                    await _dbHelper.ExecuteNonQueryAsync(updatePasswordQuery, passwordParams);
+                }
+
+                return Ok(new { message = "A profil adatainak frissítése sikeres!" });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "Hiba történt a profil frissítése közben.", details = ex.Message });
+            }
+        }
+
+        [HttpPut("company-settings")]
+        public async Task<IActionResult> UpdateOrganizationCompanySettings([FromBody] UpdateOrganizationCompanyRequest request)
+        {
+            if (string.IsNullOrEmpty(request.Name) &&
+                string.IsNullOrEmpty(request.Address) &&
+                string.IsNullOrEmpty(request.ContactEmail) &&
+                string.IsNullOrEmpty(request.ContactPhone))
+            {
+                return BadRequest(new { message = "Legalább egy mezőt meg kell változtatni." });
+            }
+
+            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
+            if (userIdClaim == null)
+            {
+                return Unauthorized(new { message = "User is not authenticated." });
+            }
+
+            if (!int.TryParse(userIdClaim.Value, out int loggedInUserId))
+            {
+                return BadRequest(new { message = "Érvénytelen felhasználói azonosító." });
+            }
+
+            try
+            {
+                // Lekérdezzük az aktuális adatokat
+                const string selectQuery = @"
+            SELECT o.Id, o.Name, o.Address, o.ContactEmail, o.ContactPhone 
+            FROM Organizations o
+            INNER JOIN Users u ON u.OrganizationId = o.Id
+            WHERE u.Id = @UserId";
+
+                var parameters = new[] { new MySqlParameter("@UserId", loggedInUserId) };
+                var currentData = await _dbHelper.ExecuteQueryAsync(selectQuery, parameters);
+
+                if (currentData.Rows.Count == 0)
+                {
+                    return NotFound(new { message = "Szervezet nem található!" });
+                }
+
+                // Az aktuális adatok beolvasása
+                var currentRow = currentData.Rows[0];
+                string currentName = currentRow["Name"]?.ToString() ?? "";
+                string currentAddress = currentRow["Address"]?.ToString() ?? "";
+                string currentEmail = currentRow["ContactEmail"]?.ToString() ?? "";
+                string currentPhone = currentRow["ContactPhone"]?.ToString() ?? "";
+
+                // Ellenőrizzük, hogy történt-e változás
+                bool hasChanges = false;
+                List<string> updateFields = new List<string>();
+                List<MySqlParameter> updateParams = new List<MySqlParameter>();
+
+                if (!string.IsNullOrEmpty(request.Name) && request.Name != currentName)
+                {
+                    updateFields.Add("Name = @Name");
+                    updateParams.Add(new MySqlParameter("@Name", request.Name));
+                    hasChanges = true;
+                }
+                if (!string.IsNullOrEmpty(request.Address) && request.Address != currentAddress)
+                {
+                    updateFields.Add("Address = @Address");
+                    updateParams.Add(new MySqlParameter("@Address", request.Address));
+                    hasChanges = true;
+                }
+                if (!string.IsNullOrEmpty(request.ContactEmail) && request.ContactEmail != currentEmail)
+                {
+                    updateFields.Add("ContactEmail = @ContactEmail");
+                    updateParams.Add(new MySqlParameter("@ContactEmail", request.ContactEmail));
+                    hasChanges = true;
+                }
+                if (!string.IsNullOrEmpty(request.ContactPhone) && request.ContactPhone != currentPhone)
+                {
+                    updateFields.Add("ContactPhone = @ContactPhone");
+                    updateParams.Add(new MySqlParameter("@ContactPhone", request.ContactPhone));
+                    hasChanges = true;
+                }
+                if (!hasChanges)
+                {
+                    return Ok(new { message = "Nem történt változás, nincs szükség frissítésre." });
+                }
+                string updateQuery = $"UPDATE Organizations SET {string.Join(", ", updateFields)} WHERE Id = @OrgId";
+                updateParams.Add(new MySqlParameter("@OrgId", currentRow["Id"]));
+
+                await _dbHelper.ExecuteNonQueryAsync(updateQuery, updateParams.ToArray());
+
+                return Ok(new { message = "A szervezet adatai sikeresen frissültek!" });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "Hiba történt a céges adatok frissítése közben.", details = ex.Message });
+            }
+        }
+
+
         private void SendEmail(string toEmail, string plainPassword, string name)
         {
             try
@@ -714,6 +875,18 @@ namespace StudentHiveServer.Controllers
             public string FirstName { get; set; }
             public string LastName { get; set; }
             public string NewAgentEmail { get; set; }
+        }
+        public class UpdateOrganizationProfileRequest
+        {
+            public string? Password { get; set; }
+            public string? Email { get; set; }
+        }
+        public class UpdateOrganizationCompanyRequest
+        {
+            public string? Name { get; set; }
+            public string? Address { get; set; }
+            public string? ContactEmail { get; set; }
+            public string? ContactPhone { get; set; }
         }
         public class JobRequest
         {
