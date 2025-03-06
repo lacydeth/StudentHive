@@ -238,6 +238,123 @@ namespace StudentHiveServer.Controllers
                 return StatusCode(500, new { message = "Belső hiba: " + ex.Message });
             }
         }
+        [HttpGet("list-user-shifts/date/{date}")]
+        public async Task<IActionResult> GetUserShiftsByDate(string date)
+        {
+            try
+            {
+                var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+                if (string.IsNullOrEmpty(userId))
+                {
+                    return Unauthorized(new { message = "Felhasználó azonosítása sikertelen." });
+                }
+
+                DateTime selectedDate = DateTime.Parse(date);
+
+                string query = @"SELECT s.Id, s.ShiftStart, s.ShiftEnd, j.Title, us.Approved, j.Id AS JobId
+                                FROM Shifts s
+                                INNER JOIN Jobs j ON s.JobId = j.Id
+                                INNER JOIN StudentShifts us ON s.Id = us.ShiftId
+                                WHERE us.StudentId = @UserId AND DATE(s.ShiftStart) = @SelectedDate
+                                ORDER BY s.ShiftStart";
+
+                var parameters = new MySqlParameter[]
+                {
+                    new MySqlParameter("@UserId", userId),
+                    new MySqlParameter("@SelectedDate", selectedDate.ToString("yyyy-MM-dd"))
+                };
+
+                var result = await _dbHelper.ExecuteQueryAsync(query, parameters);
+
+                if (result.Rows.Count == 0)
+                {
+                    return Ok(new List<object>()); // Return empty array instead of 404
+                }
+
+                var shifts = new List<object>();
+                foreach (DataRow row in result.Rows)
+                {
+
+                    shifts.Add(new
+                    {
+                        id = row["Id"].ToString(),
+                        title = row["Title"].ToString(),
+                        shiftStart = ((DateTime)row["ShiftStart"]).ToString("yyyy-MM-dd HH:mm"),
+                        shiftEnd = ((DateTime)row["ShiftEnd"]).ToString("yyyy-MM-dd HH:mm"),
+                        approvedStatus = Convert.ToInt32(row["Approved"]),
+                        jobId = row["JobId"].ToString()
+                    });
+                }
+
+                return Ok(shifts);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "Hiba a lekérdezés közben: " + ex.Message });
+            }
+        }
+
+        [HttpDelete("delete-shift/{shiftId}")]
+        public async Task<IActionResult> DeleteUserShift(string shiftId)
+        {
+            try
+            {
+                var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+                if (string.IsNullOrEmpty(userId))
+                {
+                    return Unauthorized(new { message = "Felhasználó azonosítása sikertelen." });
+                }
+
+                string checkQuery = @"SELECT s.ShiftStart 
+                                    FROM Shifts s 
+                                    INNER JOIN UserShifts us ON s.Id = us.ShiftId 
+                                    WHERE s.Id = @ShiftId AND us.UserId = @UserId";
+
+                var checkParams = new MySqlParameter[]
+                {
+                    new MySqlParameter("@ShiftId", shiftId),
+                    new MySqlParameter("@UserId", userId)
+                };
+
+                var checkResult = await _dbHelper.ExecuteQueryAsync(checkQuery, checkParams);
+
+                if (checkResult.Rows.Count == 0)
+                {
+                    return NotFound(new { message = "A műszak nem található vagy nem tartozik ehhez a felhasználóhoz." });
+                }
+
+                DateTime shiftStart = (DateTime)checkResult.Rows[0]["ShiftStart"];
+                TimeSpan timeUntilShift = shiftStart - DateTime.Now;
+
+                if (timeUntilShift.TotalHours < 12)
+                {
+                    return BadRequest(new { message = "A műszak nem törölhető, mert kevesebb mint 12 óra van a kezdetéig." });
+                }
+
+                string deleteQuery = "DELETE FROM UserShifts WHERE ShiftId = @ShiftId AND UserId = @UserId";
+
+                var deleteParams = new MySqlParameter[]
+                {
+                    new MySqlParameter("@ShiftId", shiftId),
+                    new MySqlParameter("@UserId", userId)
+                };
+
+                int rowsAffected = await _dbHelper.ExecuteNonQueryAsync(deleteQuery, deleteParams);
+
+                if (rowsAffected > 0)
+                {
+                    return Ok(new { message = "Műszak sikeresen törölve." });
+                }
+                else
+                {
+                    return StatusCode(500, new { message = "Hiba történt a műszak törlése közben." });
+                }
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "Hiba a lekérdezés közben: " + ex.Message });
+            }
+        }
         [HttpGet("list-shifts/{jobId}/date/{date}")]
         public async Task<IActionResult> GetShiftsForJobByDate(int jobId, string date)
         {
