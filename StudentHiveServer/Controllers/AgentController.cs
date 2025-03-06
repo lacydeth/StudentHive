@@ -5,6 +5,7 @@ using System.Data;
 using System.Net.Mail;
 using System.Net;
 using System.Security.Claims;
+using static StudentHiveServer.Controllers.AdminController;
 
 namespace StudentHiveServer.Controllers
 {
