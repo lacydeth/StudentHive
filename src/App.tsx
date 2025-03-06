@@ -34,6 +34,8 @@ import 'react-toastify/dist/ReactToastify.css';
 import UserProfile from './features/UserDashboard/UserProfile/UserProfile';
 import UserJobs from './features/UserDashboard/UserJobs/UserJobs';
 import UserShiftPage from './components/UserShiftPage/UserShiftPage';
+import ShiftApplications from './components/ShiftApplications/ShiftApplications';
+import UserApplications from './features/UserDashboard/UserApplications/UserApplications';
 
 const App = () => {
   useEffect(() => {
@@ -82,6 +84,14 @@ const App = () => {
             element={
               <ProtectedRoute allowedRoles={["User"]}>
                 <UserShiftPage/>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path={routes.userApplications.path}
+            element={
+              <ProtectedRoute allowedRoles={["User"]}>
+                <UserApplications/>
               </ProtectedRoute>
             }
           />
@@ -220,6 +230,14 @@ const App = () => {
             element={
               <ProtectedRoute allowedRoles={["Agent"]}>
                 <AgentJobs/>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path={routes.shiftApplications.path}
+            element={
+              <ProtectedRoute allowedRoles={["Agent"]}>
+                <ShiftApplications/>
               </ProtectedRoute>
             }
           />

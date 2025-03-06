@@ -62,7 +62,7 @@ const UserNavbar = () => {
             </Link>
           </li>
           <li>
-            <Link to={routes.worksPage.path} className="btn" onClick={closeMenu}>
+            <Link to={routes.userApplications.path} className="btn" onClick={closeMenu}>
               Jelentkezéseim
             </Link>
           </li>

@@ -18,12 +18,14 @@ export const routes = {
     orgSettings: { path: '/organization-settings', title: 'Organization Settings' },
     agentPage: { path: '/agent', title: 'Agent Dashboard' },
     agentStudentList: {path: '/agent-student-list', title: 'Agent Student List'},
+    shiftApplications: {path: '/shift-applications/:id', title: 'Shift Applications'},
     studentApplications: { path: '/applications', title: 'Student Applications'},
     agentSettings: { path: '/agent-settings', title: 'Agent Settings'},
     agentJobs: { path: '/agent-jobs', title: 'Agent Jobs'},
     adminSettings: { path: '/admin-settings', title: 'Admin Settings'},
     workPage: { path: '/works/:id', title: 'Work page'},
     shiftPage: { path: '/shift/:id', title: 'Shift page'},
+    userApplications: { path: '/user-applications', title: 'User Applications'},
     manageShiftsPage: { path: '/manage-shifts/:id', title: 'Manage shifts page'}
 };
 

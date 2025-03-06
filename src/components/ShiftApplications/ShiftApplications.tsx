@@ -1,7 +1,4 @@
-import DashboardTitle from "../../../components/DashboardTitle/DashboardTitle";
-import Sidebar from "../../../components/Sidebar/Sidebar";
-import { agentMenuLinks } from "../../../utils/routes";
-import styles from "./StudentApplications.module.css";
+import styles from "./ShiftApplications.module.css";
 import { useEffect, useMemo, useRef, useState } from "react";
 import "ag-grid-community/styles/ag-grid.css";
 import "ag-grid-community/styles/ag-theme-alpine.css";
@@ -12,61 +9,85 @@ import {
   ValidationModule
 } from "ag-grid-community";
 import axios from "axios";
-import Title from "../../../components/Title/Title";
 import { AgGridReact } from "ag-grid-react";
-import { getUserIdFromToken } from "../../../utils/authUtils";
 import { confirmAlert } from "react-confirm-alert"; 
 import "react-confirm-alert/src/react-confirm-alert.css";
+import DashboardTitle from "../DashboardTitle/DashboardTitle";
+import Sidebar from "../Sidebar/Sidebar";
+import Title from "../Title/Title";
+import { agentMenuLinks } from "../../utils/routes";
+import { useParams } from "react-router-dom";
 
 ModuleRegistry.registerModules([
   ClientSideRowModelModule,
   PaginationModule,
   ValidationModule
 ]);
+type ShiftApplicationParams = {
+    status?: string;
+    shiftStartFilter?: string;
+}
 
-const StudentApplications = () => {
+const ShiftApplications = () => {
+  const { id } = useParams();
   const [isSidebarOpen, setIsSidebarOpen] = useState(window.innerWidth >= 1000);
   const [rowData, setRowData] = useState<any[]>([]);
-  const [works, setWorks] = useState([]);
-  const [selectedWork, setSelectedWork] = useState("");
   const [selectedStatus, setSelectedStatus] = useState("");
+  const [jobTitle, setJobTitle] = useState<string | null>(null);
+  const [shiftStarts, setShiftStarts] = useState<Date[]>([]);
+  const [selectedShiftStart, setSelectedShiftStart] = useState<string | null>(null);
   const gridRef = useRef<AgGridReact<any>>(null);
 
   const handleToggleSidebar = () => {
     setIsSidebarOpen(!isSidebarOpen);
   };
 
-  const fetchApplications = async (title: string, status: string) => {
-    const agentId = getUserIdFromToken();
-    let url = `https://localhost:7067/api/agent/applications?agentId=${agentId}`;
+  const fetchApplications = async (status: string, shiftStartFilter?: Date) => {
+    const url = `https://localhost:7067/api/agent/shift-applications/${id}`;
 
-    if (title) url += `&title=${title}`;
-    if (status) url += `&status=${status}`;
+    const params: ShiftApplicationParams = {};
+    if (status) params.status = status;
+    if (shiftStartFilter) params.shiftStartFilter = shiftStartFilter.toLocaleString("hu-HU", { timeZone: "Europe/Budapest" });
 
     try {
-      const response = await axios.get(url);
+      const response = await axios.get(url, {
+        params,
+        headers: {"Authorization": `Bearer ${localStorage.getItem("token")}`}
+      });
       setRowData(response.data);
     } catch (error) {
       console.error("Error fetching applications:", error);
     }
   };
 
-  const fetchWorkTitles = async () => {
+  const fetchShiftStarts = async () => {
     try {
-      const response = await axios.get("https://localhost:7067/api/agent/work-titles");
-      setWorks(response.data);
+      const response = await axios.get(`https://localhost:7067/api/agent/shift-starts/${id}`, {
+        headers: {"Authorization": `Bearer ${localStorage.getItem("token")}`}
+      });
+      setShiftStarts(response.data);
     } catch (error) {
-      console.error("Error fetching locations:", error);
+      console.error("Error fetching shift starts:", error);
+    }
+  };
+
+  const fetchJobTitle = async () => {
+    try {
+      const response = await axios.get(`https://localhost:7067/api/agent/job-title/${id}`);
+      setJobTitle(response.data.length > 0 ? response.data[0].title : "Nincs adat");
+    } catch (error) {
+      console.error("Hiba a betöltés során:", error);
+      setJobTitle("Hiba történt");
     }
   };
 
   useEffect(() => {
-    fetchWorkTitles();
-  }, []);
-
-  useEffect(() => {
-    fetchApplications(selectedWork, selectedStatus);
-  }, [selectedWork, selectedStatus]);
+    if (id) {
+      fetchJobTitle();
+      fetchShiftStarts();
+      fetchApplications(selectedStatus, selectedShiftStart);
+    }
+  }, [id, selectedStatus, selectedShiftStart]);
 
   const confirmAction = (message: string, onConfirm: () => void) => {
     confirmAlert({
@@ -87,10 +108,19 @@ const StudentApplications = () => {
   const handleAccept = async (applicationId: number) => {
     confirmAction("Biztosan elfogadod ezt a jelentkezést?", async () => {
       try {
-        await axios.patch(`https://localhost:7067/api/agent/applications/${applicationId}/accept`);
+        await axios.patch(
+            `https://localhost:7067/api/agent/shift-applications/${applicationId}/accept`,
+            {},
+            {
+              headers: {
+                "Authorization": `Bearer ${localStorage.getItem("token")}`
+              }
+            }
+          );
+          
         setRowData((prev) =>
           prev.map((app) =>
-            app.applicationId === applicationId ? { ...app, status: 1 } : app
+            app.applicationId === applicationId ? { ...app, approvedStatus: 1 } : app
           )
         );
       } catch (error) {
@@ -102,10 +132,19 @@ const StudentApplications = () => {
   const handleDecline = async (applicationId: number) => {
     confirmAction("Biztosan elutasítod ezt a jelentkezést?", async () => {
       try {
-        await axios.patch(`https://localhost:7067/api/agent/applications/${applicationId}/decline`);
+        await axios.patch(
+            `https://localhost:7067/api/agent/shift-applications/${applicationId}/decline`,
+            {}, 
+            {
+              headers: {
+                "Authorization": `Bearer ${localStorage.getItem("token")}`
+              }
+            }
+          );
+          
         setRowData((prev) =>
           prev.map((app) =>
-            app.applicationId === applicationId ? { ...app, status: 2 } : app
+            app.applicationId === applicationId ? { ...app, approvedStatus: 2 } : app
           )
         );
       } catch (error) {
@@ -115,7 +154,7 @@ const StudentApplications = () => {
   };
 
   const actionCellRenderer = (params: any) => {
-    if (params.data.status === 1 || params.data.status === 2) {
+    if (params.data.approvedStatus === 1 || params.data.approvedStatus === 2) {
       return null;
     }
   
@@ -132,7 +171,7 @@ const StudentApplications = () => {
   };
   
 
-  const statusFormatter = (params: any) => {
+  const statusFormatter = (params: { value: 0 | 1 | 2 }) => {
     if (params.value === 0) return "Válaszra vár";
     if (params.value === 1) return "Elfogadva";
     if (params.value === 2) return "Elutasítva";
@@ -144,31 +183,34 @@ const StudentApplications = () => {
       { field: "applicationId", headerName: "Azonosító", flex: 0.5, minWidth: 80 },
       { field: "studentName", headerName: "Diák neve", flex: 1, minWidth: 150 },
       { field: "jobTitle", headerName: "Pozíció", flex: 1, minWidth: 180 },
-      { field: "organization", headerName: "Iskolaszövetkezet", flex: 1, minWidth: 180 },
-      { field: "status", headerName: "Státusz", flex: 0.8, minWidth: 120, valueFormatter: statusFormatter },
-      { field: "appliedDate", headerName: "Jelentkezés dátuma", flex: 1, minWidth: 150 },
+      { field: "shiftStart", headerName: "Műszak kezdete", flex: 1, minWidth: 180 },
+      { field: "shiftEnd", headerName: "Műszak vége", flex: 1, minWidth: 180 },
+      { field: "approvedStatus", headerName: "Státusz", flex: 0.8, minWidth: 120, valueFormatter: statusFormatter },
       { headerName: "Műveletek", field: "actions", cellRenderer: actionCellRenderer, width: 150 },
     ],
     []
   );
-
+  const handleShiftStartChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const selectedValue = e.target.value;
+    setSelectedShiftStart(selectedValue || null);
+  };
   return (
     <div className={styles.container}>
       <Sidebar isOpen={isSidebarOpen} toggleSidebar={handleToggleSidebar} topLinks={agentMenuLinks} />
       <div className={`${styles.content} ${isSidebarOpen ? styles.sidebarOpen : styles.sidebarClosed}`}>
-        <DashboardTitle title="Jelentkezések" icon="./resume.png" subTitle="Jelentkezések" />
+        <DashboardTitle title="Műszak jelentkezések" icon="/resume.png" subTitle={jobTitle || "Betöltés..."} />
         <div className={styles.applicationsContent}>
-          <Title subTitle="Munka jelentkezések" title="Tekintsd meg az elfogadásra váró jelentkezéseket!" />
+          <Title subTitle="Műszak jelentkezések" title="Tekintsd meg az elfogadásra váró jelentkezéseket!" />
           <div className={styles.filters}>
             <div className={styles.inputBox}>
-              <select value={selectedWork} onChange={(e) => setSelectedWork(e.target.value)}>
-                <option value="">Pozíció</option>
-                {works.map((work: { id: number; title: string }) => (
-                  <option key={work.id} value={work.title}>
-                    {work.title}
-                  </option>
-                ))}
-              </select>
+                <select value={selectedShiftStart || ""} onChange={handleShiftStartChange}>
+                    <option value="">Műszak kezdete</option>
+                    {shiftStarts.map((shiftStart, idx) => (
+                    <option key={idx} value={shiftStart.toLocaleString("hu-HU", { timeZone: "Europe/Budapest" })}>
+                        {shiftStart.toLocaleString("hu-HU", { timeZone: "Europe/Budapest" })}
+                    </option>
+                    ))}
+                </select>
             </div>
             <div className={styles.inputBox}>
               <select value={selectedStatus} onChange={(e) => setSelectedStatus(e.target.value)}>
@@ -197,4 +239,4 @@ const StudentApplications = () => {
   );
 };
 
-export default StudentApplications;
+export default ShiftApplications;
