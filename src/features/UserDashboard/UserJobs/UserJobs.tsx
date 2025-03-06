@@ -72,9 +72,9 @@ const UserJobs = () => {
         <div className={styles.manageShifts}>
           <div className={styles.details}>
             <h2>Műszakok kezelése</h2>
-            <p>Minden felvett műszakod egy helyen. Vess egy pillantást elfogadták-e azokat vagy akár mondd vissza, ha 12 órán kívül vagy.</p>
+            <p>Minden felvett műszakod egy helyen. Vess egy pillantást elfogadták-e vagy akár mondd vissza, ha több, mint 12 óra van hátra a kezdetéig.</p>
           </div>
-          <Link className={styles.shiftBtn} to={routes.worksPage.path}>Műszakjaim</Link>
+          <Link className={styles.shiftBtn} to={routes.userShifts.path}>Műszakjaim</Link>
         </div>
       </div>
     </div>

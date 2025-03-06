@@ -36,6 +36,7 @@ import UserJobs from './features/UserDashboard/UserJobs/UserJobs';
 import UserShiftPage from './components/UserShiftPage/UserShiftPage';
 import ShiftApplications from './components/ShiftApplications/ShiftApplications';
 import UserApplications from './features/UserDashboard/UserApplications/UserApplications';
+import UserManageShifts from './features/UserDashboard/UserManageShifts/UserManageShifts';
 
 const App = () => {
   useEffect(() => {
@@ -60,6 +61,14 @@ const App = () => {
             element={
               <ProtectedRoute allowedRoles={["User"]}>
                 <UserDashboard />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path={routes.userShifts.path}
+            element={
+              <ProtectedRoute allowedRoles={["User"]}>
+                <UserManageShifts />
               </ProtectedRoute>
             }
           />

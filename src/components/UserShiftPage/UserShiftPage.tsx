@@ -3,11 +3,9 @@ import styles from "./UserShiftPage.module.css";
 import { useState, useEffect } from "react";
 import Calendar from "react-calendar";
 import "react-calendar/dist/Calendar.css";
-import "./calendar-custom.css";
 import { useParams } from "react-router-dom";
 import axios from "axios";
 import { Value } from "react-calendar/src/shared/types.js";
-import { getUserIdFromToken } from "../../utils/authUtils";
 import { toast } from "react-toastify";
 
 type ShiftCardProps = {

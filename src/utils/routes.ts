@@ -23,10 +23,11 @@ export const routes = {
     agentSettings: { path: '/agent-settings', title: 'Agent Settings'},
     agentJobs: { path: '/agent-jobs', title: 'Agent Jobs'},
     adminSettings: { path: '/admin-settings', title: 'Admin Settings'},
-    workPage: { path: '/works/:id', title: 'Work page'},
-    shiftPage: { path: '/shift/:id', title: 'Shift page'},
+    workPage: { path: '/works/:id', title: 'Work Page'},
+    shiftPage: { path: '/shift/:id', title: 'Shift Page'},
     userApplications: { path: '/user-applications', title: 'User Applications'},
-    manageShiftsPage: { path: '/manage-shifts/:id', title: 'Manage shifts page'}
+    manageShiftsPage: { path: '/manage-shifts/:id', title: 'Manage Shifts'},
+    userShifts: {path: '/user-shifts', title: 'User Shifts'}
 };
 
 export const adminTopLinks = [
