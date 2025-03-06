@@ -132,7 +132,7 @@ const StudentApplications = () => {
   };
   
 
-  const statusFormatter = (params: any) => {
+  const statusFormatter = (params: { value: 0 | 1 | 2 }) => {
     if (params.value === 0) return "Válaszra vár";
     if (params.value === 1) return "Elfogadva";
     if (params.value === 2) return "Elutasítva";

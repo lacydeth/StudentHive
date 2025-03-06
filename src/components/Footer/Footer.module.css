@@ -1,5 +1,5 @@
 .footer {
-  background-color: #4d4d4d;
+  background: #404040;
   color: #ffffff;
   padding: 2rem 1rem;
   margin-top: auto;
@@ -62,7 +62,7 @@
   display: flex;
   align-items: center;
   gap: 15px;
-  color: #ffffff;
+  color: #cccccc;
   font-size: 0.9rem;
   transition: color 0.3s ease;
   cursor: pointer;
@@ -87,7 +87,6 @@
   margin: 0;
 }
 
-/* Responsive Design */
 @media (min-width: 768px) {
   .footerContent {
     flex-direction: row;

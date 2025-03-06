@@ -86,6 +86,48 @@
 .pagination span {
     margin: 0 10px;
 }
+.underline {
+    color: var(--black);
+    text-decoration-thickness: 2px;
+    text-decoration-color: var(--smoothGreen);
+}
+.manageShifts {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+    background: #fff;
+    border-left: 4px solid var(--smoothGreen);
+    padding: 10px 15px;
+    border-radius: 8px;
+    width: 90vw;
+    height: 150px;
+    text-align: center;
+    margin-bottom: 25px;
+}
+.manageShifts .details {
+    max-width: 300px;
+}
+.details h2 {
+    font-size: 1.2rem;
+    color: #303030;
+}
+.details p {
+    color: #303030;
+}
+.manageShifts .shiftBtn {
+    background: var(--smoothGreen);
+    padding: 10px 15px;
+    border-radius: 8px;
+    color: #fff;
+    text-decoration: none;
+    transition: all 0.4s ease;
+    text-transform: uppercase;
+    font-weight: 500;
+}
+.shiftBtn:hover {
+    background: var(--hoverGreen);
+}
 @media screen and (min-width: 768px) {
     .container {
         background: url("/blob.svg");
@@ -93,12 +135,21 @@
         background-position: center;
     }
     .content {
-        padding-top: 10%;
+        padding-top: 8%;
     }
     .cardHolder {
         flex-direction: row;
         flex-wrap: wrap;
         justify-content: center;
         align-items: center;
+    }
+    .manageShifts {
+        width: 40vw;
+        height: 120px;
+        flex-direction: row;
+        text-align: unset;
+    }
+    .manageShifts .details {
+        max-width: 500px;
     }
 }

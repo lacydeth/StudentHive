@@ -3,6 +3,8 @@ import UserCard, { UserCardProps } from "../../../components/UserCard/UserCard";
 import UserNavbar from "../../../components/UserNavbar/UserNavbar";
 import styles from "./UserJobs.module.css";
 import axios from "axios";
+import { Link } from "react-router-dom";
+import { routes } from "../../../utils/routes";
 
 const UserJobs = () => {
   const [jobs, setJobs] = useState<UserCardProps[]>([]);
@@ -53,7 +55,7 @@ const UserJobs = () => {
           {currentJobs.length > 0 ? (
             currentJobs.map((job) => <UserCard key={job.jobId} {...job} />)
           ) : (
-            <p>Nincs munka amire felvettek. Kezdj neki a keresésnek.</p>
+            <p>Nincs munka amire felvettek. <Link to={routes.worksPage.path} className={styles.underline}>Kezdj neki a keresésnek.</Link></p>
           )}
         </div>
         <div className={styles.pagination}>
@@ -66,6 +68,13 @@ const UserJobs = () => {
           <button onClick={nextPage} disabled={currentPage === totalPages || totalPages === 0}>
             Következő
           </button>
+        </div>
+        <div className={styles.manageShifts}>
+          <div className={styles.details}>
+            <h2>Műszakok kezelése</h2>
+            <p>Minden felvett műszakod egy helyen. Vess egy pillantást elfogadták-e azokat vagy akár mondd vissza, ha 12 órán kívül vagy.</p>
+          </div>
+          <Link className={styles.shiftBtn} to={routes.worksPage.path}>Műszakjaim</Link>
         </div>
       </div>
     </div>
