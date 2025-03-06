@@ -39,7 +39,7 @@ export const orgMenuLinks = [
   { path: routes.orgCurrentAgent.path, icon: "./people.png", label: "Meglévő közvetítők" },
   { path: routes.addNewJob.path, icon: "./more.png", label: "Munka létrehozása" },
   { path: routes.currentJobs.path, icon: "./job.png", label: "Létrehozott munkák" },
-  { path: routes.orgSettings.path, icon: "./settings.png", label: "Beállítások" }
+  { path: routes.orgSettings.path, icon: "./settings.png", label: "Beállítások" },
 ];  
 export const agentMenuLinks = [
   { path: routes.agentPage.path, icon: "/dashboard.png", label: "Kezelőpult"},
