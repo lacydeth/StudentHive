@@ -16,20 +16,19 @@ namespace StudentHiveServer.Controllers
             _dbHelper = new DatabaseHelper(configuration.GetConnectionString("DefaultConnection"));
         }
 
-        // GET: minden elérhető munka kilistázása - public
         [HttpGet("workcards")]
         public async Task<IActionResult> GetWorkCards([FromQuery] string? search, [FromQuery] int? categoryId, [FromQuery] string? city)
         {
             var query = @"SELECT 
-                            j.Id,
-                            j.Title, 
-                            j.HourlyRate, 
-                            j.City, 
-                            c.CategoryName, 
-                            c.ImagePath 
-                          FROM Jobs j
-                          JOIN Categories c ON j.CategoryId = c.Id
-                          WHERE j.IsActive = 1";
+                    j.Id,
+                    j.Title, 
+                    j.HourlyRate, 
+                    j.City, 
+                    c.CategoryName, 
+                    c.ImagePath 
+                  FROM Jobs j
+                  JOIN Categories c ON j.CategoryId = c.Id
+                  WHERE j.IsActive = 1 AND j.AgentId IS NOT NULL";
 
             var parameters = new List<MySqlParameter>();
 
@@ -93,7 +92,7 @@ namespace StudentHiveServer.Controllers
                                 FROM Jobs j
                                 JOIN Categories c ON j.CategoryId = c.Id
                                 LEFT JOIN Description d ON j.DescriptionId = d.Id
-                                WHERE j.Id = @Id;";
+                                WHERE j.Id = @Id";
 
             try
             {

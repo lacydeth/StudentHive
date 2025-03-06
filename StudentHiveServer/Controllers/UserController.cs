@@ -71,6 +71,87 @@ namespace StudentHiveServer.Controllers
             }
             return Ok(jobs);
         }
+        [HttpGet("user-applications")]
+        public async Task<IActionResult> GetUserApplications()
+        {
+            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
+            if (userIdClaim == null)
+            {
+                return Unauthorized(new { message = "A felhasználói azonosítás sikertelen!" });
+            }
+            var loggedInUserId = userIdClaim.Value;
+            string query = @"SELECT 
+                                a.Id,
+                                j.Title,
+                                a.AppliedAt,
+                                a.Status
+                            FROM Applications a
+                            JOIN Jobs j ON a.JobId = j.Id
+                            WHERE a.StudentId = @Id";
+            var parameters = new MySqlParameter[]
+            {
+                new MySqlParameter("@Id", loggedInUserId),
+            };
+            var result = await _dbHelper.ExecuteQueryAsync(query, parameters);
+            if (result.Rows.Count == 0)
+            {
+                return NotFound(new { message = "Nem található jelentkezés." });
+            }
+            var applications = new List<object>();
+            foreach (DataRow row in result.Rows)
+            {
+                applications.Add(new
+                {
+                    Id = row["Id"],
+                    Title = row["Title"],
+                    AppliedAt = ((DateTime)row["AppliedAt"]).ToString("yyyy-MM-dd HH:mm"),
+                    Status = row["Status"]
+                });
+            }
+            return Ok(applications);
+        }
+        [HttpDelete("delete-application/{applicationId}")]
+        public async Task<IActionResult> DeleteApplication(int applicationId)
+        {
+
+            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
+            if (userIdClaim == null)
+            {
+                return Unauthorized(new { message = "A felhasználói azonosítás sikertelen!" });
+            }
+
+            string checkQuery = "SELECT StudentId FROM Applications WHERE Id = @Id";
+            var checkParameters = new MySqlParameter[]
+            {
+                new MySqlParameter("@Id", applicationId)
+            };
+            var checkResult = await _dbHelper.ExecuteQueryAsync(checkQuery, checkParameters);
+
+            if (checkResult.Rows.Count == 0)
+            {
+                return NotFound(new { message = "Jelentkezés nem található!" });
+            }
+
+            var applicationUserId = checkResult.Rows[0]["StudentId"].ToString();
+            if (applicationUserId != userIdClaim.Value)
+            {
+                return Unauthorized(new { message = "Nincs jogosultságod a jelentkezés törléséhez!" });
+            }
+
+            string deleteQuery = "DELETE FROM Applications WHERE Id = @Id";
+            var deleteParameters = new MySqlParameter[]
+            {
+                new MySqlParameter("@Id", applicationId)
+            };
+            int rowsAffected = await _dbHelper.ExecuteNonQueryAsync(deleteQuery, deleteParameters);
+
+            if (rowsAffected == 0)
+            {
+                return NotFound(new { message = "Jelentkezés nem található!" });
+            }
+
+            return Ok(new { message = "Jelentkezés sikeresen törölve!" });
+        }
         //GET: felhasználói profil nevének lekérése - protected
         [HttpGet("profile")]
         public async Task<IActionResult> GetProfileName()
