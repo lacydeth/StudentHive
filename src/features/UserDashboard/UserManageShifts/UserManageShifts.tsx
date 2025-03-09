@@ -5,83 +5,14 @@ import axios from "axios";
 import { Value } from "react-calendar/src/shared/types.js";
 import { toast } from "react-toastify";
 import { useState, useEffect } from "react";
+import UserShiftCard, { ShiftProps } from "../../../components/UserShiftCard/UserShiftCard";
 
-interface ShiftProps {
-  id: string;
-  title: string;
-  shiftStart: string;
-  shiftEnd: string;
-  approvedStatus: number;
-  jobId: string;
-}
-
-const ShiftCard = ({ id, title, shiftStart, shiftEnd, approvedStatus, onDelete }: ShiftProps & { onDelete: (id: string) => void }) => {
-  const formatDateTime = (dateTimeStr: string) => {
-    const date = new Date(dateTimeStr);
-    return date.toLocaleString("hu-HU", {
-      year: "numeric",
-      month: "2-digit",
-      day: "2-digit",
-      hour: "2-digit",
-      minute: "2-digit"
-    });
-  };
-
-  const getStatusText = (status: number) => {
-    switch (status) {
-      case 0:
-        return "Függőben";
-      case 1:
-        return "Elfogadva";
-      case 2:
-        return "Elutasítva";
-      default:
-        return "Ismeretlen";
-    }
-  };
-
-  const getStatusColor = (status: number) => {
-    switch (status) {
-      case 0:
-        return styles.statusPending;
-      case 1:
-        return styles.statusApproved;
-      case 2:
-        return styles.statusRejected;
-      default:
-        return "";
-    }
-  };
-
-  return (
-    <div className={styles.shiftCard}>
-      <h3>{title}</h3>
-      <div className={styles.shiftDetails}>
-        <p><strong>Kezdés:</strong> {formatDateTime(shiftStart)}</p>
-        <p><strong>Befejezés:</strong> {formatDateTime(shiftEnd)}</p>
-        <p>
-          <strong>Állapot:</strong> 
-          <span className={getStatusColor(approvedStatus)}>
-            {getStatusText(approvedStatus)}
-          </span>
-        </p>
-      </div>
-      <button 
-        className={styles.deleteButton} 
-        onClick={() => onDelete(id)}
-        disabled={approvedStatus === 1 || new Date(shiftStart).getTime() - new Date().getTime() < 12 * 60 * 60 * 1000}
-      >
-        Törlés
-      </button>
-    </div>
-  );
-};
 
 const UserManageShifts = () => {
     const [date, setDate] = useState<Date>(new Date());
     const [shifts, setShifts] = useState<ShiftProps[]>([]);
     const [currentPage, setCurrentPage] = useState(1);
-    const shiftsPerPage = 3;
+    const shiftsPerPage = 2;
 
     const fetchShifts = async (selectedDate: Date) => {
       try {
@@ -108,7 +39,7 @@ const UserManageShifts = () => {
       if (value instanceof Date) {
         setDate(value);
         fetchShifts(value);
-        setCurrentPage(1); // Reset to first page when date changes
+        setCurrentPage(1);
       }
     };
 
@@ -158,22 +89,28 @@ const UserManageShifts = () => {
         </div>
         <div className={styles.userShifts}>
           <div className={styles.calendar}>
-            <h2>StudentHive Naptár</h2>
+            <div className={styles.calendarTitle}>
+              <h2>StudentHive Naptár</h2>
+              <p>Válassz egy dátumot a műszakjaid megtekintéséhez!</p>
+
+            </div>
             <Calendar onChange={handleDateChange} value={date} />
           </div>
           <div className={styles.shiftsContainer}>
             <h2>Műszakok: {date.toLocaleDateString("hu-HU")}</h2>
-            {currentShifts.length > 0 ? (
-              currentShifts.map((shift) => (
-                <ShiftCard 
-                  key={shift.id} 
-                  {...shift} 
-                  onDelete={handleDeleteShift} 
-                />
-              ))
-            ) : (
-              <p>Nincs műszak a kiválasztott napon.</p>
-            )}
+            <div className={styles.shiftCards}>
+              {currentShifts.length > 0 ? (
+                currentShifts.map((shift) => (
+                  <UserShiftCard 
+                    key={shift.id} 
+                    {...shift} 
+                    onDelete={handleDeleteShift} 
+                  />
+                ))
+              ) : (
+                <p>Nincs műszak a kiválasztott napon.</p>
+              )}
+            </div>
             {shifts.length > shiftsPerPage && (
               <div className={styles.pagination}>
                 <button onClick={prevPage} disabled={currentPage === 1}>
