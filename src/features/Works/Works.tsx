@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
+import { useLocation } from "react-router-dom";
 import Navbar from "../../components/Navbar/Navbar";
 import WorkCard from "../../components/WorkCard/WorkCard";
 import styles from "./Works.module.css";
@@ -17,15 +18,26 @@ type WorkCardData = {
   createdAt: string;
 };
 
+type CategoryData = {
+  id: number;
+  categoryName: string;
+};
+
+type LocationData = {
+  city: string;
+};
+
 const Works = () => {
+  const location = useLocation();
   const [isMobile, setIsMobile] = useState(false);
   const [showFilters, setShowFilters] = useState(false);
-  const [categories, setCategories] = useState([]);
-  const [locations, setLocations] = useState([]);
+  const [categories, setCategories] = useState<CategoryData[]>([]);
+  const [locations, setLocations] = useState<LocationData[]>([]);
   const [workCards, setWorkCards] = useState<WorkCardData[]>([]);
   const [filteredWorkCards, setFilteredWorkCards] = useState<WorkCardData[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("");
+  const [selectedCategoryId, setSelectedCategoryId] = useState("");
   const [selectedLocation, setSelectedLocation] = useState("");
   const [sortOption, setSortOption] = useState<string>("");
   const [currentPage, setCurrentPage] = useState(1);
@@ -38,18 +50,13 @@ const Works = () => {
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
+  // Fetch categories and locations
   useEffect(() => {
     axios
-      .get("https://localhost:7067/api/general/workcards")
-      .then((response) => {
-        setWorkCards(response.data);
-        setFilteredWorkCards(response.data);
-      })
-      .catch((error) => console.error("Error fetching work cards:", error));
-
-    axios
       .get("https://localhost:7067/api/organization/categories")
-      .then((response) => setCategories(response.data))
+      .then((response) => {
+        setCategories(response.data);
+      })
       .catch((error) => console.error("Error fetching categories:", error));
 
     axios
@@ -58,6 +65,37 @@ const Works = () => {
       .catch((error) => console.error("Error fetching locations:", error));
   }, []);
 
+  // Parse URL query parameters and fetch data accordingly
+  useEffect(() => {
+    const queryParams = new URLSearchParams(location.search);
+    const categoryParam = queryParams.get("category");
+    const locationParam = queryParams.get("location");
+    
+    if (categoryParam) {
+      setSelectedCategoryId(categoryParam);
+    }
+    
+    if (locationParam) {
+      setSelectedLocation(locationParam);
+    }
+    
+    // Fetch work cards with URL parameters
+    fetchWorkCards(categoryParam, locationParam);
+  }, [location.search]);
+
+  // Update selectedCategory when categories are loaded and selectedCategoryId is set
+  useEffect(() => {
+    if (categories.length > 0 && selectedCategoryId) {
+      const categoryObj = categories.find(
+        (cat) => cat.id.toString() === selectedCategoryId
+      );
+      if (categoryObj) {
+        setSelectedCategory(categoryObj.categoryName);
+      }
+    }
+  }, [categories, selectedCategoryId]);
+
+  // Sort workCards when sortOption changes
   useEffect(() => {
     const sortData = [...filteredWorkCards];
 
@@ -81,23 +119,56 @@ const Works = () => {
     setFilteredWorkCards(sortData);
   }, [sortOption]);
 
+  const fetchWorkCards = (categoryId: string | null = null, city: string | null = null) => {
+    const params: any = {};
+    
+    if (categoryId) {
+      params.categoryId = categoryId;
+    }
+    
+    if (city) {
+      params.city = city;
+    }
+    
+    if (searchTerm) {
+      params.search = searchTerm;
+    }
+    
+    axios
+      .get("https://localhost:7067/api/general/workcards", { params })
+      .then((response) => {
+        setWorkCards(response.data);
+        setFilteredWorkCards(response.data);
+      })
+      .catch((error) => console.error("Error fetching work cards:", error));
+  };
+
   const handleSearch = () => {
-    const filtered = workCards.filter((work) => {
-      const matchesTitle = work.title.toLowerCase().includes(searchTerm.toLowerCase());
-      const matchesCategory = selectedCategory ? work.category === selectedCategory : true;
-      const matchesLocation = selectedLocation ? work.location === selectedLocation : true;
-      return matchesTitle && matchesCategory && matchesLocation;
-    });
-    setFilteredWorkCards(filtered);
+    fetchWorkCards(selectedCategoryId, selectedLocation);
     setCurrentPage(1);
+  };
+
+  const handleCategoryChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const categoryName = e.target.value;
+    setSelectedCategory(categoryName);
+    
+    if (categoryName === "") {
+      setSelectedCategoryId("");
+    } else {
+      const category = categories.find(cat => cat.categoryName === categoryName);
+      if (category) {
+        setSelectedCategoryId(category.id.toString());
+      }
+    }
   };
 
   const handleClearFilters = () => {
     setSearchTerm("");
     setSelectedCategory("");
+    setSelectedCategoryId("");
     setSelectedLocation("");
-    setFilteredWorkCards(workCards);
-    setCurrentPage(1); 
+    fetchWorkCards(null, null);
+    setCurrentPage(1);
   };
 
   const indexOfLastShift = currentPage * shiftsPerPage;
@@ -139,9 +210,9 @@ const Works = () => {
                 />
               </div>
               <div className={styles.inputBox}>
-                <select value={selectedCategory} onChange={(e) => setSelectedCategory(e.target.value)}>
+                <select value={selectedCategory} onChange={handleCategoryChange}>
                   <option value="">Kategória</option>
-                  {categories.map((category: { id: number; categoryName: string }) => (
+                  {categories.map((category) => (
                     <option key={category.id} value={category.categoryName}>
                       {category.categoryName}
                     </option>
@@ -151,7 +222,7 @@ const Works = () => {
               <div className={styles.inputBox}>
                 <select value={selectedLocation} onChange={(e) => setSelectedLocation(e.target.value)}>
                   <option value="">Lokáció</option>
-                  {locations.map((location: { city: string }) => (
+                  {locations.map((location) => (
                     <option key={location.city} value={location.city}>
                       {location.city}
                     </option>
@@ -196,7 +267,7 @@ const Works = () => {
             Előző
           </button>
           <span>Oldal {currentPage} / {totalPages}</span>
-          <button onClick={nextPage} disabled={currentPage === totalPages || totalPages == 0}>
+          <button onClick={nextPage} disabled={currentPage === totalPages || totalPages === 0}>
             Következő
           </button>
         </div>

@@ -19,7 +19,7 @@ const Footer = () => {
             <li><Link to={routes.homePage.path} className={styles.link}>Rólunk</Link></li>
             <li><Link to={routes.worksPage.path} className={styles.link}>Munkák</Link></li>
             <li><Link to={routes.homePage.path} className={styles.link}>Adatkezelés</Link></li>
-            <li><Link to={routes.homePage.path} className={styles.link}>Kapcsolat</Link></li>
+            <li><Link to={routes.contactPage.path} className={styles.link}>Kapcsolat</Link></li>
           </ul>
         </div>
 
@@ -27,7 +27,7 @@ const Footer = () => {
           <h4 className={styles.sectionTitle}>Elérhetőségeink</h4>
           <div className={styles.socialLinks}>
             <div className={styles.socialLink}>
-              <img src="./mail.png"></img>info-studenthive@gmail.com
+              <img src="./mail.png"></img>info.studenthive@gmail.com
             </div>
             <div className={styles.socialLink}>
               <img src="./telephone.png"></img> +36123456789

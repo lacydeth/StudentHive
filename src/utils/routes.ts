@@ -27,7 +27,8 @@ export const routes = {
     shiftPage: { path: '/shift/:id', title: 'Shift Page'},
     userApplications: { path: '/user-applications', title: 'User Applications'},
     manageShiftsPage: { path: '/manage-shifts/:id', title: 'Manage Shifts'},
-    userShifts: {path: '/user-shifts', title: 'User Shifts'}
+    userShifts: {path: '/user-shifts', title: 'User Shifts'},
+    contactPage: {path: '/contact', title: 'Contact'}
 };
 
 export const adminTopLinks = [

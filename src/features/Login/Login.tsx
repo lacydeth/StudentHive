@@ -9,7 +9,6 @@ import { toast } from 'react-toastify';
 
 const Login = () => {
   const location = useLocation();
-  const [error, setError] = useState<string | null>(null);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [stayLoggedIn, setStayLoggedIn] = useState(false);
@@ -22,7 +21,6 @@ const Login = () => {
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError(null);
 
     try {
       const response = await axios.post('https://localhost:7067/api/auth/login', {
@@ -37,7 +35,6 @@ const Login = () => {
 
     } catch (error: any) {
       const errorMessage = error.response?.data?.message || 'Váratlan hiba lépett fel.';
-      setError(errorMessage);
       toast.error(errorMessage);
     }
   };

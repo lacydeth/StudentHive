@@ -57,6 +57,7 @@
     text-decoration: none;
     transition: all 0.3s ease;
     color: var(--white)!important;
+    transition: all 0.4s ease;
 }
 .navbar .menu-list{
     display: inline-flex;
@@ -76,8 +77,13 @@
     cursor: pointer;
     transition: all 0.3s ease;
 }
-.menu-list li .btn:hover, .menu-list li .login-btn:hover{
+.menu-list li .btn:hover{
     color: var(--hoverGreen)!important;
+}
+.menu-list li .highlighted:hover {
+    background: none;
+    outline: 2px solid var(--darkGreen);
+    color: var(--darkGreen)!important;
 }
 .icon{
     color: var(--white);

@@ -61,7 +61,11 @@ const Navbar = () => {
               Munkák
             </Link>
           </li>
-
+          <li>
+            <Link to={routes.contactPage.path} className="btn" onClick={closeMenu}>
+              Kapcsolat
+            </Link>
+          </li>
           {userRole ? (
             <>
               <li>
@@ -80,11 +84,6 @@ const Navbar = () => {
             </>
           ) : (
             <>
-              <li>
-                <Link to={routes.registerPage.path} className="btn" onClick={closeMenu}>
-                  Regisztráció
-                </Link>
-              </li>
               <li>
                 <Link to={routes.loginPage.path} className="btn highlighted" onClick={closeMenu}>
                   Bejelentkezés

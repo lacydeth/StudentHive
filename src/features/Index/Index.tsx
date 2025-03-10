@@ -47,12 +47,17 @@ const IndexPage = () => {
 
   const handleSearch = () => {
     const queryParams = new URLSearchParams();
-    if (selectedCategory) queryParams.append("category", selectedCategory);
-    if (selectedLocation) queryParams.append("location", selectedLocation);
-
+    
+    if (selectedCategory) {
+      queryParams.append("category", selectedCategory);
+    }
+    
+    if (selectedLocation) {
+      queryParams.append("location", selectedLocation);
+    }
+  
     navigate(`/works?${queryParams.toString()}`);
   };
-
   return (
     <div className="home-page">
       <Navbar />
