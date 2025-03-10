@@ -307,8 +307,8 @@ namespace StudentHiveServer.Controllers
 
                 string checkQuery = @"SELECT s.ShiftStart 
                                     FROM Shifts s 
-                                    INNER JOIN UserShifts us ON s.Id = us.ShiftId 
-                                    WHERE s.Id = @ShiftId AND us.UserId = @UserId";
+                                    INNER JOIN StudentShifts us ON s.Id = us.ShiftId 
+                                    WHERE s.Id = @ShiftId AND us.StudentId = @UserId";
 
                 var checkParams = new MySqlParameter[]
                 {
@@ -331,7 +331,7 @@ namespace StudentHiveServer.Controllers
                     return BadRequest(new { message = "A műszak nem törölhető, mert kevesebb mint 12 óra van a kezdetéig." });
                 }
 
-                string deleteQuery = "DELETE FROM UserShifts WHERE ShiftId = @ShiftId AND UserId = @UserId";
+                string deleteQuery = "DELETE FROM StudentShifts WHERE ShiftId = @ShiftId AND StudentId = @UserId";
 
                 var deleteParams = new MySqlParameter[]
                 {
