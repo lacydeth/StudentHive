@@ -185,6 +185,50 @@ const IndexPage = () => {
             <p>A platform célja, hogy átlátható, gyors és biztonságos lehetőséget nyújtson a diákoknak a munkavállalásra.</p>
         </div>
       </section>
+      <section className="role-selection-section">
+        <div className="container">
+          <h1>Csatlakozz még ma és légy részese valami forradalminak! 🚀</h1>
+          <div className="role-cards" data-aos="fade-up" data-aos-duration="1200">
+            <div className="role-card">
+              <div className="role-image-container">
+                <img src="./student-image.jpg" alt="Diák" className="role-image" />
+                <div className="role-overlay"></div>
+              </div>
+              <div className="role-content">
+                <h3>Diák vagyok</h3>
+                <p>
+                  Csatlakozz a StudentHive közösséghez diákként, és találd meg álmaid 
+                  diákmunkáját! Böngéssz több száz állásajánlat között, jelentkezz 
+                  egyszerűen, és építsd karrieredet már az iskolapadból.
+                </p>
+                <Link to={routes.registerPage.path} className="role-button">
+                  Regisztráció diákként
+                  <img src="/right.png" alt="Arrow" className="arrow-icon" />
+                </Link>
+              </div>
+            </div>
+            
+            <div className="role-card">
+              <div className="role-image-container">
+                <img src="./company-image.jpg" alt="Iskolaszövetkezet" className="role-image" />
+                <div className="role-overlay"></div>
+              </div>
+              <div className="role-content">
+                <h3>Iskolaszövetkezet vagyok</h3>
+                <p>
+                  Hirdess állásokat egyszerűen és érj el motivált diákokat azonnal! 
+                  Platformunk segítségével gyorsan megtalálhatod a megfelelő jelölteket, 
+                  és hatékonyan kezelheted az adminisztrációt.
+                </p>
+                <button className="role-button">
+                  Regisztráció iskolaszövetkezetként
+                  <img src="/right.png" alt="Arrow" className="arrow-icon" />
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
       <Footer />
     </div>
   );
