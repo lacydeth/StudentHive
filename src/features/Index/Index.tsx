@@ -14,7 +14,7 @@ const IndexPage = () => {
   const [selectedCategory, setSelectedCategory] = useState("");
   const [selectedLocation, setSelectedLocation] = useState("");
   
-  const navigate = useNavigate(); // Hook to handle navigation
+  const navigate = useNavigate();
 
   useEffect(() => {
     const updateAOS = () => {
@@ -46,12 +46,10 @@ const IndexPage = () => {
   }, []);
 
   const handleSearch = () => {
-    // Create the query parameters based on selected category and location
     const queryParams = new URLSearchParams();
     if (selectedCategory) queryParams.append("category", selectedCategory);
     if (selectedLocation) queryParams.append("location", selectedLocation);
 
-    // Redirect to /works with the query string
     navigate(`/works?${queryParams.toString()}`);
   };
 

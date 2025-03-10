@@ -66,21 +66,12 @@ const AgentSettings = () => {
             <div className={styles.formWrapper}>
               <div className={styles.inputBox}>
                 <input
-                  type="email"
-                  placeholder="Email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                />
-                <img src="./mail.png" alt="email icon" />
-              </div>
-              <div className={styles.inputBox}>
-                <input
                   type="text"
                   placeholder="Vezetéknév"
                   value={firstname}
                   onChange={(e) => setFirstName(e.target.value)}
                 />
-                <img src="./mail.png" alt="email icon" />
+                <img src="./id-card.png" alt="id-card icon" />
               </div>
               <div className={styles.inputBox}>
                 <input
@@ -88,6 +79,15 @@ const AgentSettings = () => {
                   placeholder="Keresztnév"
                   value={lastname}
                   onChange={(e) => setLastName(e.target.value)}
+                />
+                <img src="./id-card.png" alt="id-card icon" />
+              </div>
+              <div className={styles.inputBox}>
+                <input
+                  type="email"
+                  placeholder="Email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
                 />
                 <img src="./mail.png" alt="email icon" />
               </div>

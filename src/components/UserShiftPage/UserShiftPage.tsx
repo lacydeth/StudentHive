@@ -107,11 +107,14 @@ const UserShiftPage = () => {
       <UserNavbar />
       <div className={styles.content}>
         <div className={styles.calendar}>
-          <h2>Válaszd ki melyik napon szeretnél dolgozni.</h2>
+            <div className={styles.calendarTitle}>
+              <h2>StudentHive Naptár</h2>
+              <p>Válassz egy dátumot amelyik napon dolgozni szeretnél!</p>
+            </div>
           <Calendar onChange={handleDateChange} value={date} />
         </div>
         <div className={styles.shifts}>
-          <h3>Elérhető műszakok:</h3>
+          <h2>Műszakok: {date.toLocaleDateString("hu-HU")}</h2>
           <div className={styles.shiftContainer}>
             {currentShifts.length > 0 ? (
               currentShifts.map((shift: ShiftCardProps) => (

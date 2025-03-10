@@ -92,7 +92,6 @@ const UserManageShifts = () => {
             <div className={styles.calendarTitle}>
               <h2>StudentHive Naptár</h2>
               <p>Válassz egy dátumot a műszakjaid megtekintéséhez!</p>
-
             </div>
             <Calendar onChange={handleDateChange} value={date} />
           </div>

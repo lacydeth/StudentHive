@@ -48,8 +48,8 @@ export const agentMenuLinks = [
   { path: routes.agentPage.path, icon: "/dashboard.png", label: "Kezelőpult"},
   { path: routes.agentJobs.path, icon: "/job-description.png", label: "Munkák"},
   { path: routes.studentApplications.path, icon: "/resume.png", label: "Jelentkezések"},
-  { path: routes.agentSettings.path, icon: "/settings.png", label: "Beállítások"},
-  { path: routes.agentStudentList.path, icon: "/realtor.png", label: "Diákok listázása"}
+  { path: routes.agentStudentList.path, icon: "/realtor.png", label: "Diákok"},
+  { path: routes.agentSettings.path, icon: "/settings.png", label: "Beállítások"}
 ];
 export const roleRoutes: Record<string, string> = {
   Admin: routes.adminPage.path,
