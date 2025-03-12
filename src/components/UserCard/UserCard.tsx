@@ -37,7 +37,7 @@ const UserCard = ({jobId, title, city,address,imagePath,categoryName, agentName,
         </div>
         <div className={styles.bottomEnd}>
           <button className={styles.btn} onClick={(e) => {e.stopPropagation(); handleShifts();}}>
-            Műszakok kezelése
+            Műszak felvétele
           </button>
         </div>
       </div>

@@ -3,11 +3,9 @@ import styles from "./UserShiftPage.module.css";
 import { useState, useEffect } from "react";
 import Calendar from "react-calendar";
 import "react-calendar/dist/Calendar.css";
-import "./calendar-custom.css";
 import { useParams } from "react-router-dom";
 import axios from "axios";
 import { Value } from "react-calendar/src/shared/types.js";
-import { getUserIdFromToken } from "../../utils/authUtils";
 import { toast } from "react-toastify";
 
 type ShiftCardProps = {
@@ -109,11 +107,14 @@ const UserShiftPage = () => {
       <UserNavbar />
       <div className={styles.content}>
         <div className={styles.calendar}>
-          <h2>Válaszd ki melyik napon szeretnél dolgozni.</h2>
+            <div className={styles.calendarTitle}>
+              <h2>StudentHive Naptár</h2>
+              <p>Válassz egy dátumot amelyik napon dolgozni szeretnél!</p>
+            </div>
           <Calendar onChange={handleDateChange} value={date} />
         </div>
         <div className={styles.shifts}>
-          <h3>Elérhető műszakok:</h3>
+          <h2>Műszakok: {date.toLocaleDateString("hu-HU")}</h2>
           <div className={styles.shiftContainer}>
             {currentShifts.length > 0 ? (
               currentShifts.map((shift: ShiftCardProps) => (

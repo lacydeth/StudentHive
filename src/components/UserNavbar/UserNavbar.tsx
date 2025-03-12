@@ -52,8 +52,8 @@ const UserNavbar = () => {
             <i className="ri-close-line"></i>
           </div>
           <li>
-            <Link to={routes.homePage.path} className="btn" onClick={closeMenu}>
-              Főoldal
+            <Link to={routes.worksPage.path} className="btn" onClick={closeMenu}>
+              Munkák
             </Link>
           </li>
           <li>

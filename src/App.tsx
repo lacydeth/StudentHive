@@ -36,6 +36,8 @@ import UserJobs from './features/UserDashboard/UserJobs/UserJobs';
 import UserShiftPage from './components/UserShiftPage/UserShiftPage';
 import ShiftApplications from './components/ShiftApplications/ShiftApplications';
 import UserApplications from './features/UserDashboard/UserApplications/UserApplications';
+import UserManageShifts from './features/UserDashboard/UserManageShifts/UserManageShifts';
+import Contact from './features/Contact/Contact';
 
 const App = () => {
   useEffect(() => {
@@ -46,11 +48,13 @@ const App = () => {
       <ToastContainer position="top-right" autoClose={3000} />
       <Router>
         <Routes>
+          {/* Unprotected routes */ }
           <Route path={routes.homePage.path} element={<IndexPage />} />
           <Route path={routes.loginPage.path} element={<Login />} />
           <Route path={routes.registerPage.path} element={<Register />} />
           <Route path={routes.worksPage.path} element={<Works />} />
           <Route path={routes.workPage.path} element={<WorkPage />} />
+          <Route path={routes.contactPage.path} element={<Contact/>} />
           <Route path={routes.unauthorized.path} element={<Unauthorized />} />
           <Route path="*" element={<NotFound />} />
 
@@ -60,6 +64,14 @@ const App = () => {
             element={
               <ProtectedRoute allowedRoles={["User"]}>
                 <UserDashboard />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path={routes.userShifts.path}
+            element={
+              <ProtectedRoute allowedRoles={["User"]}>
+                <UserManageShifts />
               </ProtectedRoute>
             }
           />

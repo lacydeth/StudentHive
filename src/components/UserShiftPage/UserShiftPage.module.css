@@ -22,6 +22,35 @@
     margin-bottom: 5px;
     font-size: 1.1rem;
 }
+.shifts h2 {
+    text-transform: uppercase;
+    background: #ffffff;
+    border-radius: 8px;
+    padding: 10px 15px;
+    text-align: center;
+    width: 80%;
+    box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
+    margin-bottom: 15px;
+}
+.calendar {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+}
+.calendar .calendarTitle {
+    text-transform: uppercase;
+    background: #ffffff;
+    border-radius: 8px;
+    padding: 10px 15px;
+    text-align: center;
+    width: 80%;
+    box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
+}
+.calendarTitle h2 {
+    font-size: 1.2rem;
+}
 .shifts {
     display: flex;
     align-items: center;
@@ -131,6 +160,12 @@
     }
     .shiftContainer {
         flex-direction: row;
+    }
+    .calendar .calendarTitle {
+        width: 100%;
+    }
+    .shifts h2 {
+        width: 300px;
     }
 }
 :global(.react-calendar) {

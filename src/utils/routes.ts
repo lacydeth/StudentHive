@@ -23,10 +23,12 @@ export const routes = {
     agentSettings: { path: '/agent-settings', title: 'Agent Settings'},
     agentJobs: { path: '/agent-jobs', title: 'Agent Jobs'},
     adminSettings: { path: '/admin-settings', title: 'Admin Settings'},
-    workPage: { path: '/works/:id', title: 'Work page'},
-    shiftPage: { path: '/shift/:id', title: 'Shift page'},
+    workPage: { path: '/works/:id', title: 'Work Page'},
+    shiftPage: { path: '/shift/:id', title: 'Shift Page'},
     userApplications: { path: '/user-applications', title: 'User Applications'},
-    manageShiftsPage: { path: '/manage-shifts/:id', title: 'Manage shifts page'}
+    manageShiftsPage: { path: '/manage-shifts/:id', title: 'Manage Shifts'},
+    userShifts: {path: '/user-shifts', title: 'User Shifts'},
+    contactPage: {path: '/contact', title: 'Contact'}
 };
 
 export const adminTopLinks = [
@@ -47,8 +49,8 @@ export const agentMenuLinks = [
   { path: routes.agentPage.path, icon: "/dashboard.png", label: "Kezelőpult"},
   { path: routes.agentJobs.path, icon: "/job-description.png", label: "Munkák"},
   { path: routes.studentApplications.path, icon: "/resume.png", label: "Jelentkezések"},
-  { path: routes.agentSettings.path, icon: "/settings.png", label: "Beállítások"},
-  { path: routes.agentStudentList.path, icon: "/realtor.png", label: "Diákok listázása"}
+  { path: routes.agentStudentList.path, icon: "/realtor.png", label: "Diákok"},
+  { path: routes.agentSettings.path, icon: "/settings.png", label: "Beállítások"}
 ];
 export const roleRoutes: Record<string, string> = {
   Admin: routes.adminPage.path,

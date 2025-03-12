@@ -1,7 +1,6 @@
 import { confirmAlert } from "react-confirm-alert";
 import styles from "./ShiftCard.module.css"
 import axios from "axios";
-
 type ShiftCardProps = {
     id: number;
     title: string;

@@ -1,0 +1,68 @@
+.card {
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    padding: 16px;
+    width: 300px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    margin-bottom: 8px;
+}
+
+.circle {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    margin-right: 16px;
+}
+.title {
+    display: flex;
+    align-items: center;
+}
+.gray {
+    background-color: gray;
+}
+
+.green {
+    background-color: var(--smoothGreen);
+}
+
+.red {
+    background-color: #ff4d4d;
+}
+
+.details {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 15px;
+    color: #3f1a1a;
+}
+
+.deleteButton {
+    margin-top: 15px;
+    background-color: #ff4d4d;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.deleteButton:hover {
+    background-color: #ff1a1a;
+}
+@media screen and (min-width: 768px) {
+    .card {
+        flex-direction: row;
+        width: 100%;
+        justify-content: space-between;
+    }
+    .details {
+        flex-direction: row;
+    }
+    .deleteButton {
+        margin: 0 15px;
+    }
+}
