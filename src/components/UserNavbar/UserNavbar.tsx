@@ -68,7 +68,7 @@ const UserNavbar = () => {
           </li>
           <li>
             <Link to={routes.userProfile.path} className="btn" onClick={closeMenu}>
-              Profilom
+              Adataim
             </Link>
           </li>
           <li>

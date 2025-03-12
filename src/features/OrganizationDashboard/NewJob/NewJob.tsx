@@ -2,7 +2,6 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import styles from "./NewJob.module.css";
 import Title from "../../../components/Title/Title";
-import { useNavigate } from "react-router-dom";
 import { orgMenuLinks } from "../../../utils/routes";
 import Sidebar from "../../../components/Sidebar/Sidebar";
 import DashboardTitle from "../../../components/DashboardTitle/DashboardTitle";
