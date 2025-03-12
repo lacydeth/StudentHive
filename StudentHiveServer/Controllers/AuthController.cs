@@ -43,25 +43,53 @@ namespace StudentHiveServer.Controllers
             }
 
             const string insertQuery = "INSERT INTO Users (FirstName, LastName, Email, PasswordHash, RoleId) VALUES (@FirstName, @LastName, @Email, @PasswordHash, @RoleId)";
-            var parameters = new MySqlParameter[]
-            {
-                new MySqlParameter("@FirstName", request.FirstName),
-                new MySqlParameter("@LastName", request.LastName),
-                new MySqlParameter("@Email", request.Email),
-                new MySqlParameter("@PasswordHash", BCrypt.Net.BCrypt.HashPassword(request.Password)),
-                new MySqlParameter("@RoleId", 4)
-            };
+            var parameters = new MySqlParameter[] {
+        new MySqlParameter("@FirstName", request.FirstName),
+        new MySqlParameter("@LastName", request.LastName),
+        new MySqlParameter("@Email", request.Email),
+        new MySqlParameter("@PasswordHash", BCrypt.Net.BCrypt.HashPassword(request.Password)),
+        new MySqlParameter("@RoleId", 4)
+    };
 
             await _dbHelper.ExecuteNonQueryAsync(insertQuery, parameters);
+
+            const string getUserIdQuery = "SELECT Id FROM Users WHERE Email = @Email";
+            var userId = await _dbHelper.ExecuteScalarAsync<int>(getUserIdQuery, new[] { checkEmailParams });
+
+            if (userId == 0)
+            {
+                return BadRequest(new { message = "Felhasználó ID nem található!" });
+            }
+
+            const string insertStudentDetailsQuery = @"
+        INSERT INTO StudentDetails 
+        (UserId, PhoneNumber, DateOfBirth, BirthName, MothersName, 
+         CountryOfBirth, PlaceOfBirth, Gender, Citizenship, StudentCardNumber, 
+         BankAccountNumber, Country, PostalCode, City, Address, SchoolName, 
+         StudyStartDate, StudyEndDate)
+        VALUES 
+        (@UserId, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL)";
+
+            var studentDetailsParams = new MySqlParameter[] {
+        new MySqlParameter("@UserId", userId)
+    };
+
+            await _dbHelper.ExecuteNonQueryAsync(insertStudentDetailsQuery, studentDetailsParams);
+
             return Ok(new { message = "Sikeres regisztráció!" });
         }
+
+
+
+
         //POST: bejelentkezés meglévő fiókkal - public
         [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody] LoginRequest request)
         {
-            const string query = "SELECT Id, PasswordHash, RoleId FROM Users WHERE Email = @Email";
+            const string query = "SELECT Id, PasswordHash, RoleId, IsActive FROM Users WHERE Email = @Email";
             var parameters = new MySqlParameter[] { new MySqlParameter("@Email", request.Email) };
             var result = await _dbHelper.ExecuteQueryAsync(query, parameters);
+
             if (result.Rows.Count == 0)
                 return Unauthorized(new { message = "Hibás felhasználónév vagy jelszó!" });
 
@@ -69,23 +97,28 @@ namespace StudentHiveServer.Controllers
             var userId = Convert.ToInt32(row["Id"]);
             var passwordHash = row["PasswordHash"].ToString();
             var roleId = Convert.ToInt32(row["RoleId"]);
+            var isActive = Convert.ToInt32(row["IsActive"]);
+
+            if (isActive == 0)
+                return Unauthorized(new { message = "A fiók inaktív, kérjük lépjen kapcsolatba az adminisztrátorral!" });
 
             if (!BCrypt.Net.BCrypt.Verify(request.Password, passwordHash))
                 return Unauthorized(new { message = "Hibás felhasználónév vagy jelszó!" });
 
             var roleMap = new Dictionary<int, string>
-            {
-                { 1, "Admin" },
-                { 2, "Organization" },
-                { 3, "Agent" },
-                { 4, "User" } 
-            };
+    {
+        { 1, "Admin" },
+        { 2, "Organization" },
+        { 3, "Agent" },
+        { 4, "User" }
+    };
 
             var role = roleMap.GetValueOrDefault(roleId, "User");
             var token = GenerateJwtToken(userId, role, request.StayLoggedIn);
 
             return Ok(new { token, role });
         }
+
 
         //POST: kijelentkezés - public
         [HttpPost("logout")]

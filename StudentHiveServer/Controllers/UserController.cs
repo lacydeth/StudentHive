@@ -247,7 +247,7 @@ namespace StudentHiveServer.Controllers
                 if (rowsAffected > 0)
                 {
                     return Ok(new { message = "Sikeres jelentkezés!" });
-                }
+                }   
                 else
                 {
                     return StatusCode(500, new { message = "Hiba történt a jelentkezés során." });
@@ -258,105 +258,191 @@ namespace StudentHiveServer.Controllers
                 return StatusCode(500, new { message = "Belső hiba: " + ex.Message });
             }
         }
-        [HttpPost("student-details")]
-        public async Task<IActionResult> UpsertStudentDetails([FromBody] StudentDetails request)
+        [HttpGet("student-details-datas")]
+        public async Task<IActionResult> GetStudentDetails()
         {
+            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
+            if (userIdClaim == null)
+            {
+                return Unauthorized(new { message = "Felhasználói azonosítás sikertelen." });
+            }
+
+            var loggedInUserId = int.Parse(userIdClaim.Value);
+
             try
             {
-                string checkQuery = "SELECT COUNT(*) FROM StudentDetails WHERE UserId = @UserId";
-                var checkParam = new MySqlParameter("@UserId", request.UserId);
-                int count = Convert.ToInt32(await _dbHelper.ExecuteScalarAsync<int>(checkQuery, new MySqlParameter[] { checkParam }));
+                string query = @"
+            SELECT 
+                u.FirstName, u.LastName, u.Email,
+                sd.PhoneNumber, sd.DateOfBirth, sd.BirthName, sd.MothersName,
+                sd.CountryOfBirth, sd.PlaceOfBirth, sd.Gender, sd.Citizenship,
+                sd.StudentCardNumber, sd.BankAccountNumber, sd.Country, sd.PostalCode,
+                sd.City, sd.Address, sd.SchoolName, sd.StudyStartDate, sd.StudyEndDate
+            FROM Users u
+            INNER JOIN StudentDetails sd ON u.Id = sd.UserId
+            WHERE u.Id = @UserId";
 
-                string query;
-                if (count == 0)
+                var userParam = new MySqlParameter("@UserId", loggedInUserId);
+                var dataTable = await _dbHelper.ExecuteQueryAsync(query, new MySqlParameter[] { userParam });
+
+                if (dataTable.Rows.Count == 0)
                 {
-                    query = @"
-                INSERT INTO StudentDetails 
-                (UserId, PhoneNumber, DateOfBirth, BirthName, MothersName, CountryOfBirth, PlaceOfBirth, Gender, Citizenship, 
-                 StudentCardNumber, BankAccountNumber, Country, PostalCode, City, Address, SchoolName, StudyStartDate, StudyEndDate)
-                VALUES 
-                (@UserId, @PhoneNumber, @DateOfBirth, @BirthName, @MothersName, @CountryOfBirth, @PlaceOfBirth, @Gender, @Citizenship, 
-                 @StudentCardNumber, @BankAccountNumber, @Country, @PostalCode, @City, @Address, @SchoolName, @StudyStartDate, @StudyEndDate)";
-                }
-                else
-                {
-                    query = @"
-                UPDATE StudentDetails 
-                SET PhoneNumber = @PhoneNumber,
-                    DateOfBirth = @DateOfBirth,
-                    BirthName = @BirthName,
-                    MothersName = @MothersName,
-                    CountryOfBirth = @CountryOfBirth,
-                    PlaceOfBirth = @PlaceOfBirth,
-                    Gender = @Gender,
-                    Citizenship = @Citizenship,
-                    StudentCardNumber = @StudentCardNumber,
-                    BankAccountNumber = @BankAccountNumber,
-                    Country = @Country,
-                    PostalCode = @PostalCode,
-                    City = @City,
-                    Address = @Address,
-                    SchoolName = @SchoolName,
-                    StudyStartDate = @StudyStartDate,
-                    StudyEndDate = @StudyEndDate
-                WHERE UserId = @UserId";
+                    return NotFound(new { message = "A keresett felhasználó adatai nem találhatóak." });
                 }
 
-                var parameters = new MySqlParameter[]
+                var row = dataTable.Rows[0];
+
+                var studentDetails = new
                 {
-            new MySqlParameter("@UserId", request.UserId),
-            new MySqlParameter("@PhoneNumber", (object?)request.PhoneNumber ?? DBNull.Value),
-            new MySqlParameter("@DateOfBirth", (object?)request.DateOfBirth ?? DBNull.Value),
-            new MySqlParameter("@BirthName", (object?)request.BirthName ?? DBNull.Value),
-            new MySqlParameter("@MothersName", (object?)request.MothersName ?? DBNull.Value),
-            new MySqlParameter("@CountryOfBirth", (object?)request.CountryOfBirth ?? DBNull.Value),
-            new MySqlParameter("@PlaceOfBirth", (object?)request.PlaceOfBirth ?? DBNull.Value),
-            new MySqlParameter("@Gender", (object?)request.Gender ?? DBNull.Value),
-            new MySqlParameter("@Citizenship", (object?)request.Citizenship ?? DBNull.Value),
-            new MySqlParameter("@StudentCardNumber", (object?)request.StudentCardNumber ?? DBNull.Value),
-            new MySqlParameter("@BankAccountNumber", (object?)request.BankAccountNumber ?? DBNull.Value),
-            new MySqlParameter("@Country", (object?)request.Country ?? DBNull.Value),
-            new MySqlParameter("@PostalCode", (object?)request.PostalCode ?? DBNull.Value),
-            new MySqlParameter("@City", (object?)request.City ?? DBNull.Value),
-            new MySqlParameter("@Address", (object?)request.Address ?? DBNull.Value),
-            new MySqlParameter("@SchoolName", (object?)request.SchoolName ?? DBNull.Value),
-            new MySqlParameter("@StudyStartDate", (object?)request.StudyStartDate ?? DBNull.Value),
-            new MySqlParameter("@StudyEndDate", (object?)request.StudyEndDate ?? DBNull.Value)
+                    FirstName = row.Field<string>("FirstName"),
+                    LastName = row.Field<string>("LastName"),
+                    Email = row.Field<string>("Email"),
+                    PhoneNumber = row.Field<string?>("PhoneNumber"),
+                    DateOfBirth = row.IsNull("DateOfBirth") ? null : ((DateTime?)row["DateOfBirth"])?.ToString("yyyy-MM-dd"),
+                    BirthName = row.Field<string?>("BirthName"),
+                    MothersName = row.Field<string?>("MothersName"),
+                    CountryOfBirth = row.Field<string?>("CountryOfBirth"),
+                    PlaceOfBirth = row.Field<string?>("PlaceOfBirth"),
+                    Gender = row.Field<string?>("Gender"),
+                    Citizenship = row.Field<string>("Citizenship"),
+                    StudentCardNumber = row.Field<string?>("StudentCardNumber"),
+                    BankAccountNumber = row.Field<string?>("BankAccountNumber"),
+                    Country = row.Field<string?>("Country"),
+                    PostalCode = row.Field<string?>("PostalCode"),
+                    City = row.Field<string?>("City"),
+                    Address = row.Field<string?>("Address"),
+                    SchoolName = row.Field<string?>("SchoolName"),
+                    StudyStartDate = row.IsNull("StudyStartDate") ? null : ((DateTime?)row["StudyStartDate"])?.ToString("yyyy-MM-dd"),
+                    StudyEndDate = row.IsNull("StudyEndDate") ? null : ((DateTime?)row["StudyEndDate"])?.ToString("yyyy-MM-dd")
                 };
 
-                int rowsAffected = await _dbHelper.ExecuteNonQueryAsync(query, parameters);
-
-                return Ok(new { message = count == 0 ? "Felhasználói adatok létrehozva!" : "Felhasználói adatok frissítve!" });
+                return Ok(studentDetails);
             }
             catch (Exception ex)
             {
-                return StatusCode(500, new { message = "Hiba történt: " + ex.Message });
+                return StatusCode(500, new { message = "Hiba történt az adatok lekérésekor.", error = ex.Message });
             }
         }
 
 
 
-        public class StudentDetails 
-        { 
-            public int UserId { get; set; }
-            public int PhoneNumber { get; set; }
-            public int DateOfBirth { get; set; }
+
+        [HttpPut("student-details")]
+        public async Task<IActionResult> UpsertStudentDetails([FromBody] StudentDetails request)
+        {
+            var useridClaim = User.FindFirst(ClaimTypes.NameIdentifier);
+            if (useridClaim == null)
+            {
+                return Unauthorized(new { message = "Felhasználói azonosítás sikertelen." });
+            }
+
+            var loggedInUserId = int.Parse(useridClaim.Value);
+
+            bool isUserUpdated = false;
+            var updateUserQuery = string.Empty;
+            var parameters = new List<MySqlParameter>();
+
+            if (request.FirstName != null || request.LastName != null || request.Email != null)
+            {
+                updateUserQuery = @"
+            UPDATE Users 
+            SET FirstName = IFNULL(@FirstName, FirstName), 
+                LastName = IFNULL(@LastName, LastName),
+                Email = IFNULL(@Email, Email)
+            WHERE Id = @UserId";
+
+                if (request.FirstName != null)
+                {
+                    parameters.Add(new MySqlParameter("@FirstName", request.FirstName));
+                }
+                if (request.LastName != null)
+                {
+                    parameters.Add(new MySqlParameter("@LastName", request.LastName));
+                }
+                if (request.Email != null)
+                {
+                    parameters.Add(new MySqlParameter("@Email", request.Email));
+                }
+                parameters.Add(new MySqlParameter("@UserId", loggedInUserId));
+
+                var result = await _dbHelper.ExecuteNonQueryAsync(updateUserQuery, parameters.ToArray());
+                if (result > 0)
+                {
+                    isUserUpdated = true;
+                }
+            }
+
+            const string updateStudentDetailsQuery = @"
+        INSERT INTO StudentDetails (UserId, PhoneNumber, DateOfBirth, BirthName, MothersName, 
+                                    CountryOfBirth, PlaceOfBirth, Gender, Citizenship, StudentCardNumber, 
+                                    BankAccountNumber, Country, PostalCode, City, Address, SchoolName, 
+                                    StudyStartDate, StudyEndDate)
+        VALUES (@UserId, @PhoneNumber, @DateOfBirth, @BirthName, @MothersName, @CountryOfBirth, 
+                @PlaceOfBirth, @Gender, @Citizenship, @StudentCardNumber, @BankAccountNumber, 
+                @Country, @PostalCode, @City, @Address, @SchoolName, @StudyStartDate, @StudyEndDate)
+        ON DUPLICATE KEY UPDATE 
+            PhoneNumber = @PhoneNumber, DateOfBirth = @DateOfBirth, BirthName = @BirthName, 
+            MothersName = @MothersName, CountryOfBirth = @CountryOfBirth, PlaceOfBirth = @PlaceOfBirth, 
+            Gender = @Gender, Citizenship = @Citizenship, StudentCardNumber = @StudentCardNumber, 
+            BankAccountNumber = @BankAccountNumber, Country = @Country, PostalCode = @PostalCode, 
+            City = @City, Address = @Address, SchoolName = @SchoolName, StudyStartDate = @StudyStartDate, 
+            StudyEndDate = @StudyEndDate";
+
+            var studentDetailsParams = new MySqlParameter[]
+            {
+        new MySqlParameter("@UserId", loggedInUserId),
+        new MySqlParameter("@PhoneNumber", request.PhoneNumber ?? (object)DBNull.Value),
+        new MySqlParameter("@DateOfBirth", request.DateOfBirth ?? (object)DBNull.Value),
+        new MySqlParameter("@BirthName", request.BirthName ?? (object)DBNull.Value),
+        new MySqlParameter("@MothersName", request.MothersName ?? (object)DBNull.Value),
+        new MySqlParameter("@CountryOfBirth", request.CountryOfBirth ?? (object)DBNull.Value),
+        new MySqlParameter("@PlaceOfBirth", request.PlaceOfBirth ?? (object)DBNull.Value),
+        new MySqlParameter("@Gender", request.Gender ?? (object)DBNull.Value),
+        new MySqlParameter("@Citizenship", request.Citizenship ?? (object)DBNull.Value),
+        new MySqlParameter("@StudentCardNumber", request.StudentCardNumber ?? (object)DBNull.Value),
+        new MySqlParameter("@BankAccountNumber", request.BankAccountNumber ?? (object)DBNull.Value),
+        new MySqlParameter("@Country", request.Country ?? (object)DBNull.Value),
+        new MySqlParameter("@PostalCode", request.PostalCode ?? (object)DBNull.Value),
+        new MySqlParameter("@City", request.City ?? (object)DBNull.Value),
+        new MySqlParameter("@Address", request.Address ?? (object)DBNull.Value),
+        new MySqlParameter("@SchoolName", request.SchoolName ?? (object)DBNull.Value),
+        new MySqlParameter("@StudyStartDate", request.StudyStartDate ?? (object)DBNull.Value),
+        new MySqlParameter("@StudyEndDate", request.StudyEndDate ?? (object)DBNull.Value)
+            };
+
+            await _dbHelper.ExecuteNonQueryAsync(updateStudentDetailsQuery, studentDetailsParams);
+
+            return Ok(new { message = "Sikeres módosítás!" });
+        }
+
+
+
+
+
+        public class StudentDetails
+        {
+            public string FirstName { get; set; }
+            public string LastName { get; set; }
+            public string Email { get; set; }
+            public string PhoneNumber { get; set; } // Changed to string, phone numbers are typically stored as strings
+            public string? DateOfBirth { get; set; } // Changed to DateTime, assuming it's a date
             public string BirthName { get; set; }
             public string MothersName { get; set; }
             public string CountryOfBirth { get; set; }
             public string PlaceOfBirth { get; set; }
             public string Gender { get; set; }
             public string Citizenship { get; set; }
-            public int StudentCardNumber { get; set; }
-            public int BankAccountNumber { get; set; }
+            public string StudentCardNumber { get; set; } // Changed to string, student card numbers can have leading zeros
+            public string BankAccountNumber { get; set; } // Changed to string, bank account numbers can also have leading zeros
             public string Country { get; set; }
-            public int PostalCode { get; set; }
+            public string PostalCode { get; set; } // Changed to string, postal codes can sometimes contain letters or leading zeros
             public string City { get; set; }
             public string Address { get; set; }
             public string SchoolName { get; set; }
-            public DateTime StudyStartDate { get; set; }
-            public DateTime StudyEndDate { get; set; }
+            public string? StudyStartDate { get; set; }
+            public string? StudyEndDate { get; set; }
         }
+
         public class UserShiftRequest
         {
             public int ShiftId { get; set; }
