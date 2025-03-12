@@ -101,27 +101,27 @@ CREATE TABLE `JobReviews` (
   `CreatedAt` TIMESTAMP DEFAULT (CURRENT_TIMESTAMP)
 );
 
-CREATE TABLE `StudentDetails` (
-  `Id` INT PRIMARY KEY AUTO_INCREMENT,
-  `UserId` INT NOT NULL,
-  `PhoneNumber` VARCHAR(15) NOT NULL,
-  `DateOfBirth` DATETIME NOT NULL,
-  `BirthName` VARCHAR(100) NOT NULL,
-  `MothersName` VARCHAR(100) NOT NULL,
-  `CountryOfBirth` VARCHAR(50) NOT NULL,
-  `PlaceOfBirth` VARCHAR(100) NOT NULL,
-  `Gender` VARCHAR(20) NOT NULL,
-  `Citizenship` VARCHAR(50) NOT NULL,
-  `StudentCardNumber` VARCHAR(20) UNIQUE NOT NULL,
-  `BankAccountNumber` VARCHAR(30) NOT NULL,
-  `Country` VARCHAR(50) NOT NULL,
-  `PostalCode` VARCHAR(10) NOT NULL,
-  `City` VARCHAR(50) NOT NULL,
-  `Address` VARCHAR(255) NOT NULL,
-  `SchoolName` VARCHAR(255) NOT NULL,
-  `StudyStartDate` DATETIME NOT NULL,
-  `StudyEndDate` DATETIME NOT NULL
-);
+CREATE TABLE `studentdetails` (
+  `Id` int(11) NOT NULL,
+  `UserId` int(11) NOT NULL,
+  `PhoneNumber` varchar(15) DEFAULT NULL,
+  `DateOfBirth` datetime DEFAULT NULL,
+  `BirthName` varchar(100) DEFAULT NULL,
+  `MothersName` varchar(100) DEFAULT NULL,
+  `CountryOfBirth` varchar(50) DEFAULT NULL,
+  `PlaceOfBirth` varchar(100) DEFAULT NULL,
+  `Gender` varchar(20) DEFAULT NULL,
+  `Citizenship` varchar(50) DEFAULT NULL,
+  `StudentCardNumber` varchar(20) DEFAULT NULL,
+  `BankAccountNumber` varchar(30) DEFAULT NULL,
+  `Country` varchar(50) DEFAULT NULL,
+  `PostalCode` varchar(10) DEFAULT NULL,
+  `City` varchar(50) DEFAULT NULL,
+  `Address` varchar(255) DEFAULT NULL,
+  `SchoolName` varchar(255) DEFAULT NULL,
+  `StudyStartDate` datetime DEFAULT NULL,
+  `StudyEndDate` datetime DEFAULT NULL
+)
 
 CREATE TABLE `JobAssignments` (
   `Id` INT PRIMARY KEY AUTO_INCREMENT,
