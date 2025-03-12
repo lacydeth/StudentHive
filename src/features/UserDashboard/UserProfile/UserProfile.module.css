@@ -1,0 +1,107 @@
+.container {
+    width: 100%;
+    min-height: 100vh;
+    background: url("/blob-mobile.svg");
+    background-size: cover;
+    background-position: center;
+}
+.content {
+    padding-top: 30%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    min-height: 80vh;
+    flex-direction: column;
+    gap: 25px;
+}
+.jobTitle {
+    position: relative;
+    width: 90%;
+    max-width: 500px;
+    padding: 2em;
+    margin: 1em auto;
+}
+.content h1 {
+    position: relative;
+    font-weight: 300;
+    font-size: 40px;
+    color: #080808;
+    font-size: 26px;
+    font-weight: 700;
+    letter-spacing: 1px; 
+    text-transform: uppercase; 
+    width: 200px;
+    height: 60px; 
+    text-align: center; 
+    margin: auto; 
+    white-space: nowrap; 
+}
+.content h1:before {
+    background-color: var(--smoothGreen);
+    content: '';
+    display: block;
+    height: 3px;
+    width: 75px;
+    margin-bottom: 5px;
+}
+.content h1:after {
+    background-color: var(--smoothGreen);
+    content: '';
+    display: block;
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    height: 3px;
+    width: 75px;
+    margin-bottom: 15px;
+}
+.registerBtn {
+    background: var(--smoothGreen);
+    color: var(--white);
+    border-radius: 8px;
+    width: 280px;
+    height: 50px;
+    font-weight: 600;
+    border: 0;
+    outline: 0;
+    margin-bottom: 15px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
+  .registerBtn:hover {
+    background: var(--hoverGreen);
+  }
+.inputBox {
+    position: relative;
+    width: 280px;
+  }
+  .inputBox input, .inputBox select {
+    border: none;
+    padding: 15px 20px;
+    background-color: #fff;
+    display: block;
+    width: 100%;
+    border-radius: 8px;
+  }
+  .inputBox input:focus, .inputBox select:focus {
+    outline: 2px solid #99BC85;
+  }
+  .inputBox img {
+    position: absolute;
+    top: 13px;
+    right: 15px;
+    width: 24px;
+  }
+
+@media screen and (min-width: 768px) {
+    .container {
+        background: url("/blob.svg");
+        background-size: cover;
+        background-position: center;
+    }
+    .content {
+        padding-top: 10%;
+    }
+
+}
