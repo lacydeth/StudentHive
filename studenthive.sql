@@ -121,7 +121,7 @@ CREATE TABLE `studentdetails` (
   `SchoolName` varchar(255) DEFAULT NULL,
   `StudyStartDate` datetime DEFAULT NULL,
   `StudyEndDate` datetime DEFAULT NULL
-)
+);
 
 CREATE TABLE `JobAssignments` (
   `Id` INT PRIMARY KEY AUTO_INCREMENT,
