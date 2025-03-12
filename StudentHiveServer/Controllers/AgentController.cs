@@ -668,6 +668,103 @@ namespace StudentHiveServer.Controllers
                 return StatusCode(500, new { message = "Hiba a jelentkezés elutasítása során!", details = ex.Message });
             }
         }
+
+        [HttpPut("profilesettings")]
+        public async Task<IActionResult> UpdateAgentSettings([FromBody] UpdateAgentSettingsRequest request)
+        {
+            // Check if at least one field is provided for update (FirstName, LastName, Email, Password)
+            if (string.IsNullOrEmpty(request.FirstName) && string.IsNullOrEmpty(request.LastName) &&
+                string.IsNullOrEmpty(request.Email) && string.IsNullOrEmpty(request.Password))
+            {
+                return BadRequest(new { message = "Legalább egy mezőnek (first name, last name, email vagy password) meg kell változnia." });
+            }
+
+            // Retrieve the logged-in user's ID from the claim
+            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
+            if (userIdClaim == null)
+            {
+                return Unauthorized(new { message = "User is not authenticated." });
+            }
+
+            var loggedInUserId = userIdClaim.Value;
+
+            try
+            {
+                // Select user from the database using the logged-in user ID
+                const string selectQuery = "SELECT Id, Email, PasswordHash, FirstName, LastName FROM Users WHERE Id = @UserId";
+                var parameters = new[] { new MySqlParameter("@UserId", loggedInUserId) };
+                var result = await _dbHelper.ExecuteQueryAsync(selectQuery, parameters);
+
+                if (result.Rows.Count == 0)
+                {
+                    return NotFound(new { message = "Felhasználó nem található!" });
+                }
+
+                // Update Email if provided
+                if (!string.IsNullOrEmpty(request.Email))
+                {
+                    const string checkEmailQuery = "SELECT COUNT(1) FROM Users WHERE Email = @Email AND Id != @UserId";
+                    var checkEmailParams = new[] {
+                new MySqlParameter("@Email", request.Email),
+                new MySqlParameter("@UserId", loggedInUserId)
+            };
+                    var emailExists = await _dbHelper.ExecuteScalarAsync<int>(checkEmailQuery, checkEmailParams);
+                    if (emailExists > 0)
+                    {
+                        return BadRequest(new { message = "Ez az email cím már foglalt!" });
+                    }
+
+                    const string updateEmailQuery = "UPDATE Users SET Email = @Email WHERE Id = @UserId";
+                    var emailParams = new[] {
+                new MySqlParameter("@Email", request.Email),
+                new MySqlParameter("@UserId", loggedInUserId)
+            };
+                    await _dbHelper.ExecuteNonQueryAsync(updateEmailQuery, emailParams);
+                }
+
+                // Update FirstName if provided
+                if (!string.IsNullOrEmpty(request.FirstName))
+                {
+                    const string updateFirstNameQuery = "UPDATE Users SET FirstName = @FirstName WHERE Id = @UserId";
+                    var firstNameParams = new[] {
+                new MySqlParameter("@FirstName", request.FirstName),
+                new MySqlParameter("@UserId", loggedInUserId)
+            };
+                    await _dbHelper.ExecuteNonQueryAsync(updateFirstNameQuery, firstNameParams);
+                }
+
+                // Update LastName if provided
+                if (!string.IsNullOrEmpty(request.LastName))
+                {
+                    const string updateLastNameQuery = "UPDATE Users SET LastName = @LastName WHERE Id = @UserId";
+                    var lastNameParams = new[] {
+                new MySqlParameter("@LastName", request.LastName),
+                new MySqlParameter("@UserId", loggedInUserId)
+            };
+                    await _dbHelper.ExecuteNonQueryAsync(updateLastNameQuery, lastNameParams);
+                }
+
+                // Update Password if provided
+                if (!string.IsNullOrEmpty(request.Password))
+                {
+                    var hashedPassword = BCrypt.Net.BCrypt.HashPassword(request.Password);
+                    const string updatePasswordQuery = "UPDATE Users SET PasswordHash = @PasswordHash WHERE Id = @UserId";
+                    var passwordParams = new[] {
+                new MySqlParameter("@PasswordHash", hashedPassword),
+                new MySqlParameter("@UserId", loggedInUserId)
+            };
+                    await _dbHelper.ExecuteNonQueryAsync(updatePasswordQuery, passwordParams);
+                }
+
+                return Ok(new { message = "A profil adatainak frissítése sikeres!" });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "Hiba történt a profil frissítése közben.", details = ex.Message });
+            }
+        }
+
+
         private void SendEmail(string toEmail, string emailBody, string name)
         {
             try
@@ -704,6 +801,14 @@ namespace StudentHiveServer.Controllers
             public int JobId { get; set; }
             public DateTime ShiftStart { get; set; }
             public DateTime ShiftEnd { get; set; }
+        }
+
+        public class UpdateAgentSettingsRequest
+        {
+            public string? FirstName { get; set; }
+            public string? LastName { get; set; }
+            public string? Email { get; set; }
+            public string? Password { get; set; }
         }
 
     }

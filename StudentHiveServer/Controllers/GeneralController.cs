@@ -2,6 +2,7 @@
 using MySql.Data.MySqlClient;
 using StudentHiveServer.Utils;
 using System.Data;
+using System.Security.Claims;
 
 namespace StudentHiveServer.Controllers
 {
@@ -16,20 +17,19 @@ namespace StudentHiveServer.Controllers
             _dbHelper = new DatabaseHelper(configuration.GetConnectionString("DefaultConnection"));
         }
 
-        // GET: minden elérhető munka kilistázása - public
         [HttpGet("workcards")]
         public async Task<IActionResult> GetWorkCards([FromQuery] string? search, [FromQuery] int? categoryId, [FromQuery] string? city)
         {
             var query = @"SELECT 
-                            j.Id,
-                            j.Title, 
-                            j.HourlyRate, 
-                            j.City, 
-                            c.CategoryName, 
-                            c.ImagePath 
-                          FROM Jobs j
-                          JOIN Categories c ON j.CategoryId = c.Id
-                          WHERE j.IsActive = 1";
+                    j.Id,
+                    j.Title, 
+                    j.HourlyRate, 
+                    j.City, 
+                    c.CategoryName, 
+                    c.ImagePath 
+                  FROM Jobs j
+                  JOIN Categories c ON j.CategoryId = c.Id
+                  WHERE j.IsActive = 1 AND j.AgentId IS NOT NULL";
 
             var parameters = new List<MySqlParameter>();
 
@@ -93,7 +93,7 @@ namespace StudentHiveServer.Controllers
                                 FROM Jobs j
                                 JOIN Categories c ON j.CategoryId = c.Id
                                 LEFT JOIN Description d ON j.DescriptionId = d.Id
-                                WHERE j.Id = @Id;";
+                                WHERE j.Id = @Id";
 
             try
             {
@@ -277,7 +277,106 @@ namespace StudentHiveServer.Controllers
             }
 
         }
+        [HttpGet("jobreviews/{jobId}")]
+        public async Task<IActionResult> GetJobReviews(int jobId)
+        {
+            try
+            {
+                string query = @"SELECT 
+                            jr.Id,
+                            jr.JobId,
+                            jr.ReviewerId,
+                            CONCAT(u.LastName, ' ', u.FirstName) AS ReviewerName,
+                            jr.Rating,
+                            jr.Comment,
+                            jr.CreatedAt
+                        FROM JobReviews jr
+                        JOIN Users u ON jr.ReviewerId = u.Id
+                        WHERE jr.JobId = @JobId
+                        ORDER BY jr.CreatedAt DESC";
 
+                var parameters = new MySqlParameter[]
+                {
+                    new MySqlParameter("@JobId", jobId)
+                };
+
+                var result = await _dbHelper.ExecuteQueryAsync(query, parameters);
+
+                if (result.Rows.Count == 0)
+                {
+                    return Ok(new List<object>());
+                }
+
+                var reviews = new List<object>();
+                foreach (DataRow row in result.Rows)
+                {
+                    reviews.Add(new
+                    {
+                        id = Convert.ToInt32(row["Id"]),
+                        jobId = Convert.ToInt32(row["JobId"]),
+                        reviewerId = Convert.ToInt32(row["ReviewerId"]),
+                        reviewerName = row["ReviewerName"].ToString(),
+                        rating = Convert.ToInt32(row["Rating"]),
+                        comment = row["Comment"] != DBNull.Value ? row["Comment"].ToString() : "",
+                        createdAt = ((DateTime)row["CreatedAt"]).ToString("yyyy-MM-dd HH:mm")
+                    });
+                }
+
+                return Ok(reviews);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "Hiba a vélemények lekérdezése közben: " + ex.Message });
+            }
+        }
+        [HttpPost("jobreviews")]
+        public async Task<IActionResult> AddJobReview([FromBody] JobReviewRequest request)
+        {
+            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
+            if (userIdClaim == null)
+            {
+                return Unauthorized(new { message = "Felhasználó azonosítása sikertelen." });
+            }
+            try
+            {
+                if (request.JobId <= 0 || request.ReviewerId <= 0 || request.Rating < 1 || request.Rating > 5)
+                {
+                    return BadRequest(new { message = "Érvénytelen adatok." });
+                }
+
+                string checkExistingQuery = "SELECT COUNT(*) FROM JobReviews WHERE JobId = @JobId AND ReviewerId = @ReviewerId";
+                var checkParams = new MySqlParameter[]
+                {
+                    new MySqlParameter("@JobId", request.JobId),
+                    new MySqlParameter("@ReviewerId", request.ReviewerId)
+                };
+
+                var result = await _dbHelper.ExecuteScalarAsync<long>(checkExistingQuery, checkParams);
+                if (result > 0)
+                {
+                    return BadRequest(new { message = "Már értékelted ezt a munkát." });
+                }
+
+                string insertQuery = @"INSERT INTO JobReviews (JobId, ReviewerId, Rating, Comment, CreatedAt) 
+                              VALUES (@JobId, @ReviewerId, @Rating, @Comment, NOW())";
+
+                var insertParams = new MySqlParameter[]
+                {
+                    new MySqlParameter("@JobId", request.JobId),
+                    new MySqlParameter("@ReviewerId", request.ReviewerId),
+                    new MySqlParameter("@Rating", request.Rating),
+                    new MySqlParameter("@Comment", string.IsNullOrEmpty(request.Comment) ? DBNull.Value : (object)request.Comment)
+                };
+
+                await _dbHelper.ExecuteNonQueryAsync(insertQuery, insertParams);
+
+                return Ok(new { message = "Értékelés sikeresen elküldve!" });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "Hiba történt az értékelés elküldésekor.", details = ex.Message });
+            }
+        }
         public class UpdateUserProfileRequest
         {
             public string FirstName { get; set; }
@@ -290,12 +389,16 @@ namespace StudentHiveServer.Controllers
             public string NewPassword { get; set; }
         }
 
-
         public class UpdatePasswordRequest
         {
             public string NewPassword { get; set; }
         }
-
-
+        public class JobReviewRequest
+        {
+            public int JobId { get; set; }
+            public int ReviewerId { get; set; }
+            public int Rating { get; set; }
+            public string? Comment { get; set; }
+        }
     }
 }

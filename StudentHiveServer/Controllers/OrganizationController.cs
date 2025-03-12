@@ -7,6 +7,7 @@ using System.Net.Mail;
 using System.Security.Claims;
 using System.Text.Json;
 using static StudentHiveServer.Controllers.AdminController;
+using static StudentHiveServer.Controllers.AgentController;
 
 namespace StudentHiveServer.Controllers
 {
@@ -665,13 +666,13 @@ namespace StudentHiveServer.Controllers
                 return StatusCode(500, new { message = "Error occurred while deleting the job.", details = ex.Message });
             }
         }
-        //PUT: Szövetkezet fiók adatmódosítás - protected
-        [HttpPut("orgsettings")]
-        public async Task<IActionResult> UpdateOrganizationSettings([FromBody] UpdateOrganizationProfileRequest request)
+        [HttpPut("profilesettings")]
+        public async Task<IActionResult> UpdateAgentSettings([FromBody] UpdateAgentSettingsRequest request)
         {
-            if (string.IsNullOrEmpty(request.Password) && string.IsNullOrEmpty(request.Email))
+            if (string.IsNullOrEmpty(request.FirstName) && string.IsNullOrEmpty(request.LastName) &&
+                string.IsNullOrEmpty(request.Email) && string.IsNullOrEmpty(request.Password))
             {
-                return BadRequest(new { message = "Legalább egy mezőnek (email vagy jelszó) meg kell változnia." });
+                return BadRequest(new { message = "Legalább egy mezőnek (first name, last name, email vagy password) meg kell változnia." });
             }
 
             var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
@@ -679,11 +680,12 @@ namespace StudentHiveServer.Controllers
             {
                 return Unauthorized(new { message = "User is not authenticated." });
             }
+
             var loggedInUserId = userIdClaim.Value;
 
             try
             {
-                const string selectQuery = "SELECT Id, Email, PasswordHash FROM Users WHERE Id = @UserId";
+                const string selectQuery = "SELECT Id, Email, PasswordHash, FirstName, LastName FROM Users WHERE Id = @UserId";
                 var parameters = new[] { new MySqlParameter("@UserId", loggedInUserId) };
                 var result = await _dbHelper.ExecuteQueryAsync(selectQuery, parameters);
 
@@ -696,9 +698,9 @@ namespace StudentHiveServer.Controllers
                 {
                     const string checkEmailQuery = "SELECT COUNT(1) FROM Users WHERE Email = @Email AND Id != @UserId";
                     var checkEmailParams = new[] {
-                        new MySqlParameter("@Email", request.Email),
-                        new MySqlParameter("@UserId", loggedInUserId)
-                    };
+                new MySqlParameter("@Email", request.Email),
+                new MySqlParameter("@UserId", loggedInUserId)
+            };
                     var emailExists = await _dbHelper.ExecuteScalarAsync<int>(checkEmailQuery, checkEmailParams);
                     if (emailExists > 0)
                     {
@@ -707,10 +709,30 @@ namespace StudentHiveServer.Controllers
 
                     const string updateEmailQuery = "UPDATE Users SET Email = @Email WHERE Id = @UserId";
                     var emailParams = new[] {
-                        new MySqlParameter("@Email", request.Email),
-                        new MySqlParameter("@UserId", loggedInUserId)
-                    };
+                new MySqlParameter("@Email", request.Email),
+                new MySqlParameter("@UserId", loggedInUserId)
+            };
                     await _dbHelper.ExecuteNonQueryAsync(updateEmailQuery, emailParams);
+                }
+
+                if (!string.IsNullOrEmpty(request.FirstName))
+                {
+                    const string updateFirstNameQuery = "UPDATE Users SET FirstName = @FirstName WHERE Id = @UserId";
+                    var firstNameParams = new[] {
+                new MySqlParameter("@FirstName", request.FirstName),
+                new MySqlParameter("@UserId", loggedInUserId)
+            };
+                    await _dbHelper.ExecuteNonQueryAsync(updateFirstNameQuery, firstNameParams);
+                }
+
+                if (!string.IsNullOrEmpty(request.LastName))
+                {
+                    const string updateLastNameQuery = "UPDATE Users SET LastName = @LastName WHERE Id = @UserId";
+                    var lastNameParams = new[] {
+                new MySqlParameter("@LastName", request.LastName),
+                new MySqlParameter("@UserId", loggedInUserId)
+            };
+                    await _dbHelper.ExecuteNonQueryAsync(updateLastNameQuery, lastNameParams);
                 }
 
                 if (!string.IsNullOrEmpty(request.Password))
@@ -718,9 +740,9 @@ namespace StudentHiveServer.Controllers
                     var hashedPassword = BCrypt.Net.BCrypt.HashPassword(request.Password);
                     const string updatePasswordQuery = "UPDATE Users SET PasswordHash = @PasswordHash WHERE Id = @UserId";
                     var passwordParams = new[] {
-                        new MySqlParameter("@PasswordHash", hashedPassword),
-                        new MySqlParameter("@UserId", loggedInUserId)
-                    };
+                new MySqlParameter("@PasswordHash", hashedPassword),
+                new MySqlParameter("@UserId", loggedInUserId)
+            };
                     await _dbHelper.ExecuteNonQueryAsync(updatePasswordQuery, passwordParams);
                 }
 
@@ -731,6 +753,7 @@ namespace StudentHiveServer.Controllers
                 return StatusCode(500, new { message = "Hiba történt a profil frissítése közben.", details = ex.Message });
             }
         }
+
 
         [HttpPut("company-settings")]
         public async Task<IActionResult> UpdateOrganizationCompanySettings([FromBody] UpdateOrganizationCompanyRequest request)
