@@ -105,7 +105,7 @@ CREATE TABLE `StudentDetails` (
   `Id` INT PRIMARY KEY AUTO_INCREMENT,
   `UserId` INT NOT NULL,
   `PhoneNumber` VARCHAR(15) NOT NULL,
-  `DateOfBirth` DATE NOT NULL,
+  `DateOfBirth` DATETIME NOT NULL,
   `BirthName` VARCHAR(100) NOT NULL,
   `MothersName` VARCHAR(100) NOT NULL,
   `CountryOfBirth` VARCHAR(50) NOT NULL,
@@ -119,8 +119,8 @@ CREATE TABLE `StudentDetails` (
   `City` VARCHAR(50) NOT NULL,
   `Address` VARCHAR(255) NOT NULL,
   `SchoolName` VARCHAR(255) NOT NULL,
-  `StudyStartDate` DATE NOT NULL,
-  `StudyEndDate` DATE NOT NULL
+  `StudyStartDate` DATETIME NOT NULL,
+  `StudyEndDate` DATETIME NOT NULL
 );
 
 CREATE TABLE `JobAssignments` (
