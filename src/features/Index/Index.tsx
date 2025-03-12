@@ -118,8 +118,8 @@ const IndexPage = () => {
                 Keresés
                 <img src="/loupe.png" alt="Search" />
               </button>
-              <Link className="secondary-btn" to={routes.loginPage.path}>
-                Iskolaszövetkezet vagyok
+              <Link className="secondary-btn" to={routes.organizationRequest.path}>
+                Még nincs fiókom
               </Link>
             </div>
           </div>
@@ -187,11 +187,10 @@ const IndexPage = () => {
       </section>
       <section className="role-selection-section">
         <div className="container">
-          <h1>Csatlakozz még ma és légy részese valami forradalminak! 🚀</h1>
-          <div className="role-cards" data-aos="fade-up" data-aos-duration="1200">
+          <div className="role-cards">
             <div className="role-card">
               <div className="role-image-container">
-                <img src="./student-image.jpg" alt="Diák" className="role-image" />
+                <img src="/student-image.jpg" alt="Diák" className="role-image"  />
                 <div className="role-overlay"></div>
               </div>
               <div className="role-content">
@@ -210,7 +209,7 @@ const IndexPage = () => {
             
             <div className="role-card">
               <div className="role-image-container">
-                <img src="./company-image.jpg" alt="Iskolaszövetkezet" className="role-image" />
+                <img src="/company-image.jpg" alt="Iskolaszövetkezet" className="role-image"  />
                 <div className="role-overlay"></div>
               </div>
               <div className="role-content">
@@ -220,10 +219,10 @@ const IndexPage = () => {
                   Platformunk segítségével gyorsan megtalálhatod a megfelelő jelölteket, 
                   és hatékonyan kezelheted az adminisztrációt.
                 </p>
-                <button className="role-button">
+                <Link to={routes.organizationRequest.path} className="role-button">
                   Regisztráció iskolaszövetkezetként
                   <img src="/right.png" alt="Arrow" className="arrow-icon" />
-                </button>
+                </Link>
               </div>
             </div>
           </div>

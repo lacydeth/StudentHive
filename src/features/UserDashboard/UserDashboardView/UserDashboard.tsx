@@ -8,22 +8,22 @@ import { useEffect, useState } from "react"
 const UserDashboard = () => {
   const [profile, setProfile] = useState<{ firstName: string; lastName: string } | null>(null);
 
-  const handleProfile = async () => {
-    const token = localStorage.getItem("token");
-    if (!token) return;
-
-    try {
-      const response = await axios.get("https://localhost:7067/api/user/profile", {
-        headers: { Authorization: `Bearer ${token}`},
-      });
-      setProfile(response.data);
-    } catch (error) {
-      console.error("Hiba az adatok lekérdezése közben:", error)
-    }
-  }
   useEffect(() => {
+    const handleProfile = async () => {
+      const token = localStorage.getItem("token");
+      if (!token) return;
+  
+      try {
+        const response = await axios.get("https://localhost:7067/api/user/profile", {
+          headers: { Authorization: `Bearer ${token}`},
+        });
+        setProfile(response.data);
+      } catch (error) {
+        console.error("Hiba az adatok lekérdezése közben:", error)
+      }
+    }
     handleProfile();
-  })
+  }, [])
   return (
     <div className={styles.container}>
       <div className={styles.user}>

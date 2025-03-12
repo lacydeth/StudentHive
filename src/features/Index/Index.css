@@ -260,17 +260,6 @@
     background-position: center;
     background-size: cover;
 }
-.role-selection-section h1 {
-    background: #fff;
-    color: var(--darkGreen);
-    font-size: 1.1rem;
-    width: 50%;
-    text-align: center;
-    padding: 10px;
-    border-radius: 8px;
-    box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
-    text-transform: uppercase;
-}
 .role-selection-section .container {
     display: flex;
     justify-content: center;

@@ -38,15 +38,19 @@ import ShiftApplications from './components/ShiftApplications/ShiftApplications'
 import UserApplications from './features/UserDashboard/UserApplications/UserApplications';
 import UserManageShifts from './features/UserDashboard/UserManageShifts/UserManageShifts';
 import Contact from './features/Contact/Contact';
+import OrganizationRequest from './features/OrganizationRequest/OrganizationRequest';
+import ScrollToTop from './components/ScrollToTop/ScrollToTop';
 
 const App = () => {
   useEffect(() => {
     AOS.init({})
   })
+  
   return (
     <>
       <ToastContainer position="top-right" autoClose={3000} />
       <Router>
+        <ScrollToTop />
         <Routes>
           {/* Unprotected routes */ }
           <Route path={routes.homePage.path} element={<IndexPage />} />
@@ -55,6 +59,7 @@ const App = () => {
           <Route path={routes.worksPage.path} element={<Works />} />
           <Route path={routes.workPage.path} element={<WorkPage />} />
           <Route path={routes.contactPage.path} element={<Contact/>} />
+          <Route path={routes.organizationRequest.path} element={<OrganizationRequest/>} />
           <Route path={routes.unauthorized.path} element={<Unauthorized />} />
           <Route path="*" element={<NotFound />} />
 

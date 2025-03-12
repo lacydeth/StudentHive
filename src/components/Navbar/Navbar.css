@@ -83,7 +83,7 @@
 .menu-list li .highlighted:hover {
     background: none;
     outline: 2px solid var(--darkGreen);
-    color: var(--darkGreen)!important;
+    color: var(--black)!important;
 }
 .icon{
     color: var(--white);
