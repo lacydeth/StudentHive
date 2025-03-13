@@ -5,7 +5,9 @@ using System;
 using System.Data;
 using System.Net.Mail;
 using System.Net;
-  
+using System.Security.Claims;
+using System.Text.RegularExpressions;
+
 namespace StudentHiveServer.Controllers
 {
     [ApiController]
@@ -67,7 +69,7 @@ namespace StudentHiveServer.Controllers
                 return StatusCode(500, new { message = "Hiba történt a szervezetek és felhasználók lekérdezése közben.", details = ex.Message });
             }
         }
-        //GET: minden iskolaszövetkezet kilistázása - protected 
+        //GET: minden iskolaszövetkezet kilistázása - public 
         [HttpGet("organizations")]
         public async Task<IActionResult> GetOrganizations()
         {
@@ -97,9 +99,19 @@ namespace StudentHiveServer.Controllers
         [HttpPut("organization/{organizationId}/password")]
         public async Task<IActionResult> ChangeOrganizationPassword(int organizationId, [FromBody] ChangePasswordRequest request)
         {
+            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
+            if (userIdClaim == null)
+            {
+                return Unauthorized(new { message = "Felhasználó azonosítása sikertelen." });
+            }
+
             if (string.IsNullOrEmpty(request.NewPassword))
             {
                 return BadRequest(new { message = "A jelszó nem lehet üres!" });
+            }
+            if (string.IsNullOrEmpty(request.NewPassword) && !IsValidPassword(request.NewPassword))
+            {
+                return BadRequest(new { message = "Legalább egy mezőnek (email vagy jelszó) meg kell változnia." });
             }
 
             try
@@ -137,6 +149,12 @@ namespace StudentHiveServer.Controllers
         [HttpPost("new-organization")]
         public async Task<IActionResult> CreateNewOrganization([FromBody] NewOrganizationRequest request)
         {
+            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
+            if (userIdClaim == null)
+            {
+                return Unauthorized(new { message = "Felhasználó azonosítása sikertelen." });
+            }
+
             if (string.IsNullOrEmpty(request.OrgName) || string.IsNullOrEmpty(request.Email) ||
                 string.IsNullOrEmpty(request.PhoneNumber) || string.IsNullOrEmpty(request.Address))
             {
@@ -196,14 +214,30 @@ namespace StudentHiveServer.Controllers
             }
         }
         //PUT: admin fiók adatmódosítás - protected
-        [HttpPut("settings/{userId}")]
-        public async Task<IActionResult> UpdateAdminSettings(int userId, [FromBody] UpdateAdminSettingsRequest request)
+        [HttpPut("settings")]
+        public async Task<IActionResult> UpdateAdminSettings([FromBody] UpdateAdminSettingsRequest request)
         {
+            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
+            if (userIdClaim == null)
+            {
+                return Unauthorized(new { message = "Felhasználó azonosítása sikertelen." });
+            }
+
+            var userId = userIdClaim.Value;
+
             if (string.IsNullOrEmpty(request.Password) && string.IsNullOrEmpty(request.Email))
             {
                 return BadRequest(new { message = "Legalább egy mezőnek (email vagy jelszó) meg kell változnia." });
             }
+            if (!string.IsNullOrEmpty(request.Email) && !IsValidEmail(request.Email))
+            {
+                return BadRequest(new { message = "Hibás email formátum!" });
+            }
 
+            if (!string.IsNullOrEmpty(request.Password) && !IsValidPassword(request.Password))
+            {
+                return BadRequest(new { message = "A jelszónak tartalmaznia kell legalább egy nagybetűt, egy számot, és 8-15 karakter hosszúnak kell lennie!" });
+            }
             try
             {
                 const string selectQuery = "SELECT Id, Email, PasswordHash FROM Users WHERE Id = @UserId";
@@ -258,6 +292,12 @@ namespace StudentHiveServer.Controllers
         [HttpPut("organization/{organizationId}")]
         public async Task<IActionResult> UpdateOrganizationDetails(int organizationId, [FromBody] UpdateOrganizationRequest request)
         {
+            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
+            if (userIdClaim == null)
+            {
+                return Unauthorized(new { message = "Felhasználó azonosítása sikertelen." });
+            }
+
             if (string.IsNullOrEmpty(request.Name) || string.IsNullOrEmpty(request.Address) ||
                 string.IsNullOrEmpty(request.ContactEmail) || string.IsNullOrEmpty(request.ContactPhone))
             {
@@ -337,6 +377,17 @@ namespace StudentHiveServer.Controllers
             {
                 Console.WriteLine($"Error sending email: {ex.Message}");
             }
+        }
+        private bool IsValidEmail(string email)
+        {
+            var pattern = @"^[\w\.-]+@[a-zA-Z\d-]+\.[a-zA-Z]{2,}$";
+            return Regex.IsMatch(email, pattern);
+        }
+
+        private bool IsValidPassword(string password)
+        {
+            var pattern = @"^(?=.*[A-Z])(?=.*\d).{8,15}$";
+            return Regex.IsMatch(password, pattern);
         }
         public class NewOrganizationRequest
         {
