@@ -1,16 +1,17 @@
-import { useState, useEffect } from 'react';
-import { useLocation, Link } from 'react-router-dom';
-import axios from 'axios';
-import styles from './Login.module.css';
-import Title from '../../components/Title/Title';
-import Navbar from '../../components/Navbar/Navbar';
-import { roleRoutes, routes } from '../../utils/routes';
-import { toast } from 'react-toastify';
+import { useState, useEffect } from "react";
+import { useLocation, useNavigate, Link } from "react-router-dom";
+import axios from "axios";
+import styles from "./Login.module.css";
+import Title from "../../components/Title/Title";
+import Navbar from "../../components/Navbar/Navbar";
+import { roleRoutes, routes } from "../../utils/routes";
+import { toast } from "react-toastify";
 
 const Login = () => {
   const location = useLocation();
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const navigate = useNavigate();
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [stayLoggedIn, setStayLoggedIn] = useState(false);
 
   useEffect(() => {
@@ -23,18 +24,18 @@ const Login = () => {
     e.preventDefault();
 
     try {
-      const response = await axios.post('https://localhost:7067/api/auth/login', {
+      const response = await axios.post("https://localhost:7067/api/auth/login", {
         email,
         password,
         stayLoggedIn,
       });
 
       const { token, role } = response.data;
-      localStorage.setItem('token', token);
-      window.location.href = roleRoutes[role] || routes.homePage.path;
+      localStorage.setItem("token", token);
+      navigate(roleRoutes[role] || routes.homePage.path);
 
     } catch (error: any) {
-      const errorMessage = error.response?.data?.message || 'Váratlan hiba lépett fel.';
+      const errorMessage = error.response?.data?.message || "Váratlan hiba lépett fel.";
       toast.error(errorMessage);
     }
   };

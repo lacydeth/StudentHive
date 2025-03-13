@@ -1,14 +1,14 @@
 import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
-import { handleLogout } from "../../utils/authUtils";
+import { Link, useNavigate } from "react-router-dom";
 import { routes } from "../../utils/routes";
 import axios from "axios";
+import { toast } from "react-toastify";
 
 const UserNavbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isSticky, setIsSticky] = useState(false);
   const [profile, setProfile] = useState<{ firstName: string; lastName: string } | null>(null);
-
+  const navigate = useNavigate();
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
   };
@@ -39,7 +39,22 @@ const UserNavbar = () => {
   }, []);
 
   const closeMenu = () => setIsMenuOpen(false);
+  const handleLogout = async () => {
+    try {
+      const response = await axios.post("https://localhost:7067/api/auth/logout");
 
+      if (response.status === 200) {
+        localStorage.removeItem("token");
+        toast.success("Sikeres kijelentkezés!");
+        navigate("/login");
+      } else {
+        toast.error("Sikertelen kijelentkezés!");
+      }
+    } catch (error) {
+      toast.error("Hiba történt a kijelentkezés közben!");
+      console.error("Kijelentkezési hiba:", error);
+    }
+  };
   return (
     <div className={`navbar ${isMenuOpen ? "show" : ""} ${isSticky ? "sticky" : ""}`}>
       <div className="content">

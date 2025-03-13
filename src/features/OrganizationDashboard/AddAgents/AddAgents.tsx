@@ -13,13 +13,39 @@ const AddAgents = () => {
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [newAgentEmail, setNewAgentEmail] = useState("");
+  const [errors, setErrors] = useState({ firstName: "", lastName: "", newAgentEmail: "" });
   const [isSidebarOpen, setIsSidebarOpen] = useState(window.innerWidth >= 1000);
 
   const handleToggleSidebar = () => {
     setIsSidebarOpen(!isSidebarOpen);
   };
 
+  const validateInputs = () => {
+    let valid = true;
+    const newErrors = { firstName: "", lastName: "", newAgentEmail: "" };
+
+    if (!/^[a-zA-ZáéíóöőúüűÁÉÍÓÖŐÚÜŰ]{2,}$/.test(firstName)) {
+      newErrors.firstName = "A keresztnév legalább 2 karakter hosszú és csak betűket tartalmazhat.";
+      valid = false;
+    }
+
+    if (!/^[a-zA-ZáéíóöőúüűÁÉÍÓÖŐÚÜŰ]{2,}$/.test(lastName)) {
+      newErrors.lastName = "A vezetéknév legalább 2 karakter hosszú és csak betűket tartalmazhat.";
+      valid = false;
+    }
+
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(newAgentEmail)) {
+      newErrors.newAgentEmail = "Érvényes email címet adj meg.";
+      valid = false;
+    }
+
+    setErrors(newErrors);
+    return valid;
+  };
+
   const handleRegister = async () => {
+    if (!validateInputs()) return;
+
     const loggedInUserId = getUserIdFromToken();
     if (!loggedInUserId) {
       toast.error("Nem található felhasználói bejelentkezés.");
@@ -45,12 +71,9 @@ const AddAgents = () => {
       setFirstName("");
       setLastName("");
       setNewAgentEmail("");
+      setErrors({ firstName: "", lastName: "", newAgentEmail: "" });
     } catch (error: any) {
-      if (error.response?.data?.message) {
-        toast.error(error.response.data.message);
-      } else {
-        toast.error("Ismeretlen hiba lépett fel.");
-      }
+      toast.error(error.response?.data?.message || "Ismeretlen hiba lépett fel.");
     }
   };
 
@@ -77,6 +100,7 @@ const AddAgents = () => {
                 required
               />
               <img src="./id-card.png" alt="last name icon" />
+              {errors.lastName && <span className={styles.error}>{errors.lastName}</span>}
             </div>
             <div className={styles.inputBox}>
               <input
@@ -87,6 +111,7 @@ const AddAgents = () => {
                 required
               />
               <img src="./id-card.png" alt="first name icon" />
+              {errors.firstName && <span className={styles.error}>{errors.firstName}</span>}
             </div>
             <div className={styles.inputBox}>
               <input
@@ -97,6 +122,7 @@ const AddAgents = () => {
                 required
               />
               <img src="./mail.png" alt="email icon" />
+              {errors.newAgentEmail && <span className={styles.error}>{errors.newAgentEmail}</span>}
             </div>
 
             <button type="submit" className={styles.registerBtn}>
