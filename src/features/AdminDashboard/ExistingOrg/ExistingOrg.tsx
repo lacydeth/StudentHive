@@ -41,7 +41,6 @@ const ExistingOrg = () => {
     const organization = params.data;
     return (
       <div style={{ display: "flex", gap: "15px" }}>
-        {/* View Button */}
         <button
           onClick={() => {
             toggleDialog();
@@ -51,7 +50,6 @@ const ExistingOrg = () => {
         >
           <img src="./view.png" alt="View" />
         </button>
-        {/* Key Button */}
         <button
           onClick={() => {
             toggleDialog();

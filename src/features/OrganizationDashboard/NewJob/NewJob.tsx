@@ -8,7 +8,6 @@ import DashboardTitle from "../../../components/DashboardTitle/DashboardTitle";
 import { getUserIdFromToken } from "../../../utils/authUtils";
 import { toast } from "react-toastify";
 
-
 const NewJob = () => {
   const [title, setTitle] = useState("");
   const [hourlyrate, setHourlyRate] = useState("");
@@ -17,7 +16,7 @@ const NewJob = () => {
   const [ourOffer, setOurOffer] = useState("");
   const [city, setCity] = useState("");
   const [address, setAddress] = useState("");
-  const [mainTaks, setmainTaks] = useState("");
+  const [mainTaks, setMainTaks] = useState("");
   const [jobRequirements, setJobRequirements] = useState("");
   const [advantages, setAdvantages] = useState("");
   const [isSidebarOpen, setIsSidebarOpen] = useState(window.innerWidth >= 1000);
@@ -32,24 +31,34 @@ const NewJob = () => {
     const fetchCategories = async () => {
       const response = await axios.get("https://localhost:7067/api/organization/categories");
       setCategories(response.data);
-      if (response.status != 200) {
-        toast.error("Hiba a kategóriák betöltése közben.")
+      if (response.status !== 200) {
+        toast.error("Hiba a kategóriák betöltése közben.");
       }
     };
     fetchCategories();
   }, []);
 
   const handleRegister = async () => {
+    if (title.length > 84) {
+      toast.error("A munka neve nem lehet hosszabb 84 karakternél.");
+      return;
+    }
+
+    if (parseFloat(hourlyrate) <= 0) {
+      toast.error("Az órabér nem lehet 0 vagy negatív szám.");
+      return;
+    }
+
     const loggedInUserId = getUserIdFromToken();
     if (!loggedInUserId) {
-      toast.error("User is not authenticated.");
+      toast.error("Felhasználó nincs hitelesítve.");
       return;
     }
 
     try {
       const token = localStorage.getItem("token");
       if (!token) {
-        toast.error("No authentication token found.");
+        toast.error("Nem található hitelesítési token!");
         return;
       }
 
@@ -64,7 +73,7 @@ const NewJob = () => {
           ourOffer,
           mainTaks,
           jobRequirements,
-          advantages
+          advantages,
         },
         {
           headers: { Authorization: `Bearer ${token}` },
@@ -72,23 +81,28 @@ const NewJob = () => {
       );
       toast.success(response?.data?.message);
 
+      setTitle("");
+      setHourlyRate("");
+      setSelectedCategory("");
+      setOurOffer("");
+      setCity("");
+      setAddress("");
+      setMainTaks("");
+      setJobRequirements("");
+      setAdvantages("");
     } catch (error: any) {
       if (error.response?.data?.message) {
         toast.error(error.response?.data?.message || "Ismeretlen hiba lépett fel.");
       } else {
-        toast.error("Ismeretlen hiba lépett fel.")
+        toast.error("Ismeretlen hiba lépett fel.");
       }
     }
   };
 
-
   return (
     <div className={styles.container}>
       <Sidebar isOpen={isSidebarOpen} toggleSidebar={handleToggleSidebar} topLinks={orgMenuLinks} />
-      <div
-        className={`${styles.content} ${isSidebarOpen ? styles.sidebarOpen : styles.sidebarClosed
-          }`}
-      >
+      <div className={`${styles.content} ${isSidebarOpen ? styles.sidebarOpen : styles.sidebarClosed}`}>
         <DashboardTitle title="Munka létrehozása" icon="./more.png" subTitle="Munka létrehozása" />
         <div className={styles.newJobContent}>
           <Title subTitle="Munka létrehozása" title="Adj hozzá új munkát pár adat megadásával!" />
@@ -108,8 +122,9 @@ const NewJob = () => {
                     value={title}
                     onChange={(e) => setTitle(e.target.value)}
                     required
+                    maxLength={84}
                   />
-                  <img src="./job-description.png" alt="last name icon" />
+                  <img src="./job-description.png" alt="title icon" />
                 </div>
                 <div className={styles.inputBox}>
                   <select
@@ -127,7 +142,6 @@ const NewJob = () => {
                     ))}
                   </select>
                 </div>
-
               </div>
               <div className={styles.row}>
                 {/* FAQ 1 */}
@@ -189,7 +203,7 @@ const NewJob = () => {
                         <textarea
                           placeholder="Főbb feladatok"
                           value={mainTaks}
-                          onChange={(e) => setmainTaks(e.target.value)}
+                          onChange={(e) => setMainTaks(e.target.value)}
                           required
                           className={styles.textarea}
                         />

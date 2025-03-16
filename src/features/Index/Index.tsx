@@ -118,7 +118,7 @@ const IndexPage = () => {
                 Keresés
                 <img src="/loupe.png" alt="Search" />
               </button>
-              <Link className="secondary-btn" to={routes.organizationRequest.path}>
+              <Link className="secondary-btn" to={routes.registerPage.path}>
                 Még nincs fiókom
               </Link>
             </div>

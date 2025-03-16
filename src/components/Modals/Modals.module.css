@@ -21,7 +21,7 @@
     width: 280px;
 }
   
-.inputBox input {
+.inputBox input, .inputBox select {
     border: none;
     padding: 15px 20px;
     background-color: #fff;
@@ -29,11 +29,21 @@
     width: 100%;
     border-radius: 8px;
 }
-  
-.inputBox input:focus {
+.inputBox input:focus, .inputBox select:focus {
     outline: 2px solid #99BC85;
 }
-  
+.textarea {
+    width: 100%;
+    padding: 15px 20px;
+    background-color: #fff;
+    border: none;
+    border-radius: 8px;
+    resize: vertical; 
+    min-height: 60px;
+}
+.textarea:focus {
+    outline: 2px solid #99BC85;
+}
 .inputBox img {
     width: 24px;
     position: absolute;

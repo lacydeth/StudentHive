@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import styles from "./Modals.module.css";
+import { toast } from "react-toastify";
 
-interface JobPatchViewModalProps {
+type JobPatchViewModalProps = {
   jobId: number;
 }
 
@@ -12,6 +13,7 @@ const JobPatchViewModal: React.FC<JobPatchViewModalProps> = ({ jobId }) => {
   const [currentJobId, setCurrentJobId] = useState<string>("");
 
   useEffect(() => {
+    setSelectedAgent(null);
     setCurrentJobId(jobId.toString());
   }, [jobId]);
 
@@ -32,12 +34,12 @@ const JobPatchViewModal: React.FC<JobPatchViewModalProps> = ({ jobId }) => {
     fetchAgents();
   }, []);
 
-  const handleAgentChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
-    setSelectedAgent(Number(event.target.value));
+  const handleAgentChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    setSelectedAgent(Number(e.target.value));
   };
 
-  const handleSubmit = async (event: React.FormEvent) => {
-    event.preventDefault();
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
 
     if (selectedAgent === null || currentJobId === "") {
       alert("Kérlek válassz egy közvetítőt és add meg a munkát (Job ID).");
@@ -45,7 +47,7 @@ const JobPatchViewModal: React.FC<JobPatchViewModalProps> = ({ jobId }) => {
     }
 
     try {
-      const response = await axios.patch(
+      await axios.patch(
         `https://localhost:7067/api/organization/assign-agent/${selectedAgent}/${currentJobId}`,
         {},
         {
@@ -55,11 +57,10 @@ const JobPatchViewModal: React.FC<JobPatchViewModalProps> = ({ jobId }) => {
         }
       );
 
-      console.log("Közvetítő sikeresen hozzárendelve:", response.data);
-      alert("Közvetítő sikeresen hozzárendelve!");
+      toast.success("Közvetítő sikeresen hozzárendelve!");
     } catch (error) {
       console.error("Hiba történt a közvetítő hozzárendelésekor:", error);
-      alert("Hiba történt a közvetítő hozzárendelésekor.");
+      toast.error("Hiba történt a közvetítő hozzárendelésekor.");
     }
   };
 

@@ -23,7 +23,8 @@ const OrgPasswordModal = ({ organizationId }: OrgPasswordModalProps) => {
     try {
       await axios.put(
         `https://localhost:7067/api/admin/organization/${organizationId}/password`,
-        { newPassword }
+        { newPassword },
+        { headers: { Authorization: `Bearer ${localStorage.getItem("token")}` } }
       );
       toast.success("A jelszó sikeresen megváltozott!");
       setNewPassword("");
