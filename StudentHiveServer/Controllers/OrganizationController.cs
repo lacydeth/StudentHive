@@ -302,6 +302,90 @@ namespace StudentHiveServer.Controllers
                 return StatusCode(500, new { message = "Error loading data!", details = ex.Message });
             }
         }
+        // GET: részlet információ egy adott munkáról - protected
+        [HttpGet("job/{id}")]
+        public async Task<IActionResult> GetJobDetails(int id)
+        {
+            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
+            if (userIdClaim == null)
+            {
+                return Unauthorized(new { message = "Felhasználó azonosítása sikertelen." });
+            }
+
+            var loggedInUserId = userIdClaim.Value;
+
+            try
+            {
+                const string getOrganizationQuery = "SELECT OrganizationId FROM Users WHERE Id = @UserId";
+                var organizationParameters = new[] {
+                    new MySqlParameter("@UserId", loggedInUserId)
+                };
+
+                var organizationTable = await _dbHelper.ExecuteQueryAsync(getOrganizationQuery, organizationParameters);
+                if (organizationTable.Rows.Count == 0)
+                {
+                    return Unauthorized(new { message = "A felhasználó nem tartozik egyetlen szövetkezethez sem." });
+                }
+
+                var organizationId = organizationTable.Rows[0].Field<int>("OrganizationId");
+
+                var query = @"SELECT 
+                        j.Id, 
+                        j.Title, 
+                        j.CategoryId,
+                        c.CategoryName, 
+                        j.City, 
+                        j.Address, 
+                        j.HourlyRate, 
+                        j.AgentId, 
+                        j.IsActive,
+                        d.OurOffer,
+                        d.MainTaks,
+                        d.JobRequirements,
+                        d.Advantages
+                    FROM Jobs j
+                    LEFT JOIN Categories c ON j.CategoryId = c.Id 
+                    LEFT JOIN Description d ON j.DescriptionId = d.Id
+                    WHERE j.Id = @JobId AND j.OrganizationId = @OrganizationId";
+
+                var jobParameters = new[] {
+                    new MySqlParameter("@JobId", id),
+                    new MySqlParameter("@OrganizationId", organizationId)
+                };
+
+                var dataTable = await _dbHelper.ExecuteQueryAsync(query, jobParameters);
+
+                if (dataTable.Rows.Count == 0)
+                {
+                    return NotFound(new { message = "Munka nem található vagy nem tartozik a szövetkezethez." });
+                }
+
+                var row = dataTable.Rows[0];
+
+                var jobDetails = new
+                {
+                    Id = row.Field<int>("Id"),
+                    Title = row.Field<string>("Title"),
+                    CategoryId = row.Field<int>("CategoryId"),
+                    CategoryName = row.Field<string>("CategoryName"),
+                    City = row.Field<string>("City"),
+                    Address = row.Field<string>("Address"),
+                    HourlyRate = row.Field<int>("HourlyRate"),
+                    AgentId = row.IsNull("AgentId") ? (int?)null : row.Field<int>("AgentId"),
+                    IsActive = row.Field<bool>("IsActive"),
+                    OurOffer = row.IsNull("OurOffer") ? "" : row.Field<string>("OurOffer"),
+                    MainTaks = row.IsNull("MainTaks") ? "" : row.Field<string>("MainTaks"),
+                    JobRequirements = row.IsNull("JobRequirements") ? "" : row.Field<string>("JobRequirements"),
+                    Advantages = row.IsNull("Advantages") ? "" : row.Field<string>("Advantages")
+                };
+
+                return Ok(jobDetails);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "Hiba az adatok betöltése során!", details = ex.Message });
+            }
+        }
         //GET: elérhető kategóriák listázása - public
         [HttpGet("categories")]
         public async Task<IActionResult> GetCategories()
@@ -619,53 +703,6 @@ namespace StudentHiveServer.Controllers
                 return StatusCode(500, $"Internal server error: {ex.Message}");
             }
         }
-        //DELETE: munka törlése - protected
-        [HttpDelete("delete-job/{jobId}")]
-        public async Task<IActionResult> DeleteJob(int jobId)
-        {
-            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
-            if (userIdClaim == null)
-            {
-                return Unauthorized(new { message = "User is not authenticated." });
-            }
-
-            var loggedInUserId = userIdClaim.Value;
-
-            try
-            {
-
-                const string checkQuery = "SELECT OrganizationId FROM Jobs WHERE Id = @JobId";
-                var checkParameters = new[] { new MySqlParameter("@JobId", jobId) };
-
-                var jobTable = await _dbHelper.ExecuteQueryAsync(checkQuery, checkParameters);
-
-                if (jobTable.Rows.Count == 0)
-                {
-                    return NotFound(new { message = "Job not found." });
-                }
-
-                var organizationId = jobTable.Rows[0].Field<int>("OrganizationId");
-
-                if (organizationId != int.Parse(loggedInUserId))
-                {
-                    return Unauthorized(new { message = "You do not have permission to delete this job." });
-                }
-
-
-                await _dbHelper.ExecuteNonQueryAsync("DELETE FROM Applications WHERE JobId = @JobId", new[] { new MySqlParameter("@JobId", jobId) });
-                await _dbHelper.ExecuteNonQueryAsync("DELETE FROM Shifts WHERE JobId = @JobId", new[] { new MySqlParameter("@JobId", jobId) });
-                await _dbHelper.ExecuteNonQueryAsync("DELETE FROM JobReviews WHERE JobId = @JobId", new[] { new MySqlParameter("@JobId", jobId) });
-                await _dbHelper.ExecuteNonQueryAsync("DELETE FROM Description WHERE Id IN (SELECT DescriptionId FROM Jobs WHERE Id = @JobId)", new[] { new MySqlParameter("@JobId", jobId) });
-                const string deleteJobQuery = "DELETE FROM Jobs WHERE Id = @JobId";
-                await _dbHelper.ExecuteNonQueryAsync(deleteJobQuery, new[] { new MySqlParameter("@JobId", jobId) });
-
-                return Ok(new { message = "Job deleted successfully." });
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, new { message = "Error occurred while deleting the job.", details = ex.Message });
-            }
-        }
         [HttpPut("profilesettings")]
         public async Task<IActionResult> UpdateAgentSettings([FromBody] UpdateAgentSettingsRequest request)
         {
@@ -914,15 +951,16 @@ namespace StudentHiveServer.Controllers
         public class JobRequest
         {
             public string Title { get; set; }
-            public string CategoryId { get; set; }
             public string Address { get; set; }
-            public int HourlyRate { get; set; }
+            public decimal HourlyRate { get; set; }
             public string City { get; set; }
+            public int CategoryId { get; set; }
             public string OurOffer { get; set; }
             public string MainTaks { get; set; }
             public string JobRequirements { get; set; }
             public string Advantages { get; set; }
         }
+
 
     }
 }

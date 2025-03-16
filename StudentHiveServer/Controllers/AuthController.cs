@@ -44,12 +44,12 @@ namespace StudentHiveServer.Controllers
 
             const string insertQuery = "INSERT INTO Users (FirstName, LastName, Email, PasswordHash, RoleId) VALUES (@FirstName, @LastName, @Email, @PasswordHash, @RoleId)";
             var parameters = new MySqlParameter[] {
-        new MySqlParameter("@FirstName", request.FirstName),
-        new MySqlParameter("@LastName", request.LastName),
-        new MySqlParameter("@Email", request.Email),
-        new MySqlParameter("@PasswordHash", BCrypt.Net.BCrypt.HashPassword(request.Password)),
-        new MySqlParameter("@RoleId", 4)
-    };
+                new MySqlParameter("@FirstName", request.FirstName),
+                new MySqlParameter("@LastName", request.LastName),
+                new MySqlParameter("@Email", request.Email),
+                new MySqlParameter("@PasswordHash", BCrypt.Net.BCrypt.HashPassword(request.Password)),
+                new MySqlParameter("@RoleId", 4)
+            };
 
             await _dbHelper.ExecuteNonQueryAsync(insertQuery, parameters);
 
@@ -62,25 +62,22 @@ namespace StudentHiveServer.Controllers
             }
 
             const string insertStudentDetailsQuery = @"
-        INSERT INTO StudentDetails 
-        (UserId, PhoneNumber, DateOfBirth, BirthName, MothersName, 
-         CountryOfBirth, PlaceOfBirth, Gender, Citizenship, StudentCardNumber, 
-         BankAccountNumber, Country, PostalCode, City, Address, SchoolName, 
-         StudyStartDate, StudyEndDate)
-        VALUES 
-        (@UserId, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL)";
+                                                        INSERT INTO StudentDetails 
+                                                        (UserId, PhoneNumber, DateOfBirth, BirthName, MothersName, 
+                                                         CountryOfBirth, PlaceOfBirth, Gender, Citizenship, StudentCardNumber, 
+                                                         BankAccountNumber, Country, PostalCode, City, Address, SchoolName, 
+                                                         StudyStartDate, StudyEndDate)
+                                                        VALUES 
+                                                        (@UserId, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL)";
 
             var studentDetailsParams = new MySqlParameter[] {
-        new MySqlParameter("@UserId", userId)
-    };
+                new MySqlParameter("@UserId", userId)
+            };
 
             await _dbHelper.ExecuteNonQueryAsync(insertStudentDetailsQuery, studentDetailsParams);
 
             return Ok(new { message = "Sikeres regisztráció!" });
         }
-
-
-
 
         //POST: bejelentkezés meglévő fiókkal - public
         [HttpPost("login")]
@@ -106,19 +103,18 @@ namespace StudentHiveServer.Controllers
                 return Unauthorized(new { message = "Hibás felhasználónév vagy jelszó!" });
 
             var roleMap = new Dictionary<int, string>
-    {
-        { 1, "Admin" },
-        { 2, "Organization" },
-        { 3, "Agent" },
-        { 4, "User" }
-    };
+            {
+                { 1, "Admin" },
+                { 2, "Organization" },
+                { 3, "Agent" },
+                { 4, "User" }
+            };
 
             var role = roleMap.GetValueOrDefault(roleId, "User");
             var token = GenerateJwtToken(userId, role, request.StayLoggedIn);
 
             return Ok(new { token, role });
         }
-
 
         //POST: kijelentkezés - public
         [HttpPost("logout")]
