@@ -496,7 +496,7 @@ namespace StudentHiveServer.Controllers
                     LastName = row.Field<string>("LastName"),
                     Email = row.Field<string>("Email"),
                     PhoneNumber = row.Field<string?>("PhoneNumber"),
-                    DateOfBirth = row.IsNull("DateOfBirth") ? null : ((DateTime?)row["DateOfBirth"])?.ToString("yyyy-MM-dd"),
+                    DateOfBirth = row.Field<DateTime?>("DateOfBirth")?.ToString("yyyy-MM-dd"),
                     BirthName = row.Field<string?>("BirthName"),
                     MothersName = row.Field<string?>("MothersName"),
                     CountryOfBirth = row.Field<string?>("CountryOfBirth"),
@@ -510,8 +510,8 @@ namespace StudentHiveServer.Controllers
                     City = row.Field<string?>("City"),
                     Address = row.Field<string?>("Address"),
                     SchoolName = row.Field<string?>("SchoolName"),
-                    StudyStartDate = row.IsNull("StudyStartDate") ? null : ((DateTime?)row["StudyStartDate"])?.ToString("yyyy-MM-dd"),
-                    StudyEndDate = row.IsNull("StudyEndDate") ? null : ((DateTime?)row["StudyEndDate"])?.ToString("yyyy-MM-dd")
+                    StudyStartDate = row.Field<DateTime?>("StudyStartDate")?.ToString("yyyy-MM-dd"),
+                    StudyEndDate = row.Field<DateTime?>("StudyEndDate")?.ToString("yyyy-MM-dd")
                 };
 
                 return Ok(studentDetails);
@@ -522,118 +522,99 @@ namespace StudentHiveServer.Controllers
             }
         }
 
-
-
-
         [HttpPut("student-details")]
         public async Task<IActionResult> UpsertStudentDetails([FromBody] StudentDetails request)
         {
-            var useridClaim = User.FindFirst(ClaimTypes.NameIdentifier);
-            if (useridClaim == null)
+            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
+            if (userIdClaim == null)
             {
                 return Unauthorized(new { message = "Felhasználói azonosítás sikertelen." });
             }
 
-            var loggedInUserId = int.Parse(useridClaim.Value);
+            var loggedInUserId = int.Parse(userIdClaim.Value);
 
-            bool isUserUpdated = false;
-            var updateUserQuery = string.Empty;
-            var parameters = new List<MySqlParameter>();
-
-            if (request.FirstName != null || request.LastName != null || request.Email != null)
-            {
-                updateUserQuery = @"
-            UPDATE Users 
-            SET FirstName = IFNULL(@FirstName, FirstName), 
+            string updateUserQuery = @"
+                UPDATE Users 
+                SET FirstName = IFNULL(@FirstName, FirstName), 
                 LastName = IFNULL(@LastName, LastName),
                 Email = IFNULL(@Email, Email)
-            WHERE Id = @UserId";
+                WHERE Id = @UserId";
 
-                if (request.FirstName != null)
-                {
-                    parameters.Add(new MySqlParameter("@FirstName", request.FirstName));
-                }
-                if (request.LastName != null)
-                {
-                    parameters.Add(new MySqlParameter("@LastName", request.LastName));
-                }
-                if (request.Email != null)
-                {
-                    parameters.Add(new MySqlParameter("@Email", request.Email));
-                }
-                parameters.Add(new MySqlParameter("@UserId", loggedInUserId));
+            var parameters = new List<MySqlParameter>
+            {
+                new MySqlParameter("@UserId", loggedInUserId),
+                new MySqlParameter("@FirstName", request.FirstName ?? (object)DBNull.Value),
+                new MySqlParameter("@LastName", request.LastName ?? (object)DBNull.Value),
+                new MySqlParameter("@Email", request.Email ?? (object)DBNull.Value)
+            };
 
-                var result = await _dbHelper.ExecuteNonQueryAsync(updateUserQuery, parameters.ToArray());
-                if (result > 0)
-                {
-                    isUserUpdated = true;
-                }
-            }
+            await _dbHelper.ExecuteNonQueryAsync(updateUserQuery, parameters.ToArray());
 
-            const string updateStudentDetailsQuery = @"
-        INSERT INTO StudentDetails (UserId, PhoneNumber, DateOfBirth, BirthName, MothersName, 
-                                    CountryOfBirth, PlaceOfBirth, Gender, Citizenship, StudentCardNumber, 
-                                    BankAccountNumber, Country, PostalCode, City, Address, SchoolName, 
-                                    StudyStartDate, StudyEndDate)
-        VALUES (@UserId, @PhoneNumber, @DateOfBirth, @BirthName, @MothersName, @CountryOfBirth, 
-                @PlaceOfBirth, @Gender, @Citizenship, @StudentCardNumber, @BankAccountNumber, 
-                @Country, @PostalCode, @City, @Address, @SchoolName, @StudyStartDate, @StudyEndDate)
-        ON DUPLICATE KEY UPDATE 
-            PhoneNumber = @PhoneNumber, DateOfBirth = @DateOfBirth, BirthName = @BirthName, 
-            MothersName = @MothersName, CountryOfBirth = @CountryOfBirth, PlaceOfBirth = @PlaceOfBirth, 
-            Gender = @Gender, Citizenship = @Citizenship, StudentCardNumber = @StudentCardNumber, 
-            BankAccountNumber = @BankAccountNumber, Country = @Country, PostalCode = @PostalCode, 
-            City = @City, Address = @Address, SchoolName = @SchoolName, StudyStartDate = @StudyStartDate, 
-            StudyEndDate = @StudyEndDate";
+
+            string updateStudentDetailsQuery = @"
+                UPDATE StudentDetails
+                SET PhoneNumber = IFNULL(@PhoneNumber, PhoneNumber),
+                    DateOfBirth = IFNULL(@DateOfBirth, DateOfBirth),
+                    BirthName = IFNULL(@BirthName, BirthName),
+                    MothersName = IFNULL(@MothersName, MothersName),
+                    CountryOfBirth = IFNULL(@CountryOfBirth, CountryOfBirth),
+                    PlaceOfBirth = IFNULL(@PlaceOfBirth, PlaceOfBirth),
+                    Gender = IFNULL(@Gender, Gender),
+                    Citizenship = IFNULL(@Citizenship, Citizenship),
+                    StudentCardNumber = IFNULL(NULLIF(@StudentCardNumber, ''), StudentCardNumber),
+                    BankAccountNumber = IFNULL(@BankAccountNumber, BankAccountNumber),
+                    Country = IFNULL(@Country, Country),
+                    PostalCode = IFNULL(@PostalCode, PostalCode),
+                    City = IFNULL(@City, City),
+                    Address = IFNULL(@Address, Address),
+                    SchoolName = IFNULL(@SchoolName, SchoolName),
+                    StudyStartDate = IFNULL(@StudyStartDate, StudyStartDate),
+                    StudyEndDate = IFNULL(@StudyEndDate, StudyEndDate)
+                WHERE UserId = @UserId";
 
             var studentDetailsParams = new MySqlParameter[]
             {
-        new MySqlParameter("@UserId", loggedInUserId),
-        new MySqlParameter("@PhoneNumber", request.PhoneNumber ?? (object)DBNull.Value),
-        new MySqlParameter("@DateOfBirth", request.DateOfBirth ?? (object)DBNull.Value),
-        new MySqlParameter("@BirthName", request.BirthName ?? (object)DBNull.Value),
-        new MySqlParameter("@MothersName", request.MothersName ?? (object)DBNull.Value),
-        new MySqlParameter("@CountryOfBirth", request.CountryOfBirth ?? (object)DBNull.Value),
-        new MySqlParameter("@PlaceOfBirth", request.PlaceOfBirth ?? (object)DBNull.Value),
-        new MySqlParameter("@Gender", request.Gender ?? (object)DBNull.Value),
-        new MySqlParameter("@Citizenship", request.Citizenship ?? (object)DBNull.Value),
-        new MySqlParameter("@StudentCardNumber", request.StudentCardNumber ?? (object)DBNull.Value),
-        new MySqlParameter("@BankAccountNumber", request.BankAccountNumber ?? (object)DBNull.Value),
-        new MySqlParameter("@Country", request.Country ?? (object)DBNull.Value),
-        new MySqlParameter("@PostalCode", request.PostalCode ?? (object)DBNull.Value),
-        new MySqlParameter("@City", request.City ?? (object)DBNull.Value),
-        new MySqlParameter("@Address", request.Address ?? (object)DBNull.Value),
-        new MySqlParameter("@SchoolName", request.SchoolName ?? (object)DBNull.Value),
-        new MySqlParameter("@StudyStartDate", request.StudyStartDate ?? (object)DBNull.Value),
-        new MySqlParameter("@StudyEndDate", request.StudyEndDate ?? (object)DBNull.Value)
+                new MySqlParameter("@PhoneNumber", request.PhoneNumber ?? (object)DBNull.Value),
+                new MySqlParameter("@DateOfBirth", request.DateOfBirth ?? (object)DBNull.Value),
+                new MySqlParameter("@BirthName", request.BirthName ?? (object)DBNull.Value),
+                new MySqlParameter("@MothersName", request.MothersName ?? (object)DBNull.Value),
+                new MySqlParameter("@CountryOfBirth", request.CountryOfBirth ?? (object)DBNull.Value),
+                new MySqlParameter("@PlaceOfBirth", request.PlaceOfBirth ?? (object)DBNull.Value),
+                new MySqlParameter("@Gender", request.Gender ?? (object)DBNull.Value),
+                new MySqlParameter("@Citizenship", request.Citizenship ?? (object)DBNull.Value),
+                new MySqlParameter("@StudentCardNumber", string.IsNullOrEmpty(request.StudentCardNumber) ? DBNull.Value : (object)request.StudentCardNumber),
+                new MySqlParameter("@BankAccountNumber", request.BankAccountNumber ?? (object)DBNull.Value),
+                new MySqlParameter("@Country", request.Country ?? (object)DBNull.Value),
+                new MySqlParameter("@PostalCode", request.PostalCode ?? (object)DBNull.Value),
+                new MySqlParameter("@City", request.City ?? (object)DBNull.Value),
+                new MySqlParameter("@Address", request.Address ?? (object)DBNull.Value),
+                new MySqlParameter("@SchoolName", request.SchoolName ?? (object)DBNull.Value),
+                new MySqlParameter("@StudyStartDate", request.StudyStartDate ?? (object)DBNull.Value),
+                new MySqlParameter("@StudyEndDate", request.StudyEndDate ?? (object)DBNull.Value),
+                new MySqlParameter("@UserId", loggedInUserId)
             };
 
             await _dbHelper.ExecuteNonQueryAsync(updateStudentDetailsQuery, studentDetailsParams);
 
             return Ok(new { message = "Sikeres módosítás!" });
         }
-
-
-
-
-
         public class StudentDetails
         {
             public string FirstName { get; set; }
             public string LastName { get; set; }
             public string Email { get; set; }
-            public string PhoneNumber { get; set; } // Changed to string, phone numbers are typically stored as strings
-            public string? DateOfBirth { get; set; } // Changed to DateTime, assuming it's a date
+            public string PhoneNumber { get; set; } 
+            public string? DateOfBirth { get; set; } 
             public string BirthName { get; set; }
             public string MothersName { get; set; }
             public string CountryOfBirth { get; set; }
             public string PlaceOfBirth { get; set; }
             public string Gender { get; set; }
             public string Citizenship { get; set; }
-            public string StudentCardNumber { get; set; } // Changed to string, student card numbers can have leading zeros
-            public string BankAccountNumber { get; set; } // Changed to string, bank account numbers can also have leading zeros
+            public string StudentCardNumber { get; set; } 
+            public string BankAccountNumber { get; set; } 
             public string Country { get; set; }
-            public string PostalCode { get; set; } // Changed to string, postal codes can sometimes contain letters or leading zeros
+            public string PostalCode { get; set; } 
             public string City { get; set; }
             public string Address { get; set; }
             public string SchoolName { get; set; }
