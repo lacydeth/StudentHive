@@ -25,55 +25,9 @@ const UserProfile = () => {
   const [schoolName, setSchoolName] = useState("");
   const [studyStartDate, setStudyStartDate] = useState("");
   const [studyEndDate, setStudyEndDate] = useState("");
+  const [loading, setLoading] = useState(true);
+  const [activeTab, setActiveTab] = useState("personal");
 
-  useEffect(() => {
-    const fetchUserData = async () => {
-      try {
-        const token = localStorage.getItem("token");
-        if (!token) {
-          toast.error("Nincs bejelentkezve.");
-          return;
-        }
-  
-        const response = await axios.get(
-          "https://localhost:7067/api/user/student-details-datas",
-          { headers: { Authorization: `Bearer ${token}` } }
-        );
-  
-        if (response.data) {
-          const user = response.data;
-  
-          setFirstName(user.firstName || "");
-          setLastName(user.lastName || "");
-          setEmail(user.email || "");
-          setPhone(user.phoneNumber || "");
-          setDateOfBirth(user.dateOfBirth || "");
-          setBirthName(user.birthName || "");
-          setMothersName(user.mothersName || "");
-          setCountryOfBirth(user.countryOfBirth || "");
-          setPlaceOfBirth(user.placeOfBirth || "");
-          setGender(user.gender || "");
-          setCitizenship(user.citizenship || "");
-          setStudentCardNumber(user.studentCardNumber || "");
-          setBankAccountNumber(user.bankAccountNumber || "");
-          setCountry(user.country || "");
-          setPostalCode(user.postalCode || "");
-          setCity(user.city || "");
-          setAddress(user.address || "");
-          setSchoolName(user.schoolName || "");
-          setStudyStartDate(user.studyStartDate || "");
-          setStudyEndDate(user.studyEndDate || "");
-        }
-      } catch (error) {
-        console.error("Hiba az adatok lekérésekor:", error);
-        toast.error("Hiba történt az adatok lekérésekor.");
-      }
-    };
-    fetchUserData();
-  }, []);
-  
-
-  // PUT kérés küldése az adatok frissítéséhez
   const [originalDates, setOriginalDates] = useState({
     dateOfBirth: "",
     studyStartDate: "",
@@ -83,6 +37,7 @@ const UserProfile = () => {
   useEffect(() => {
     const fetchUserData = async () => {
       try {
+        setLoading(true);
         const token = localStorage.getItem("token");
         if (!token) {
           toast.error("Nincs bejelentkezve.");
@@ -94,9 +49,6 @@ const UserProfile = () => {
           { headers: { Authorization: `Bearer ${token}` } }
         );
   
-console.log(response);
-
-
         if (response.data) {
           const user = response.data;
   
@@ -121,22 +73,23 @@ console.log(response);
           setStudyStartDate(user.studyStartDate || "");
           setStudyEndDate(user.studyEndDate || "");
   
-          // Eredeti dátumok mentése
           setOriginalDates({
             dateOfBirth: user.dateOfBirth || "",
             studyStartDate: user.studyStartDate || "",
             studyEndDate: user.studyEndDate || "",
           });
         }
+        setLoading(false);
       } catch (error) {
         console.error("Hiba az adatok lekérésekor:", error);
         toast.error("Hiba történt az adatok lekérésekor.");
+        setLoading(false);
       }
     };
     fetchUserData();
   }, []);
   
-  const handlesubmit = async () => {
+  const handleSubmit = async () => {
     try {
       const token = localStorage.getItem("token");
       if (!token) {
@@ -166,7 +119,8 @@ console.log(response);
         studyStartDate: studyStartDate === originalDates.studyStartDate ? null : studyStartDate,
         studyEndDate: studyEndDate === originalDates.studyEndDate ? null : studyEndDate,
       };
-  
+      
+      setLoading(true);
       const response = await axios.put(
         `https://localhost:7067/api/user/student-details`,
         updatedData,
@@ -176,41 +130,293 @@ console.log(response);
       if (response.status === 200) {
         toast.success("A profil sikeresen frissítve!");
       }
+      setLoading(false);
     } catch (error) {
       console.error("Hiba az adatok frissítésekor:", error);
       toast.error("Hiba történt az adatok frissítésekor.");
+      setLoading(false);
     }
   };
-  
+
+  const renderPersonalInfoTab = () => {
+    return (
+      <div className={styles.formSection}>
+        <div className={styles.sectionHeader}>
+          <h4>Általános információk</h4>
+        </div>
+        <div className={styles.formGrid}>
+          <div className={styles.formField}>
+            <label>Vezetéknév</label>
+            <input 
+              type="text" 
+              value={firstName} 
+              onChange={(e) => setFirstName(e.target.value)} 
+              placeholder="Vezetéknév"
+            />
+          </div>
+          <div className={styles.formField}>
+            <label>Keresztnév</label>
+            <input 
+              type="text" 
+              value={lastName} 
+              onChange={(e) => setLastName(e.target.value)} 
+              placeholder="Keresztnév"
+            />
+          </div>
+          <div className={styles.formField}>
+            <label>Email</label>
+            <input 
+              type="email" 
+              value={email} 
+              onChange={(e) => setEmail(e.target.value)} 
+              placeholder="Email cím"
+            />
+          </div>
+          <div className={styles.formField}>
+            <label>Telefonszám</label>
+            <input 
+              type="text" 
+              value={phoneNumber} 
+              onChange={(e) => setPhone(e.target.value)} 
+              placeholder="+36 20 123 4567"
+            />
+          </div>
+        </div>
+
+        <div className={styles.sectionHeader}>
+          <h4>Születési adatok</h4>
+        </div>
+        <div className={styles.formGrid}>
+          <div className={styles.formField}>
+            <label>Születési Dátum</label>
+            <input 
+              type="date" 
+              value={dateOfBirth} 
+              onChange={(e) => setDateOfBirth(e.target.value)}
+            />
+          </div>
+          <div className={styles.formField}>
+            <label>Születési Név</label>
+            <input 
+              type="text" 
+              value={birthName} 
+              onChange={(e) => setBirthName(e.target.value)} 
+              placeholder="Születési név"
+            />
+          </div>
+          <div className={styles.formField}>
+            <label>Anyja Neve</label>
+            <input 
+              type="text" 
+              value={mothersName} 
+              onChange={(e) => setMothersName(e.target.value)} 
+              placeholder="Anyja neve"
+            />
+          </div>
+          <div className={styles.formField}>
+            <label>Születési Ország</label>
+            <input 
+              type="text" 
+              value={countryOfBirth} 
+              onChange={(e) => setCountryOfBirth(e.target.value)} 
+              placeholder="Magyarország"
+            />
+          </div>
+          <div className={styles.formField}>
+            <label>Születési Hely</label>
+            <input 
+              type="text" 
+              value={placeOfBirth} 
+              onChange={(e) => setPlaceOfBirth(e.target.value)} 
+              placeholder="Budapest"
+            />
+          </div>
+          <div className={styles.formField}>
+            <label>Nem</label>
+            <select value={gender} onChange={(e) => setGender(e.target.value)}>
+              <option value="">Válassz...</option>
+              <option value="Férfi">Férfi</option>
+              <option value="Nő">Nő</option>
+              <option value="Egyéb">Egyéb</option>
+            </select>
+          </div>
+          <div className={styles.formField}>
+            <label>Állampolgárság</label>
+            <input 
+              type="text" 
+              value={citizenship} 
+              onChange={(e) => setCitizenship(e.target.value)} 
+              placeholder="Magyar"
+            />
+          </div>
+        </div>
+      </div>
+    );
+  };
+
+  const renderAddressTab = () => {
+    return (
+      <div className={styles.formSection}>
+        <div className={styles.sectionHeader}>
+          <h4>Lakcím információk</h4>
+        </div>
+        <div className={styles.formGrid}>
+          <div className={styles.formField}>
+            <label>Ország</label>
+            <input 
+              type="text" 
+              value={country} 
+              onChange={(e) => setCountry(e.target.value)} 
+              placeholder="Magyarország"
+            />
+          </div>
+          <div className={styles.formField}>
+            <label>Irányítószám</label>
+            <input 
+              type="text" 
+              value={postalCode} 
+              onChange={(e) => setPostalCode(e.target.value)} 
+              placeholder="1234"
+            />
+          </div>
+          <div className={styles.formField}>
+            <label>Város</label>
+            <input 
+              type="text" 
+              value={city} 
+              onChange={(e) => setCity(e.target.value)} 
+              placeholder="Budapest"
+            />
+          </div>
+          <div className={styles.formField}>
+            <label>Cím</label>
+            <input 
+              type="text" 
+              value={address} 
+              onChange={(e) => setAddress(e.target.value)} 
+              placeholder="Példa utca 42."
+            />
+          </div>
+        </div>
+      </div>
+    );
+  };
+
+  const renderDocumentsTab = () => {
+    return (
+      <div className={styles.formSection}>
+        <div className={styles.sectionHeader}>
+          <h4>Dokumentumok és azonosítók</h4>
+        </div>
+        <div className={styles.formGrid}>
+          <div className={styles.formField}>
+            <label>Diákigazolványszám</label>
+            <input 
+              type="text" 
+              value={studentCardNumber} 
+              onChange={(e) => setStudentCardNumber(e.target.value)} 
+              placeholder="123456789"
+            />
+          </div>
+          <div className={styles.formField}>
+            <label>Bankszámlaszám</label>
+            <input 
+              type="text" 
+              value={bankAccountNumber} 
+              onChange={(e) => setBankAccountNumber(e.target.value)} 
+              placeholder="12345678-12345678-12345678"
+            />
+          </div>
+        </div>
+
+        <div className={styles.sectionHeader}>
+          <h4>Tanulmányi információk</h4>
+        </div>
+        <div className={styles.formGrid}>
+          <div className={styles.formField}>
+            <label>Iskola Neve</label>
+            <input 
+              type="text" 
+              value={schoolName} 
+              onChange={(e) => setSchoolName(e.target.value)} 
+              placeholder="Példa Egyetem"
+            />
+          </div>
+          <div className={styles.formField}>
+            <label>Tanulmány kezdete</label>
+            <input 
+              type="date" 
+              value={studyStartDate} 
+              onChange={(e) => setStudyStartDate(e.target.value)} 
+            />
+          </div>
+          <div className={styles.formField}>
+            <label>Tanulmány Vége</label>
+            <input 
+              type="date" 
+              value={studyEndDate} 
+              onChange={(e) => setStudyEndDate(e.target.value)} 
+            />
+          </div>
+        </div>
+      </div>
+    );
+  };
 
   return (
     <div className={styles.container}>
       <UserNavbar />
-      <div className={styles.content}>
-        <h3>Személyes Adatok</h3>
-        <form className={styles.newJobForm}>
-          <div className={styles.inputBox}><label>Vezetéknév</label><input type="text" value={firstName} onChange={(e) => setFirstName(e.target.value)} /></div>
-          <div className={styles.inputBox}><label>Keresztnév</label><input type="text" value={lastName} onChange={(e) => setLastName(e.target.value)} /></div>
-          <div className={styles.inputBox}><label>Email</label><input type="email" value={email} onChange={(e) => setEmail(e.target.value)} /></div>
-          <div className={styles.inputBox}><label>Telefonszám</label><input type="text" value={phoneNumber} onChange={(e) => setPhone(e.target.value)} /></div>
-          <div className={styles.inputBox}><label>Születési Dátum</label><input type="date" value={dateOfBirth} onChange={(e) => setDateOfBirth(e.target.value)}  /></div>
-          <div className={styles.inputBox}><label>Születési Név</label><input type="text" value={birthName} onChange={(e) => setBirthName(e.target.value)} /></div>
-          <div className={styles.inputBox}><label>Anyja Neve</label><input type="text" value={mothersName} onChange={(e) => setMothersName(e.target.value)} /></div>
-          <div className={styles.inputBox}><label>Születési Ország</label><input type="text" value={countryOfBirth} onChange={(e) => setCountryOfBirth(e.target.value)} /></div>
-          <div className={styles.inputBox}><label>Születési Hely</label><input type="text" value={placeOfBirth} onChange={(e) => setPlaceOfBirth(e.target.value)} /></div>
-          <div className={styles.inputBox}><label>Nem</label><input type="text" value={gender} onChange={(e) => setGender(e.target.value)} /></div>
-          <div className={styles.inputBox}><label>Állampolgárság</label><input type="text" value={citizenship} onChange={(e) => setCitizenship(e.target.value)} /></div>
-          <div className={styles.inputBox}><label>Diákigazolványszám</label><input type="text" value={studentCardNumber} onChange={(e) => setStudentCardNumber(e.target.value)} /></div>
-          <div className={styles.inputBox}><label>Bankszámlaszám</label><input type="text" value={bankAccountNumber} onChange={(e) => setBankAccountNumber(e.target.value)} /></div>
-          <div className={styles.inputBox}><label>Ország</label><input type="text" value={country} onChange={(e) => setCountry(e.target.value)} /></div>
-          <div className={styles.inputBox}><label>Irányítószám</label><input type="text" value={postalCode} onChange={(e) => setPostalCode(e.target.value)} /></div>
-          <div className={styles.inputBox}><label>Város</label><input type="text" value={city} onChange={(e) => setCity(e.target.value)} /></div>
-          <div className={styles.inputBox}><label>Cím</label><input type="text" value={address} onChange={(e) => setAddress(e.target.value)} /></div>
-          <div className={styles.inputBox}><label>Iskola Neve</label><input type="text" value={schoolName} onChange={(e) => setSchoolName(e.target.value)} /></div>
-          <div className={styles.inputBox}><label>Tanulmány kezdete</label><input type="date" value={studyStartDate} onChange={(e) => setStudyStartDate(e.target.value)} /></div>
-          <div className={styles.inputBox}><label>Tanulmány Vége</label><input type="date" value={studyEndDate} onChange={(e) => setStudyEndDate(e.target.value)} /></div>
-        </form>
-        <button type="submit" onClick={handlesubmit} className="registerBtn">Frissítés</button>
+      <div className={styles.pageWrapper}>
+        <div className={styles.jobTitle}>
+          <h1>Adataim</h1>
+        </div>
+        <div className={styles.cardContainer}>
+          <div className={styles.tabsContainer}>
+            <button 
+              className={`${styles.tabButton} ${activeTab === 'personal' ? styles.active : ''}`}
+              onClick={() => setActiveTab('personal')}
+            >
+              Személyes adatok
+            </button>
+            <button 
+              className={`${styles.tabButton} ${activeTab === 'address' ? styles.active : ''}`}
+              onClick={() => setActiveTab('address')}
+            >
+              Lakcím
+            </button>
+            <button 
+              className={`${styles.tabButton} ${activeTab === 'documents' ? styles.active : ''}`}
+              onClick={() => setActiveTab('documents')}
+            >
+              Dokumentumok
+            </button>
+          </div>
+          
+          <div className={styles.formContainer}>
+            {loading ? (
+              <div className={styles.loadingContainer}>
+                <div className={styles.spinner}></div>
+                <p>Adatok betöltése...</p>
+              </div>
+            ) : (
+              <>
+                {activeTab === 'personal' && renderPersonalInfoTab()}
+                {activeTab === 'address' && renderAddressTab()}
+                {activeTab === 'documents' && renderDocumentsTab()}
+                
+                <div className={styles.submitButtonContainer}>
+                  <button 
+                    className={styles.submitButton} 
+                    onClick={handleSubmit}
+                    disabled={loading}
+                  >
+                    {loading ? 'Mentés...' : 'Adatok mentése'}
+                  </button>
+                </div>
+              </>
+            )}
+          </div>
+        </div>
       </div>
     </div>
   );
