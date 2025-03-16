@@ -15,13 +15,6 @@
     flex-direction: column;
     gap: 25px;
 }
-.jobTitle {
-    position: relative;
-    width: 90%;
-    max-width: 500px;
-    padding: 2em;
-    margin: 1em auto;
-}
 .content h1 {
     position: relative;
     font-weight: 300;
