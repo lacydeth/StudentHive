@@ -22,12 +22,9 @@ const Contact = () => {
 
       if (response.data.success) {
         toast.success("Üzenetét megkaptunk! A lehető legrövidebb időn belül válaszolunk.");
-        e.currentTarget.reset();
       } else {
         toast.error(response.data.message || "Hiba történt az üzenet küldése közben");
       }
-    } catch (err) {
-      console.error("Hálózati hiba történt, kérjük próbáld újra később");
     } finally {
       setLoading(false);
     }

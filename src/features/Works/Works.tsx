@@ -50,7 +50,6 @@ const Works = () => {
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
-  // Fetch categories and locations
   useEffect(() => {
     axios
       .get("https://localhost:7067/api/organization/categories")
@@ -65,7 +64,6 @@ const Works = () => {
       .catch((error) => console.error("Error fetching locations:", error));
   }, []);
 
-  // Parse URL query parameters and fetch data accordingly
   useEffect(() => {
     const queryParams = new URLSearchParams(location.search);
     const categoryParam = queryParams.get("category");
@@ -79,11 +77,9 @@ const Works = () => {
       setSelectedLocation(locationParam);
     }
     
-    // Fetch work cards with URL parameters
     fetchWorkCards(categoryParam, locationParam);
   }, [location.search]);
 
-  // Update selectedCategory when categories are loaded and selectedCategoryId is set
   useEffect(() => {
     if (categories.length > 0 && selectedCategoryId) {
       const categoryObj = categories.find(
@@ -95,7 +91,6 @@ const Works = () => {
     }
   }, [categories, selectedCategoryId]);
 
-  // Sort workCards when sortOption changes
   useEffect(() => {
     const sortData = [...filteredWorkCards];
 
@@ -232,17 +227,6 @@ const Works = () => {
             </div>
             <hr className={styles.line} />
             <div className={styles.row}>
-              <div className={styles.inputBox}>
-                <select value={sortOption} onChange={(e) => setSortOption(e.target.value)}>
-                  <option value="" disabled>
-                    Rendezés
-                  </option>
-                  <option value="hourlyRateAsc">Órabér növekvő</option>
-                  <option value="hourlyRateDesc">Órabér csökkenő</option>
-                  <option value="createdAtAsc">Létrehozás dátuma növekvő</option>
-                  <option value="createdAtDesc">Létrehozás dátuma csökkenő</option>
-                </select>
-              </div>
               <div className={styles.btnGroup}>
                 <button className={styles.btn} onClick={handleSearch}>
                   <img src="./search.png" alt="search icon" />
