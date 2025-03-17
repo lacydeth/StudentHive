@@ -75,7 +75,20 @@ if (userRole != "Organization")
 
 
 
+contact.tsx input validálás
+regisztrálás validálása
 
+admin oldalon szövetkezet létrehozásánál a szövetkezet nevébe lehet speciális karaktert és számokat megadni
+
+organization:
+	-munka létrehozásakor munka neve tartalmazhat számokat és a város is tartalmazhat szamokat és speciális karaktereket
+	-lehet jelentkezni munkara -> megoldás jelentkezés gomb role ellenőrzése
+	-org settings nem mukodik
+	- szervezet adatai validálása szintúgy
+
+agent: 
+	-toast succes helytelen szöveg kiirasa 
+	-settings validálása
 
 
 
