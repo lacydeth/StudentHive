@@ -130,13 +130,6 @@ CREATE TABLE `JobAssignments` (
   `AssignedAt` TIMESTAMP DEFAULT (CURRENT_TIMESTAMP)
 );
 
-CREATE TABLE `History` (
-  `Id` INT PRIMARY KEY AUTO_INCREMENT,
-  `StudentId` INT NOT NULL,
-  `JobId` INT NOT NULL,
-  `StartDate` DATE NOT NULL,
-  `EndDate` DATE NOT NULL
-);
 
 CREATE UNIQUE INDEX `JobAssignments_index_0` ON `JobAssignments` (`UserId`, `JobId`);
 
@@ -172,6 +165,3 @@ ALTER TABLE `JobAssignments` ADD FOREIGN KEY (`UserId`) REFERENCES `Users` (`Id`
 
 ALTER TABLE `JobAssignments` ADD FOREIGN KEY (`JobId`) REFERENCES `Jobs` (`Id`) ON DELETE CASCADE;
 
-ALTER TABLE `History` ADD FOREIGN KEY (`StudentId`) REFERENCES `Users` (`Id`);
-
-ALTER TABLE `History` ADD FOREIGN KEY (`JobId`) REFERENCES `Jobs` (`Id`);
