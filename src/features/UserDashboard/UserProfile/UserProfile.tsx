@@ -83,11 +83,7 @@ const UserProfile = () => {
   
 
   // PUT kérés küldése az adatok frissítéséhez
-  const [originalDates, setOriginalDates] = useState({
-    dateOfBirth: "",
-    studyStartDate: "",
-    studyEndDate: "",
-  });
+
   
   useEffect(() => {
     const fetchUserData = async () => {
@@ -550,7 +546,7 @@ const UserProfile = () => {
                 <div className={styles.submitButtonContainer}>
                   <button 
                     className={styles.submitButton} 
-                    onClick={handleSubmit}
+                    onClick={handlesubmit}
                     disabled={loading}
                   >
                     {loading ? 'Mentés...' : 'Adatok mentése'}
