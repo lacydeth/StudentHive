@@ -94,9 +94,6 @@ const UserProfile = () => {
           { headers: { Authorization: `Bearer ${token}` } }
         );
   
-console.log(response);
-
-
         if (response.data) {
           const user = response.data;
   
@@ -135,9 +132,98 @@ console.log(response);
     };
     fetchUserData();
   }, []);
-  
+
   const handlesubmit = async () => {
     try {
+      let isValid = true;
+  
+      if (firstName !== "" && (firstName.length > 64 || !/^[A-Za-zÁÉÍÓÖŐÚÜŰáéíóöőúüű]+$/.test(firstName))) {
+        toast.error("A vezetéknév csak betűket tartalmazhat és max. 64 karakter lehet.");
+        isValid = false;
+      }
+  
+      if (lastName !== "" && (lastName.length > 64 || !/^[A-Za-zÁÉÍÓÖŐÚÜŰáéíóöőúüű]+$/.test(lastName))) {
+        toast.error("A keresztnév csak betűket tartalmazhat és max. 64 karakter lehet.");
+        isValid = false;
+      }
+  
+      if (email !== "" && !/^[\w.-]+@[a-zA-Z\d.-]+\.[a-zA-Z]{2,}$/.test(email)) {
+        toast.error("Érvénytelen email cím formátum.");
+        isValid = false;
+      }
+  
+      if (phoneNumber !== "" && !/^\d{11}$/.test(phoneNumber)) {
+        toast.error("A telefonszámnak pontosan 11 számjegyből kell állnia.");
+        isValid = false;
+      }
+
+      if (birthName !== "" && (birthName.length > 64 || !/^[A-Za-zÁÉÍÓÖŐÚÜŰáéíóöőúüű]+$/.test(birthName))) {
+        toast.error("A születési név csak betűket tartalmazhat és max. 64 karakter lehet.");
+        isValid = false;
+      }
+
+      if (mothersName !== "" && (mothersName.length > 64 || !/^[A-Za-zÁÉÍÓÖŐÚÜŰáéíóöőúüű]+$/.test(mothersName))) {
+        toast.error("A anyja neve csak betűket tartalmazhat és max. 64 karakter lehet.");
+        isValid = false;
+      }
+
+      if (countryOfBirth !== "" && (countryOfBirth.length > 64 || !/^[A-Za-zÁÉÍÓÖŐÚÜŰáéíóöőúüű]+$/.test(countryOfBirth))) {
+        toast.error("A születési ország csak betűket tartalmazhat és max. 64 karakter lehet.");
+        isValid = false;
+      }
+
+      if (placeOfBirth !== "" && (placeOfBirth.length > 64 || !/^[A-Za-zÁÉÍÓÖŐÚÜŰáéíóöőúüű]+$/.test(placeOfBirth))) {
+        toast.error("A születési hely csak betűket tartalmazhat és max. 64 karakter lehet.");
+        isValid = false;
+      }
+
+      if (gender !== "" && (gender.length > 64 || !/^[A-Za-zÁÉÍÓÖŐÚÜŰáéíóöőúüű]+$/.test(gender))) {
+        toast.error("A nem csak betűket tartalmazhat és max. 64 karakter lehet.");
+        isValid = false;
+      }
+
+      if (citizenship !== "" && (citizenship.length > 64 || !/^[A-Za-zÁÉÍÓÖŐÚÜŰáéíóöőúüű]+$/.test(citizenship))) {
+        toast.error("Az állampolgárság csak betűket tartalmazhat és max. 64 karakter lehet.");
+        isValid = false;
+      }
+
+      if (studentCardNumber !== "" && !/^\d{11}$/.test(studentCardNumber)) {
+        toast.error("A diákigazolványszám pontosan 11 számjegyből kell állnia.");
+        isValid = false;
+      }
+
+      if (bankAccountNumber !== "" && !/^\d{8}$/.test(bankAccountNumber)) {
+        toast.error("A bankszámlaszámnak pontosan 8 számjegyből kell állnia.");
+        isValid = false;
+      }
+
+      if (country !== "" && (country.length > 64 || !/^[A-Za-zÁÉÍÓÖŐÚÜŰáéíóöőúüű]+$/.test(country))) {
+        toast.error("Az ország csak betűket tartalmazhat és max. 64 karakter lehet.");
+        isValid = false;
+      }
+
+      if (postalCode !== "" && !/^\d{4}$/.test(postalCode)) {
+        toast.error("Az irányítószámnak pontosan 4 számjegyből kell állnia.");
+        isValid = false;
+      }
+
+      if (city !== "" && (city.length > 64 || !/^[A-Za-zÁÉÍÓÖŐÚÜŰáéíóöőúüű]+$/.test(city))) {
+        toast.error("A város csak betűket tartalmazhat és max. 64 karakter lehet.");
+        isValid = false;
+      }
+
+      if (address !== "" && (address.length > 64 || !/^[A-Za-zÁÉÍÓÖŐÚÜŰáéíóöőúüű]+$/.test(address))) {
+        toast.error("A cím csak betűket tartalmazhat és max. 64 karakter lehet.");
+        isValid = false;
+      }
+
+      if (schoolName !== "" && (schoolName.length > 64 || !/^[A-Za-zÁÉÍÓÖŐÚÜŰáéíóöőúüű]+$/.test(schoolName))) {
+        toast.error("Az iskola neve csak betűket tartalmazhat és max. 64 karakter lehet.");
+        isValid = false;
+      }
+      // Ha valamelyik validáció megbukott, akkor nem küldjük el a kérést
+      if (!isValid) return;
+  
       const token = localStorage.getItem("token");
       if (!token) {
         toast.error("Nincs bejelentkezve.");
@@ -181,6 +267,8 @@ console.log(response);
       toast.error("Hiba történt az adatok frissítésekor.");
     }
   };
+  
+  
   
 
   return (
