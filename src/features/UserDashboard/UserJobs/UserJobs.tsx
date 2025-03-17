@@ -58,17 +58,19 @@ const UserJobs = () => {
             <p>Nincs munka amire felvettek. <Link to={routes.worksPage.path} className={styles.underline}>Kezdj neki a keresésnek.</Link></p>
           )}
         </div>
-        <div className={styles.pagination}>
-          <button onClick={prevPage} disabled={currentPage === 1}>
-            Előző
-          </button>
-          <span>
-            Oldal {currentPage} / {totalPages}
-          </span>
-          <button onClick={nextPage} disabled={currentPage === totalPages || totalPages === 0}>
-            Következő
-          </button>
-        </div>
+        {jobs.length > jobsPerPage && (
+            <div className={styles.pagination}>
+              <button onClick={prevPage} disabled={currentPage === 1}>
+                Előző
+              </button>
+              <span>
+                Oldal {currentPage} / {totalPages}
+              </span>
+              <button onClick={nextPage} disabled={currentPage === totalPages || totalPages === 0}>
+                Következő
+              </button>
+          </div>
+        )}
         <div className={styles.manageShifts}>
           <div className={styles.details}>
             <h2>Műszakok kezelése</h2>

@@ -16,9 +16,8 @@ const Footer = () => {
         <div className={styles.footerSection}>
           <h4 className={styles.sectionTitle}>Oldalak</h4>
           <ul className={styles.linkList}>
-            <li><Link to={routes.homePage.path} className={styles.link}>Rólunk</Link></li>
+            <li><Link to={routes.organizationRequest.path} className={styles.link}>Szövetkezeteknek</Link></li>
             <li><Link to={routes.worksPage.path} className={styles.link}>Munkák</Link></li>
-            <li><Link to={routes.homePage.path} className={styles.link}>Adatkezelés</Link></li>
             <li><Link to={routes.contactPage.path} className={styles.link}>Kapcsolat</Link></li>
           </ul>
         </div>

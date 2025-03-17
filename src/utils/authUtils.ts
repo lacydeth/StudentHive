@@ -2,8 +2,8 @@ import axios from "axios";
 import { jwtDecode } from "jwt-decode";
 
 interface DecodedToken {
-  "http://schemas.microsoft.com/ws/2008/06/identity/claims/role"?: string; // Role claim
-  "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier"?: string; // User ID claim
+  "http://schemas.microsoft.com/ws/2008/06/identity/claims/role"?: string;
+  "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier"?: string;
   exp?: number;
   iss?: string;
   aud?: string;
@@ -109,20 +109,5 @@ export const getUserIdFromToken = (): string | null => {
   } catch (error) {
     console.error("Hiba a token dekódolás során:", error);
     return null;
-  }
-};
-
-export const handleLogout = async () => {
-  try {
-    const response = await axios.post("https://localhost:7067/api/auth/logout");
-
-    if (response.status === 200) {
-      localStorage.removeItem("token");
-      window.location.href = "/login";
-    } else {
-      console.error("Sikertelen kijelentkezés");
-    }
-  } catch (error) {
-    console.error("Hiba történt a kijelentkezés közben:", error);
   }
 };

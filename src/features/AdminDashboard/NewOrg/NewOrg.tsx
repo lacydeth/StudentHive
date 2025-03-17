@@ -10,7 +10,6 @@ import { adminTopLinks } from "../../../utils/routes";
 
 const NewOrg = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(window.innerWidth >= 1000);
-
   const [orgName, setOrgName] = useState("");
   const [email, setEmail] = useState("");
   const [phoneNumber, setPhoneNumber] = useState("");
@@ -20,14 +19,45 @@ const NewOrg = () => {
     setIsSidebarOpen(!isSidebarOpen);
   };
 
+  const validateInputs = () => {
+    if (!orgName.trim()) {
+      toast.error("A szövetkezet neve megadása kötelező!");
+      return false;
+    }
+    if (orgName.length > 50) {
+      toast.error("A szövetkezet neve legfeljebb 50 karakter lehet!");
+      return false;
+    }
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      toast.error("Érvénytelen email cím!");
+      return false;
+    }
+    const phoneRegex = /^\+?\d{10,15}$/;
+    if (!phoneRegex.test(phoneNumber)) {
+      toast.error("Érvénytelen telefonszám! 10-15 számjegy kell, opcionális '+' előtaggal.");
+      return false;
+    }
+    if (!address.trim()) {
+      toast.error("A cím megadása kötelező!");
+      return false;
+    }
+    if (address.length > 100) {
+      toast.error("A cím legfeljebb 100 karakter lehet!");
+      return false;
+    }
+    return true;
+  };
+
   const handleNewOrganization = async () => {
+    if (!validateInputs()) return;
+
     try {
-      const response = await axios.post("https://localhost:7067/api/admin/new-organization", {
-        orgName,
-        email,
-        phoneNumber,
-        address,
-      });
+      const response = await axios.post(
+        "https://localhost:7067/api/admin/new-organization",
+        { orgName, email, phoneNumber, address },
+        { headers: { Authorization: `Bearer ${localStorage.getItem("token")}` } }
+      );
       toast.success(response.data.message || "Szövetkezet sikeresen hozzáadva!");
       setOrgName("");
       setEmail("");

@@ -1,10 +1,11 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 import styles from "./Modals.module.css";
+import { toast } from "react-toastify";
 
 type JobViewModalProps = {
   job: {
-    id: string;
+    id: number;
     title: string;
     address: string;
     hourlyRate: number;
@@ -13,7 +14,8 @@ type JobViewModalProps = {
     mainTaks: string;
     jobRequirements: string;
     advantages: string;
-    categoryId: number; // Alapértelmezett kategória ID
+    categoryId: number;
+    categoryName: string;
   };
 };
 
@@ -22,34 +24,50 @@ const JobViewModal = ({ job }: JobViewModalProps) => {
   const [address, setAddress] = useState<string>(job.address);
   const [hourlyRate, setHourlyRate] = useState<number>(job.hourlyRate);
   const [city, setCity] = useState<string>(job.city);
-  const [ourOffer, setOurOffer] = useState<string>(job.ourOffer);
-  const [mainTaks, setmainTaks] = useState<string>(job.mainTaks);
-  const [jobRequirements, setJobRequirements] = useState<string>(job.jobRequirements);
-  const [advantages, setAdvantages] = useState<string>(job.advantages);
-  const [error, setError] = useState<string | null>(null);
-  const [success, setSuccess] = useState<string | null>(null);
-
+  const [ourOffer, setOurOffer] = useState<string>(job.ourOffer || "");
+  const [mainTaks, setMainTasks] = useState<string>(job.mainTaks || "");
+  const [jobRequirements, setJobRequirements] = useState<string>(job.jobRequirements || "");
+  const [advantages, setAdvantages] = useState<string>(job.advantages || "");
+  const [categories, setCategories] = useState<{id: number, categoryName: string}[]>([]);
+  const [selectedCategoryId, setSelectedCategoryId] = useState<number>(job.categoryId);
+  
+  useEffect(() => {
+    setTitle(job.title);
+    setAddress(job.address);
+    setHourlyRate(job.hourlyRate);
+    setCity(job.city);
+    setOurOffer(job.ourOffer || "");
+    setMainTasks(job.mainTaks || "");
+    setJobRequirements(job.jobRequirements || "");
+    setAdvantages(job.advantages || "");
+    setSelectedCategoryId(job.categoryId);
+  }, [job]);
+  
   useEffect(() => {
     const fetchCategories = async () => {
       try {
-        const response = await axios.get("https://localhost:7067/api/organization/categories");
+        const token = localStorage.getItem("token");
+        const response = await axios.get("https://localhost:7067/api/organization/categories", {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+        setCategories(response.data);
       } catch (err) {
-        console.error("Error fetching categories:", err);
+        console.error("Hiba az adatok betöltése során:", err);
+        toast.error("Nem sikerült a kategóriák betöltése!");
       }
     };
 
     fetchCategories();
   }, []);
 
-  const categoryid = job.categoryId;
-  
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     const request = {
       title,
-      categoryid: categoryid.toString(), // Convert the categoryId to a string
+      categoryId: Number(selectedCategoryId),
       address,
       hourlyRate,
       city,
@@ -59,11 +77,10 @@ const JobViewModal = ({ job }: JobViewModalProps) => {
       advantages,
     };
     
-
     try {
       const token = localStorage.getItem("token");
 
-      const response = await axios.put(
+      await axios.put(
         `https://localhost:7067/api/organization/update-job/${job.id}`,
         request,
         {
@@ -73,11 +90,10 @@ const JobViewModal = ({ job }: JobViewModalProps) => {
         }
       );
 
-      setSuccess("A munkaadatok frissítése sikeres!");
-      setError(null);
+      toast.success("A munkaadatok frissítése sikeres!");
     } catch (err) {
-      setError("Nem sikerült az adatok frissítése!");
-      setSuccess(null);
+      toast.error("Nem sikerült az adatok frissítése!");
+      console.log("Hiba az adatok frissítése során:", err)
     }
   };
 
@@ -89,23 +105,27 @@ const JobViewModal = ({ job }: JobViewModalProps) => {
           <div className={styles.inputBox}>
             <input
               type="text"
-              placeholder="Munka címe"
+              placeholder="Azonosító"
               value={job.id}
               required readOnly
             />
             <img src="./id-card.png" alt="id card icon" />
           </div>
 
-          {/* Read-Only Category */}
           <div className={styles.inputBox}>
-            <input
-              type="text"
-              placeholder="Kategória"
-              value={job.categoryId}
-              readOnly
-            />
-            <img src="./category-icon.png" alt="category icon" />
+            <select 
+              value={selectedCategoryId} 
+              onChange={(e) => setSelectedCategoryId(Number(e.target.value))}
+              required
+            >
+              {categories.map(category => (
+                <option key={category.id} value={category.id}>
+                  {category.categoryName}
+                </option>
+              ))}
+            </select>
           </div>
+          
           <div className={styles.inputBox}>
             <input
               type="text"
@@ -116,6 +136,7 @@ const JobViewModal = ({ job }: JobViewModalProps) => {
             />
             <img src="./office-building.png" alt="job title icon" />
           </div>
+          
           <div className={styles.inputBox}>
             <input
               type="text"
@@ -126,6 +147,7 @@ const JobViewModal = ({ job }: JobViewModalProps) => {
             />
             <img src="./location.png" alt="address icon" />
           </div>
+          
           <div className={styles.inputBox}>
             <input
               type="number"
@@ -134,8 +156,9 @@ const JobViewModal = ({ job }: JobViewModalProps) => {
               onChange={(e) => setHourlyRate(Number(e.target.value))}
               required
             />
-            <img src="./money.png" alt="hourly rate icon" />
+            <img src="./hourly-rate.png" alt="hourly rate icon" />
           </div>
+          
           <div className={styles.inputBox}>
             <input
               type="text"
@@ -144,51 +167,47 @@ const JobViewModal = ({ job }: JobViewModalProps) => {
               onChange={(e) => setCity(e.target.value)}
               required
             />
-            <img src="./location-city.png" alt="city icon" />
+            <img src="./location.png" alt="city icon" />
           </div>
+          
           <div className={styles.inputBox}>
-            <input
+            <textarea
               placeholder="Ajánlatunk"
-              value={ourOffer}
+              value={ourOffer} className={styles.textarea}
               onChange={(e) => setOurOffer(e.target.value)}
               required
             />
-            <img src="./offer.png" alt="our offer icon" />
           </div>
+          
           <div className={styles.inputBox}>
-            <input
+            <textarea
               placeholder="Fő Feladatok"
-              value={mainTaks}
-              onChange={(e) => setmainTaks(e.target.value)}
+              value={mainTaks} className={styles.textarea}
+              onChange={(e) => setMainTasks(e.target.value)}
               required
             />
-            <img src="./tasks.png" alt="main tasks icon" />
           </div>
+          
           <div className={styles.inputBox}>
-            <input
+            <textarea
               placeholder="Munkaköri Követelmények"
-              value={jobRequirements}
+              value={jobRequirements} className={styles.textarea}
               onChange={(e) => setJobRequirements(e.target.value)}
               required
             />
-            <img src="./requirements.png" alt="requirements icon" />
           </div>
+          
           <div className={styles.inputBox}>
-            <input
+            <textarea
               placeholder="Előnyök"
-              value={advantages}
+              value={advantages} className={styles.textarea}
               onChange={(e) => setAdvantages(e.target.value)}
               required
             />
-            <img src="./advantages.png" alt="advantages icon" />
           </div>
         </div>
 
-        <div className={styles.footer}>
-          {error && <p style={{ color: "red" }}>{error}</p>}
-          {success && <p style={{ color: "green" }}>{success}</p>}
-          <button type="submit">Adatok frissítése</button>
-        </div>
+        <button type="submit">Adatok frissítése</button>
       </form>
     </div>
   );

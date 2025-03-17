@@ -37,6 +37,21 @@ const CurrentJobs = () => {
     setIsSidebarOpen(!isSidebarOpen);
   };
 
+  const fetchJobDetails = async (jobId: number) => {
+    try {
+      const token = localStorage.getItem("token");
+      const response = await axios.get(`https://localhost:7067/api/organization/job/${jobId}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      return response.data;
+    } catch (error) {
+      console.error("Error fetching job details:", error);
+      return null;
+    }
+  };
+
   const fetchJobs = async () => {
     try {
       const token = localStorage.getItem("token");
@@ -46,16 +61,7 @@ const CurrentJobs = () => {
         },
       });
 
-      const allJobs = response.data.map((job: any) => ({
-        ...job,
-        categoryName: job.categoryName,
-        agentId: null,
-        ourOffer: job.ourOffer,
-        mainTaks: job.mainTaks,
-        jobRequirements: job.jobRequirements,
-        advantages: job.advantages,
-      }));
-
+      const allJobs = response.data;
       setActiveJobs(allJobs);
     } catch (error) {
       console.error("Error fetching jobs:", error);
@@ -107,14 +113,7 @@ const CurrentJobs = () => {
           },
         }
       );
-      fetchJobs()
-      const updatedJobs = [...activeJobs];
-      const jobIndex = updatedJobs.findIndex((job) => job.id === jobId);
-      if (jobIndex !== -1) {
-        updatedJobs[jobIndex].isActive = updatedStatus;
-        setActiveJobs(updatedJobs);
-      }
-
+      fetchJobs();
     } catch (error) {
       console.error("Error updating job status:", error);
     }
@@ -122,17 +121,28 @@ const CurrentJobs = () => {
 
   const actionCellRenderer = (params: any) => {
     const job = params.data;
-    const [isActive, setIsActive] = useState(job.isActive);
 
     const handleToggleStatus = async () => {
-      confirmStatusChange(job, isActive);
+      confirmStatusChange(job, job.isActive);
     };
 
-    const handleViewJob = () => {
-      setDialogContent(
-        <JobViewModal job={job} />
-      );
-      toggleDialog();
+    const handleViewJob = async () => {
+      // Fetch complete job details before opening modal
+      const jobDetails = await fetchJobDetails(job.id);
+      if (jobDetails) {
+        setDialogContent(
+          <JobViewModal job={{
+            ...job,
+            ...jobDetails,
+            categoryId: jobDetails.categoryId || job.categoryId,
+            ourOffer: jobDetails.ourOffer || "",
+            mainTaks: jobDetails.mainTaks || "",
+            jobRequirements: jobDetails.jobRequirements || "",
+            advantages: jobDetails.advantages || ""
+          }} />
+        );
+        toggleDialog();
+      }
     };
 
     const handlePatchJob = () => {
@@ -151,7 +161,7 @@ const CurrentJobs = () => {
           <img src="/briefcase.png" alt="Assign job"/>
         </button>
         <button onClick={handleToggleStatus} className={styles.actionBtn}>
-          <img src={isActive ? "./onbutton.png" : "./offbutton.png"} alt={isActive ? "Active" : "Inactive"} />
+          <img src={job.isActive ? "./onbutton.png" : "./offbutton.png"} alt={job.isActive ? "Active" : "Inactive"} />
         </button>
       </div>
     );

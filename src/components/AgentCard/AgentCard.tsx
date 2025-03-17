@@ -37,10 +37,10 @@ const AgentCard = ({ id, title, agentName, location, category, image }: WorkCard
         </div>
         <div className={styles.bottomEnd}>
             <button className={styles.btn} onClick={(e) => { e.stopPropagation(); handleShifts(); }}>
-                Műszak hozzáadása
+                Hozzáadás
             </button>
             <button className={styles.btn} onClick={(e) => { e.stopPropagation(); handleShiftApplications(); }}>
-                Műszak jelentkezések
+                Jelentkezések
             </button>
         </div>
       </div>

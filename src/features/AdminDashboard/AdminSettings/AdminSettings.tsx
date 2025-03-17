@@ -6,10 +6,12 @@ import Title from "../../../components/Title/Title";
 import { adminTopLinks } from "../../../utils/routes";
 import axios from "axios";
 import { getUserIdFromToken } from "../../../utils/authUtils";
-
+import { toast } from "react-toastify";
+type adminSettinsProps = {
+  email?: string;
+  password?: string;
+}
 const AdminSettings = () => {
-  const [message, setMessage] = useState<string | null>(null);
-  const [error, setError] = useState<string | null>(null);
   const [isSidebarOpen, setIsSidebarOpen] = useState(window.innerWidth >= 1000);
 
   const [email, setEmail] = useState<string>("");
@@ -25,30 +27,28 @@ const AdminSettings = () => {
   
     const userId = getUserIdFromToken();
     if (!userId) {
-      setError("Nem található azonosító a tokenben.");
+      toast.error("Sikertelen felhasználói azonosítás.")
       return;
     }
   
     if (password !== confirmPassword) {
-      setError("A jelszavak nem egyeznek.");
-      setMessage(null);
+      toast.error("A jelszavak nem egyeznek.")
       return;
     }
   
     try {
-      const updatedAdminSettings: any = {};
+      const updatedAdminSettings: adminSettinsProps = {};
       if (email) updatedAdminSettings.email = email;
       if (password) updatedAdminSettings.password = password;
   
       await axios.put(
-        `https://localhost:7067/api/admin/settings/${userId}`,
-        updatedAdminSettings
+        "https://localhost:7067/api/admin/settings",
+        updatedAdminSettings,
+        {headers: {Authorization: `Bearer ${localStorage.getItem("token")}`}}
       );
-      setMessage("A szervezet adatainak frissítése sikeres!");
-      setError(null);
+      toast.success("A szervezet adatainak frissítése sikeres!");
     } catch (err: any) {
-      setError(err.response?.data?.message || "Nem sikerült az adatok frissítése!");
-      setMessage(null);
+      toast.error(err.response?.data?.message || "Nem sikerült az adatok frissítése!");
     }
   };
 
@@ -60,9 +60,7 @@ const AdminSettings = () => {
       >
         <DashboardTitle title="Profil beállítások" icon="./settings.png" subTitle="Profil beállítások" />
         <div className={styles.settingsContent}>
-          <Title subTitle="Beállítások" title="Változtasd meg profilod adatait!" />
-          {error && <p style={{ color: "red" }}>{error}</p>}
-          {message && <p style={{ color: "green" }}>{message}</p>}
+          <Title subTitle="Beállítások" title="Változtasd meg profilod adatait! Az üresen hagyott mező nem változik." />
           <form className={styles.settingsForm} onSubmit={handleSubmit}>
             <div className={styles.formWrapper}>
               <div className={styles.inputBox}>
@@ -94,7 +92,7 @@ const AdminSettings = () => {
               </div>
             </div>
             <button type="submit" className={styles.saveBtn}>
-              mentés
+              Mentés
             </button>
           </form>
         </div>

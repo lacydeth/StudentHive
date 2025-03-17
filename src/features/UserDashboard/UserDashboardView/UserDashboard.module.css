@@ -44,6 +44,7 @@
     flex-direction: column;
     gap: 15px;
     max-width: 400px;
+    justify-content: center;
 }
 .welcomeCard {
     width: 300px;

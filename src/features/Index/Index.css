@@ -254,6 +254,110 @@
     margin-bottom: 15px;
 }
 
+.role-selection-section {
+    padding: 40px 0;
+    background: url("blob-index.svg");
+    background-position: center;
+    background-size: cover;
+}
+.role-selection-section .container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    width: 100%;
+    padding: 0 20px;
+    margin: 0 auto;
+}
+.role-cards {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    margin-top: 30px;
+}
+.role-card {
+    background-color: white;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.role-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+}
+
+.role-image-container {
+    position: relative;
+    height: 180px;
+    overflow: hidden;
+}
+
+.role-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.5s ease;
+}
+
+.role-card:hover .role-image {
+    transform: scale(1.05);
+}
+
+.role-overlay {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 50%;
+    background: linear-gradient(to top, rgba(0, 0, 0, 0.7), transparent);
+}
+
+.role-content {
+    padding: 20px;
+}
+
+.role-content h3 {
+    font-size: 20px;
+    margin-bottom: 12px;
+    color: #333;
+}
+
+.role-content p {
+    color: #666;
+    margin-bottom: 20px;
+    line-height: 1.5;
+    font-size: 14px;
+}
+
+.role-button {
+    display: inline-flex;
+    align-items: center;
+    padding: 10px 20px;
+    background-color: var(--smoothGreen);
+    color: white;
+    border-radius: 6px;
+    text-decoration: none;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    border: none;
+    cursor: pointer;
+    font-size: 14px;
+    width: 100%;
+    justify-content: center;
+}
+
+.role-button:hover {
+    background-color: var(--darkGreen);
+}
+
+.role-button .arrow-icon {
+    width: 16px;
+    height: 16px;
+    margin-left: 8px;
+}
+
 @media screen and (min-width: 480px) {
     .hero-text h1 {
         font-size: 2.5rem;
@@ -319,6 +423,52 @@
     .about-section .about-right {
         flex-basis: 56%;
         text-align: left;
+    }
+    .role-selection-section {
+        padding: 80px 0;
+        }
+        
+    .role-selection-section .container {
+        max-width: 960px;
+    }
+    
+    .role-cards {
+        flex-direction: row;
+        gap: 30px;
+        margin-top: 50px;
+    }
+    
+    .role-card {
+        flex: 1;
+        min-width: 300px;
+    }
+    
+    .role-card:hover {
+        transform: translateY(-10px);
+        box-shadow: 0 15px 30px rgba(0, 0, 0, 0.15);
+    }
+    
+    .role-image-container {
+        height: 220px;
+    }
+    
+    .role-card:hover .role-image {
+        transform: scale(1.1);
+    }
+    
+    .role-content {
+        padding: 30px;
+    }
+    
+    .role-content h3 {
+        font-size: 24px;
+        margin-bottom: 15px;
+    }
+    
+    .role-content p {
+        font-size: 16px;
+        margin-bottom: 25px;
+        line-height: 1.6;
     }
 }
 
