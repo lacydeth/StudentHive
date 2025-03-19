@@ -70,6 +70,7 @@ const ShiftPage = () => {
             const response = await axios.post("https://localhost:7067/api/agent/add-shift", shiftData, {
                 headers: {
                     "Content-Type": "application/json",
+                    Authorization: `Bearer ${localStorage.getItem("token")}`
                 },
             });
     

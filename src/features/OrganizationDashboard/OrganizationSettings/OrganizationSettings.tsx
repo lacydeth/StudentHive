@@ -10,7 +10,6 @@ import { toast } from "react-toastify";
 const OrganizationSettings = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(window.innerWidth >= 1000);
 
-  // Állapotok az űrlap mezőkhöz
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
   const [confirmPassword, setConfirmPassword] = useState<string>("");
@@ -19,7 +18,6 @@ const OrganizationSettings = () => {
   const [contactEmail, setContactEmail] = useState<string>("");
   const [contactPhone, setContactPhone] = useState<string>("");
 
-  // API-ból adatok betöltése
   useEffect(() => {
 
     const fetchOrganizationDetails = async () => {

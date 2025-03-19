@@ -27,7 +27,9 @@ const ShiftCard = ({id, title, shiftStart, shiftEnd}: ShiftCardProps) => {
     const handleDelete = () => {
         confirmAction("Biztosan szeretnéd törölni a műszakot?", async () => {
             axios
-            .delete(`https://localhost:7067/api/agent/delete-shift/${id}`)
+            .delete(`https://localhost:7067/api/agent/delete-shift/${id}`, {
+                headers: {Authorization: `Bearer ${localStorage.getItem("token")}`}
+            })
             .catch((error) => console.error("Hiba a törlés során:", error));
             window.location.reload()
         });
