@@ -613,6 +613,12 @@ namespace StudentHiveServer.Controllers
         [HttpDelete("delete-shift/{id}")]
         public async Task<IActionResult> DeleteShift(int id)
         {
+            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
+            if (userIdClaim == null)
+            {
+                return Unauthorized(new { message = "Felhasználó azonosítása sikertelen." });
+            }
+
             const string getShiftQuery = "SELECT * FROM Shifts WHERE Id = @Id";
             const string getBookedUsersQuery = "SELECT StudentId FROM StudentShifts WHERE ShiftId = @ShiftId";
             const string deleteStudentShiftsQuery = "DELETE FROM StudentShifts WHERE ShiftId = @ShiftId";
