@@ -23,10 +23,15 @@ const NewOrg = () => {
     if (!orgName.trim()) {
       toast.error("A szövetkezet neve megadása kötelező!");
       return false;
-    }
-    if (orgName.length > 50) {
+    } else if (orgName.length > 50) {
       toast.error("A szövetkezet neve legfeljebb 50 karakter lehet!");
       return false;
+    } else {
+      const lettersOnlyRegex = /^[a-zA-ZáéíóöőúüűÁÉÍÓÖŐÚÜŰ\s]+$/;
+      if (!lettersOnlyRegex.test(orgName)) {
+        toast.error("A szövetkezet neve csak betűket és szóközöket tartalmazhat!");
+        return false;
+      }
     }
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) {

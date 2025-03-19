@@ -227,7 +227,6 @@ const UserProfile = () => {
         toast.error("Az iskola neve csak betűket tartalmazhat és max. 64 karakter lehet.");
         isValid = false;
       }
-      // Ha valamelyik validáció megbukott, akkor nem küldjük el a kérést
       if (!isValid) return;
   
       const token = localStorage.getItem("token");

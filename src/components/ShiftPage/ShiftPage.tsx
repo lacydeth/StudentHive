@@ -5,6 +5,7 @@ import styles from "./ShiftPage.module.css";
 import { Link, useParams } from "react-router-dom";
 import axios from "axios";
 import ShiftCard from "../ShiftCard/ShiftCard";
+import { toast } from "react-toastify";
 
 type WorkDetails = {
     title: string;
@@ -30,8 +31,6 @@ const ShiftPage = () => {
     const [isSidebarOpen, setIsSidebarOpen] = useState(window.innerWidth >= 1000);
     const [shiftStart, setShiftStart] = useState<string>("");
     const [shiftEnd, setEndTime] = useState<string>("");
-    const [message, setMessage] = useState<string | null>(null);
-    const [error, setError] = useState<string | null>(null);
     const [currentPage, setCurrentPage] = useState(1);
     const shiftsPerPage = 4; 
 
@@ -46,15 +45,14 @@ const ShiftPage = () => {
             .catch((error) => console.error("Error fetching work details:", error));
         
         axios
-            .get(`https://localhost:7067/api/agent/manage-shifts/${id}`)
-            .then((response) => setShifts(response.data)) 
-            .catch((error) => console.error("Error fetching shifts:", error));
+            .get(`https://localhost:7067/api/agent/manage-shifts/${id}`, {
+                headers: { Authorization: `Bearer ${localStorage.getItem("token")}`}})
+            .then((response) => setShifts(response.data))
+            .catch((error) => console.error("Error fetching updated shifts:", error));
     }, [id]);
 
     const handleAddShift = async (e: React.FormEvent) => {
         e.preventDefault();
-        setMessage(null);
-        setError(null);
     
         const shiftStartDate = new Date(shiftStart);
         const shiftEndDate = new Date(shiftEnd);
@@ -76,20 +74,21 @@ const ShiftPage = () => {
             });
     
             if (response.status === 200) {
-                setMessage(response.data.message);
+                toast.success(response.data.message);
                 setShiftStart("");
                 setEndTime("");
                 axios
-                    .get(`https://localhost:7067/api/agent/manage-shifts/${id}`)
+                    .get(`https://localhost:7067/api/agent/manage-shifts/${id}`, {
+                        headers: { Authorization: `Bearer ${localStorage.getItem("token")}` }})
                     .then((response) => setShifts(response.data))
                     .catch((error) => console.error("Error fetching updated shifts:", error));
             }
         } catch (error: any) {
             if (error.response && error.response.data) {
                 const { message } = error.response.data;
-                setError(message || "Ismeretlen hiba lépett fel.");
+                toast.error(message || "Ismeretlen hiba lépett fel.");
             } else {
-                setError("Ismeretlen hiba lépett fel.");
+                toast.error("Ismeretlen hiba lépett fel.");
             }
         }
     };
@@ -141,8 +140,6 @@ const ShiftPage = () => {
                     </div>
                     <div className={styles.bottom}>
                         <div className={styles.left}>
-                            {error && <p style={{ color: "red" }}>{error}</p>}
-                            {message && <p style={{ color: "green" }}>{message}</p>}
                             <form className={styles.addShift} onSubmit={handleAddShift}>
                                 <div className={styles.input}>
                                     <div className={styles.inputBox}>

@@ -7,7 +7,7 @@ type JobPatchViewModalProps = {
   jobId: number;
 }
 
-const JobPatchViewModal: React.FC<JobPatchViewModalProps> = ({ jobId }) => {
+const JobPatchViewModal = ({ jobId }: JobPatchViewModalProps) => {
   const [agents, setAgents] = useState<any[]>([]);
   const [selectedAgent, setSelectedAgent] = useState<number | null>(null);
   const [currentJobId, setCurrentJobId] = useState<string>("");
@@ -76,7 +76,7 @@ const JobPatchViewModal: React.FC<JobPatchViewModalProps> = ({ jobId }) => {
               </option>
               {agents.map((agent: { id: number; firstName: string; lastName: string }) => (
                 <option key={agent.id} value={agent.id}>
-                  {agent.firstName} {agent.lastName}
+                  {agent.lastName} {agent.firstName}
                 </option>
               ))}
             </select>

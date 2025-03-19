@@ -7,24 +7,104 @@ import axios from "axios";
 
 const Contact = () => {
   const [loading, setLoading] = useState(false);
+  const [errors, setErrors] = useState({
+    name: "",
+    email: "",
+    message: ""
+  });
+  const [formData, setFormData] = useState({
+    name: "",
+    email: "",
+    message: ""
+  });
 
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+  const validateForm = () => {
+    let isValid = true;
+    const newErrors = {
+      name: "",
+      email: "",
+      message: ""
+    };
+
+    if (!formData.name.trim()) {
+      newErrors.name = "A név megadása kötelező";
+      isValid = false;
+    } else if (formData.name.trim().length < 2) {
+      newErrors.name = "A név legalább 2 karakter hosszú legyen";
+      isValid = false;
+    }
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!formData.email.trim()) {
+      newErrors.email = "Az email cím megadása kötelező";
+      isValid = false;
+    } else if (!emailRegex.test(formData.email)) {
+      newErrors.email = "Érvénytelen email formátum";
+      isValid = false;
+    }
+
+    if (!formData.message.trim()) {
+      newErrors.message = "Az üzenet megadása kötelező";
+      isValid = false;
+    } else if (formData.message.trim().length < 10) {
+      newErrors.message = "Az üzenet legalább 10 karakter hosszú legyen";
+      isValid = false;
+    }
+
+    setErrors(newErrors);
+    return isValid;
+  };
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [name]: value
+    }));
+
+    if (errors[name]) {
+      setErrors(prev => ({
+        ...prev,
+        [name]: ""
+      }));
+    }
+  };
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
+    
+    if (!validateForm()) {
+      toast.error("Kérjük, javítsa a hibákat a folytatáshoz");
+      return;
+    }
+    
     setLoading(true);
 
-    const formData = new FormData(e.currentTarget);
-    formData.append("access_key", "a587178b-0a8c-4d9e-83d6-703134df0a0d");
+    const submitFormData = new FormData();
+    submitFormData.append("access_key", "a587178b-0a8c-4d9e-83d6-703134df0a0d");
+    submitFormData.append("name", formData.name);
+    submitFormData.append("email", formData.email);
+    submitFormData.append("message", formData.message);
+    submitFormData.append("subject", "Új üzenet a StudentHive-tól");
 
     try {
-      const response = await axios.post("https://api.web3forms.com/submit", formData, {
-        headers: { "Content-Type": "multipart/form-data" },
-      });
+      const response = await axios.post(
+        "https://api.web3forms.com/submit", 
+        submitFormData, 
+        {
+          headers: { "Content-Type": "multipart/form-data" },
+        }
+      );
 
       if (response.data.success) {
         toast.success("Üzenetét megkaptunk! A lehető legrövidebb időn belül válaszolunk.");
+        setFormData({ name: "", email: "", message: "" });
       } else {
         toast.error(response.data.message || "Hiba történt az üzenet küldése közben");
       }
+    } catch (error) {
+      toast.error("Hiba történt az üzenet küldése közben. Kérjük próbálja újra később.");
+      console.error("Form submission error:", error);
     } finally {
       setLoading(false);
     }
@@ -47,25 +127,45 @@ const Contact = () => {
             </div>
 
             <form className={styles.contactForm} onSubmit={handleSubmit}>
-              <input
-                type="hidden"
-                name="access_key"
-                value="a587178b-0a8c-4d9e-83d6-703134df0a0d"
-              />
-              <input type="hidden" name="subject" value="Új üzenet a StudentHive-tól" />
               <input type="checkbox" name="botcheck" className={styles.hidden} />
 
               <div className={styles.formGroup}>
                 <label htmlFor="name">Teljes név</label>
-                <input type="text" id="name" name="name" required />
+                <input 
+                  type="text" 
+                  id="name" 
+                  name="name" 
+                  value={formData.name}
+                  onChange={handleChange}
+                  className={errors.name ? styles.inputError : ""}
+                />
+                {errors.name && <p className={styles.errorText}>{errors.name}</p>}
               </div>
+
               <div className={styles.formGroup}>
                 <label htmlFor="email">Email</label>
-                <input type="email" id="email" name="email" required />
+                <input 
+                  type="email" 
+                  id="email" 
+                  name="email" 
+                  value={formData.email}
+                  onChange={handleChange}
+                  className={errors.email ? styles.inputError : ""}
+                />
+                {errors.email && <p className={styles.errorText}>{errors.email}</p>}
               </div>
+
               <div className={styles.formGroup}>
                 <label htmlFor="message">Üzenet</label>
-                <textarea id="message" name="message" rows={5} required></textarea>
+                <textarea 
+                  id="message" 
+                  name="message" 
+                  rows={5} 
+                  value={formData.message}
+                  onChange={handleChange}
+                  className={errors.message ? styles.inputError : ""}
+                ></textarea>
+                {errors.message && <p className={styles.errorText}>{errors.message}</p>}
               </div>
 
               <button

@@ -6,7 +6,14 @@ import styles from "./AgentJobs.module.css";
 import AgentCard, { WorkCardProps } from "../../../components/AgentCard/AgentCard";
 import { getUserIdFromToken } from "../../../utils/authUtils";
 import axios from "axios";
-
+type workCardProps = {
+  id: string;
+  title: string;
+  agentName: string;
+  location: string;
+  category: string;
+  image: string;
+}
 const AgentJobs = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(window.innerWidth >= 1000);
   const [workCards, setWorkCards] = useState<WorkCardProps[]>([]);
@@ -14,19 +21,21 @@ const AgentJobs = () => {
   const fetchAgentWorkCards = async () => {
     const agentId = getUserIdFromToken();
     try {
-      const response = await axios.get(`https://localhost:7067/api/agent/agent-work-cards?agentId=${agentId}`);
+      const response = await axios.get(`https://localhost:7067/api/agent/agent-work-cards?agentId=${agentId}`, {
+        headers: { Authorization: `Bearer ${localStorage.getItem("token")}`}
+      });
 
-      const mappedWorkCards = response.data.map((card: any) => ({
-        id: card.id || card.Id,
-        title: card.title || card.Title,
-        agentName: card.agentName || card.AgentName,
-        location: card.location || card.Location,
-        category: card.category || card.Category,
-        image: card.image || card.Image,
+      const mappedWorkCards = response.data.map((card: workCardProps) => ({
+        id: card.id,
+        title: card.title,
+        agentName: card.agentName,
+        location: card.location,
+        category: card.category,
+        image: card.image,
       }));
       setWorkCards(mappedWorkCards);
     } catch (error) {
-      console.error("Error fetching agent work cards:", error);
+      console.error("Hiba a közvetítő munkái lekérdezése közben:", error);
     }
   };
   

@@ -44,7 +44,9 @@ const StudentApplications = () => {
     if (status) url += `&status=${status}`;
 
     try {
-      const response = await axios.get(url);
+      const response = await axios.get(url, {
+        headers: { Authorization: `Bearer ${localStorage.getItem("token")}`}
+      });
       setRowData(response.data);
     } catch (error) {
       console.error("Error fetching applications:", error);
@@ -87,7 +89,9 @@ const StudentApplications = () => {
   const handleAccept = async (applicationId: number) => {
     confirmAction("Biztosan elfogadod ezt a jelentkezést?", async () => {
       try {
-        await axios.patch(`https://localhost:7067/api/agent/applications/${applicationId}/accept`);
+        await axios.patch(`https://localhost:7067/api/agent/applications/${applicationId}/accept`, {}, {
+          headers: {Authorization: `Bearer ${localStorage.getItem("token")}`}
+        });
         setRowData((prev) =>
           prev.map((app) =>
             app.applicationId === applicationId ? { ...app, status: 1 } : app
@@ -102,7 +106,9 @@ const StudentApplications = () => {
   const handleDecline = async (applicationId: number) => {
     confirmAction("Biztosan elutasítod ezt a jelentkezést?", async () => {
       try {
-        await axios.patch(`https://localhost:7067/api/agent/applications/${applicationId}/decline`);
+        await axios.patch(`https://localhost:7067/api/agent/applications/${applicationId}/decline`, {}, {
+          headers: {Authorization: `Bearer ${localStorage.getItem("token")}`}
+        });
         setRowData((prev) =>
           prev.map((app) =>
             app.applicationId === applicationId ? { ...app, status: 2 } : app
@@ -162,7 +168,7 @@ const StudentApplications = () => {
           <div className={styles.filters}>
             <div className={styles.inputBox}>
               <select value={selectedWork} onChange={(e) => setSelectedWork(e.target.value)}>
-                <option value="">Pozíció</option>
+                <option key="default" value="">Pozíció</option>
                 {works.map((work: { id: number; title: string }) => (
                   <option key={work.id} value={work.title}>
                     {work.title}
@@ -172,10 +178,10 @@ const StudentApplications = () => {
             </div>
             <div className={styles.inputBox}>
               <select value={selectedStatus} onChange={(e) => setSelectedStatus(e.target.value)}>
-                <option value="">Összes</option>
-                <option value="0">Válaszra vár</option>
-                <option value="1">Elfogadva</option>
-                <option value="2">Elutasítva</option>
+                <option key="all" value="">Összes</option>
+                <option key="pending" value="0">Válaszra vár</option>
+                <option key="accepted" value="1">Elfogadva</option>
+                <option key="rejected" value="2">Elutasítva</option>
               </select>
             </div>
           </div>

@@ -47,7 +47,7 @@ const AgentSettings = () => {
           headers: { Authorization: `Bearer ${token}` },
         }
       );
-      toast.success("A szervezet adatainak frissítése sikeres!");
+      toast.success("Az adatok frissítése sikeres!");
     } catch (err: any) {
       toast.error(err.response?.data?.message || "Nem sikerült az adatok frissítése!");
     }

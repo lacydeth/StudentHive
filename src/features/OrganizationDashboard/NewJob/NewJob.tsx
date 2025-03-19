@@ -29,23 +29,75 @@ const NewJob = () => {
 
   useEffect(() => {
     const fetchCategories = async () => {
-      const response = await axios.get("https://localhost:7067/api/organization/categories");
-      setCategories(response.data);
-      if (response.status !== 200) {
+      try {
+        const response = await axios.get("https://localhost:7067/api/organization/categories");
+        setCategories(response.data);
+        if (response.status !== 200) {
+          toast.error("Hiba a kategóriák betöltése közben.");
+        }
+      } catch (error) {
         toast.error("Hiba a kategóriák betöltése közben.");
       }
     };
     fetchCategories();
   }, []);
 
-  const handleRegister = async () => {
-    if (title.length > 84) {
+  const handleTitleChange = (e) => {
+    const value = e.target.value;
+    const lettersOnlyRegex = /^[a-zA-ZáéíóöőúüűÁÉÍÓÖŐÚÜŰ\s]*$/;
+    
+    if (value === "" || lettersOnlyRegex.test(value)) {
+      setTitle(value);
+    } else {
+      toast.error("A munka neve csak betűket és szóközöket tartalmazhat!");
+    }
+  };
+
+  const handleCityChange = (e) => {
+    const value = e.target.value;
+    const lettersOnlyRegex = /^[a-zA-ZáéíóöőúüűÁÉÍÓÖŐÚÜŰ\s]*$/;
+    
+    if (value === "" || lettersOnlyRegex.test(value)) {
+      setCity(value);
+    } else {
+      toast.error("A város neve csak betűket és szóközöket tartalmazhat!");
+    }
+  };
+
+  const validateForm = () => {
+    let isValid = true;
+
+    if (!title.trim()) {
+      toast.error("A munka neve megadása kötelező.");
+      isValid = false;
+    } else if (title.length > 84) {
       toast.error("A munka neve nem lehet hosszabb 84 karakternél.");
-      return;
+      isValid = false;
     }
 
-    if (parseFloat(hourlyrate) <= 0) {
+    if (!city.trim()) {
+      toast.error("A város megadása kötelező.");
+      isValid = false;
+    }
+
+    if (!hourlyrate) {
+      toast.error("Az órabér megadása kötelező.");
+      isValid = false;
+    } else if (parseFloat(hourlyrate) <= 0) {
       toast.error("Az órabér nem lehet 0 vagy negatív szám.");
+      isValid = false;
+    }
+
+    if (!selectedCategory) {
+      toast.error("Kategória kiválasztása kötelező.");
+      isValid = false;
+    }
+
+    return isValid;
+  };
+
+  const handleRegister = async () => {
+    if (!validateForm()) {
       return;
     }
 
@@ -79,8 +131,9 @@ const NewJob = () => {
           headers: { Authorization: `Bearer ${token}` },
         }
       );
-      toast.success(response?.data?.message);
+      toast.success(response?.data?.message || "Munka sikeresen létrehozva!");
 
+      // Reset form fields after successful submission
       setTitle("");
       setHourlyRate("");
       setSelectedCategory("");
@@ -120,7 +173,7 @@ const NewJob = () => {
                     type="text"
                     placeholder="Munka neve"
                     value={title}
-                    onChange={(e) => setTitle(e.target.value)}
+                    onChange={handleTitleChange}
                     required
                     maxLength={84}
                   />
@@ -151,6 +204,7 @@ const NewJob = () => {
                     <img
                       className={styles.faq}
                       src={isFaq1Open ? "./src/assets/minus-sign.png" : "./src/assets/plus-sign.png"}
+                      alt={isFaq1Open ? "collapse" : "expand"}
                     />
                   </div>
                   {isFaq1Open && (
@@ -160,7 +214,7 @@ const NewJob = () => {
                           type="text"
                           placeholder="Város"
                           value={city}
-                          onChange={(e) => setCity(e.target.value)}
+                          onChange={handleCityChange}
                           required
                         />
                         <img src="./location.png" alt="city icon" />
@@ -186,6 +240,7 @@ const NewJob = () => {
                     <img
                       className={styles.faq}
                       src={isFaq2Open ? "./src/assets/minus-sign.png" : "./src/assets/plus-sign.png"}
+                      alt={isFaq2Open ? "collapse" : "expand"}
                     />
                   </div>
                   {isFaq2Open && (
@@ -238,6 +293,7 @@ const NewJob = () => {
                     value={hourlyrate}
                     onChange={(e) => setHourlyRate(e.target.value)}
                     required
+                    min="1"
                   />
                   <img src="./hourly-rate.png" alt="hourly rate icon" />
                 </div>

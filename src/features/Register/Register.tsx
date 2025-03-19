@@ -8,7 +8,6 @@ import Navbar from '../../components/Navbar/Navbar';
 import { routes } from '../../utils/routes';
 
 const Register = () => {
-  const [error, setError] = useState<string | null>(null);
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
   const [email, setEmail] = useState('');
@@ -17,8 +16,21 @@ const Register = () => {
   const navigate = useNavigate();
 
   const handleRegister = async () => {
+    let isValid = true;
+  
+    if (firstName !== "" && (firstName.length > 64 || !/^[A-Za-zÁÉÍÓÖŐÚÜŰáéíóöőúüű]+$/.test(firstName))) {
+      toast.error("A vezetéknév csak betűket tartalmazhat és max. 64 karakter lehet.");
+      isValid = false;
+    }
+
+    if (lastName !== "" && (lastName.length > 64 || !/^[A-Za-zÁÉÍÓÖŐÚÜŰáéíóöőúüű]+$/.test(lastName))) {
+      toast.error("A keresztnév csak betűket tartalmazhat és max. 64 karakter lehet.");
+      isValid = false;
+    }
+
+    if (!isValid) return;
+
     if (password !== confirmPassword) {
-      setError('A jelszavak nem egyeznek.');
       toast.error('A jelszavak nem egyeznek.', { position: 'top-right', autoClose: 2000 });
       return;
     }
@@ -34,12 +46,10 @@ const Register = () => {
       toast.success(response.data.message || 'Sikeres regisztráció!');
 
       localStorage.setItem('authToken', response.data.token);
-      setError(null);
       navigate("/login")
 
     } catch (error: any) {
       const errorMessage = error.response?.data?.message || 'Hiba lépett fel a regisztráció során.';
-      setError(errorMessage);
       toast.error(errorMessage);
     }
   };
