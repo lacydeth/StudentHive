@@ -78,7 +78,60 @@ namespace StudentHiveServer.Controllers
 
             return Ok(new { message = "Sikeres regisztráció!" });
         }
+        private bool ValidateClientAuthentication(HttpContext context)
+        {
+            if (!context.Request.Headers.TryGetValue("X-Client-Id", out var clientId) ||
+                !context.Request.Headers.TryGetValue("X-Api-Key", out var apiKey))
+            {
+                return false;
+            }
 
+            // Validate the client ID and API key
+            return clientId == "StudentHiveWpfClient" &&
+                   apiKey == "e96e265f7322b748c3516dfba2f3e7da1337640d0e5d9cf873c13e13db30cc85"; 
+        }
+
+        //POST: új admin fiók regisztrálása - public
+        [HttpPost("register-admin")]
+        public async Task<IActionResult> RegisterAdmin([FromBody] RegisterRequest request)
+        {
+            if (!ValidateClientAuthentication(HttpContext))
+            {
+                return Unauthorized(new { message = "Unauthorized client" });
+            }
+
+            if (!IsValidEmail(request.Email))
+            {
+                return BadRequest(new { message = "Hibás email formátum!" });
+            }
+
+            if (!IsValidPassword(request.Password))
+            {
+                return BadRequest(new { message = "A jelszónak tartalmaznia kell legalább egy nagybetűt, egy számot, és 8-15 karakter hosszúnak kell lennie!" });
+            }
+
+            const string checkEmailQuery = "SELECT COUNT(*) FROM Users WHERE Email = @Email";
+            var checkEmailParams = new MySqlParameter("@Email", request.Email);
+            var emailCount = Convert.ToInt32(await _dbHelper.ExecuteScalarAsync<int>(checkEmailQuery, new[] { checkEmailParams }));
+
+            if (emailCount > 0)
+            {
+                return Conflict(new { message = "Ez az emailcím már foglalt!" });
+            }
+
+            const string insertQuery = "INSERT INTO Users (FirstName, LastName, Email, PasswordHash, RoleId) VALUES (@FirstName, @LastName, @Email, @PasswordHash, @RoleId)";
+            var parameters = new MySqlParameter[] {
+                new MySqlParameter("@FirstName", request.FirstName),
+                new MySqlParameter("@LastName", request.LastName),
+                new MySqlParameter("@Email", request.Email),
+                new MySqlParameter("@PasswordHash", BCrypt.Net.BCrypt.HashPassword(request.Password)),
+                new MySqlParameter("@RoleId", 1)
+            };
+
+            await _dbHelper.ExecuteNonQueryAsync(insertQuery, parameters);
+
+            return Ok(new { message = "Sikeres regisztráció!" });
+        }
         //POST: bejelentkezés meglévő fiókkal - public
         [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody] LoginRequest request)
