@@ -1,13 +1,12 @@
-﻿<Window x:Class="StudentHiveWpf.Views.LoginPage"
+﻿<Window x:Class="StudentHiveWpf.RegisterPage"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
         xmlns:local="clr-namespace:StudentHiveWpf"
         mc:Ignorable="d"
-        Title="Bejelentkezés" Height="550" Width="600"
-         WindowStartupLocation="CenterScreen"     
+        Title="Regisztráció" Height="750" Width="600"
+        WindowStartupLocation="CenterScreen"     
         TextElement.Foreground="{DynamicResource MaterialDesignBody}"
         Background="AliceBlue"
         AllowsTransparency="True"
@@ -94,6 +93,55 @@
                                FontWeight="Medium"
                                FontFamily="Montserrat"
                                HorizontalAlignment="Center"/>
+                    <TextBlock Text="Vezetéknév"
+                       Foreground="DarkGray"
+                       FontSize="18"
+                       FontWeight="Medium"
+                       FontFamily="Montserrat"                             
+                       Margin="0,15,0,0"/>
+                    <TextBox x:Name="LastNameTextBox"
+                         FontSize="16"
+                         FontWeight="Medium"
+                         FontFamily="Montserrat"                            
+                         Foreground="White"
+                         CaretBrush="LightGray"
+                         BorderBrush="DarkGray"
+                         BorderThickness="0,0,0,2"
+                         Height="40"
+                         VerticalContentAlignment="Center"
+                         Margin="0,5,0,0"
+                         Padding="35,0,0,0">
+                        <TextBox.Background>
+                            <ImageBrush ImageSource="/icons/user.png"
+                                Stretch="None"
+                                AlignmentX="Left"/>
+                        </TextBox.Background>
+                    </TextBox>
+
+                    <TextBlock Text="Keresztnév"
+                       Foreground="DarkGray"
+                       FontSize="18"
+                       FontWeight="Medium"
+                       FontFamily="Montserrat"                             
+                       Margin="0,15,0,0"/>
+                    <TextBox x:Name="FirstNameTextBox"
+                        FontSize="16"
+                        FontWeight="Medium"
+                        FontFamily="Montserrat"                            
+                        Foreground="White"
+                        CaretBrush="LightGray"
+                        BorderBrush="DarkGray"
+                        BorderThickness="0,0,0,2"
+                        Height="40"
+                        VerticalContentAlignment="Center"
+                        Margin="0,5,0,0"
+                        Padding="35,0,0,0">
+                        <TextBox.Background>
+                            <ImageBrush ImageSource="/icons/user.png"
+                                Stretch="None"
+                                AlignmentX="Left"/>
+                        </TextBox.Background>
+                    </TextBox>
                     <TextBlock Text="Email"
                                Foreground="DarkGray"
                                FontSize="18"
@@ -144,7 +192,7 @@
                     </PasswordBox>
                     <Button                          
                             BorderThickness="0"
-                            Content="Bejelentkezés"
+                            Content="Regisztráció"
                             Foreground="Black"
                             FontSize="12"
                             FontFamily="Montserrat"
@@ -172,35 +220,7 @@
                             </ControlTemplate>
                         </Button.Template>
                     </Button>
-                    <Button BorderThickness="0"
-                        Content="Regisztráció"
-                        Foreground="Black"
-                        FontSize="12"
-                        FontFamily="Montserrat"
-                        Cursor="Hand"                           
-                        Margin="0,15,0,0"
-                        Click="RegisterButton_Click">
-                        <Button.Style>
-                            <Style TargetType="Button">
-                                <Setter Property="Background" Value="#ffffff"/>
-                                <Style.Triggers>
-                                    <Trigger Property="IsMouseOver" Value="True">
-                                        <Setter Property="Background" Value="#F5CC7A"/>
-                                    </Trigger>
-                                </Style.Triggers>
-                            </Style>
-                        </Button.Style>
-                        <Button.Template>
-                            <ControlTemplate TargetType="Button">
-                                <Border Width="150" Height="40"
-                    CornerRadius="20"
-                    Background="{TemplateBinding Background}">
-                                    <ContentPresenter VerticalAlignment="Center"
-                                  HorizontalAlignment="Center"/>
-                                </Border>
-                            </ControlTemplate>
-                        </Button.Template>
-                    </Button>
+
                 </StackPanel>
             </Grid>
         </Border>

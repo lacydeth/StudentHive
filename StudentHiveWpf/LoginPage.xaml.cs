@@ -63,7 +63,15 @@ namespace StudentHiveWpf.Views
             }
         }
 
+        private void RegisterButton_Click(object sender, RoutedEventArgs e)
+        {
+            RegisterPage registerPage = new RegisterPage();
+            registerPage.Show();
 
+            this.Hide();
+
+            registerPage.Closed += (s, args) => this.Show();
+        }
 
         private void btnClose_Click(object sender, RoutedEventArgs e)
         {
