@@ -9,7 +9,14 @@
 
         public DatabaseHelper(string connectionString)
         {
-            _connectionString = connectionString;
+            if (!connectionString.Contains("Database=") && !connectionString.Contains("Initial Catalog="))
+            {
+                _connectionString = connectionString + "Database=studenthive;";
+            }
+            else
+            {
+                _connectionString = connectionString;
+            }
         }
         public async Task<T> ExecuteScalarAsync<T>(string query, MySqlParameter[] parameters)
         {

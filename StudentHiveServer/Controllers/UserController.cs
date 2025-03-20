@@ -190,9 +190,15 @@ namespace StudentHiveServer.Controllers
             try
             {
                 var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
-                if (userIdClaim == null)
+                var userRoleClaim = User.FindFirst(ClaimTypes.Role);
+                if (userIdClaim == null || userRoleClaim == null)
                 {
-                    return Unauthorized(new { message = "User is not authenticated." });
+                    return Unauthorized(new { message = "Felhasználó nincs azonosítva." });
+                }
+
+                if (userRoleClaim.Value != "User")
+                {
+                    return BadRequest(new { message = "Csak a felhasználók jelentkezhetnek munkára." });
                 }
 
                 var loggedInUserId = int.Parse(userIdClaim.Value);

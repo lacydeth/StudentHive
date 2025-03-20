@@ -46,6 +46,12 @@ namespace StudentHiveServer.Controllers
         [HttpGet("agent-work-cards")]
         public async Task<IActionResult> GetAgentWorkCards([FromQuery] int agentId)
         {
+            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
+            if (userIdClaim == null)
+            {
+                return Unauthorized(new { message = "Felhasználó azonosítása sikertelen." });
+            }
+
             var query = @"SELECT 
                             j.Id,
                             j.Title, 
@@ -142,6 +148,12 @@ namespace StudentHiveServer.Controllers
         [HttpGet("manage-shifts/{jobId}")]
         public async Task<IActionResult> GetShiftsByJobId(int jobId)
         {
+            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
+            if (userIdClaim == null)
+            {
+                return Unauthorized(new { message = "Felhasználó azonosítása sikertelen." });
+            }
+
             const string query = @"SELECT 
                                         s.Id,
                                         s.ShiftStart,
@@ -185,6 +197,7 @@ namespace StudentHiveServer.Controllers
                 return StatusCode(500, new { message = "Hiba történt a műszakok lekérdezése közben.", details = ex.Message });
             }
         }
+        // GET: pozíció megnevezése - public
         [HttpGet("job-title/{jobId}")]
         public async Task<IActionResult> JobTitle(int jobId)
         {
@@ -212,7 +225,7 @@ namespace StudentHiveServer.Controllers
             }
 
         }
-        // Get distinct shiftStart values after the current date
+        // GET: adott munkához tartozó műszakkezdések - public
         [HttpGet("shift-starts/{jobId}")]
         public async Task<IActionResult> GetDistinctShiftStarts(int jobId)
         {
@@ -250,7 +263,7 @@ namespace StudentHiveServer.Controllers
             }
         }
 
-        // GET: műszak jelentkezések kilistázása - protected, modified to check future dates
+        // GET: műszak jelentkezések kilistázása - protected
         [HttpGet("shift-applications/{jobId}")]
         public async Task<IActionResult> GetApplications(int jobId, [FromQuery] int? status = null, [FromQuery] DateTime? shiftStartFilter = null)
         {
@@ -315,8 +328,7 @@ namespace StudentHiveServer.Controllers
             }
         }
 
-
-        //PATCH: műszakra jelentkezés elfogadása: protected
+        //PATCH: műszakra jelentkezés elfogadása - protected
         [HttpPatch("shift-applications/{id}/accept")]
         public async Task<IActionResult> AcceptShiftApplication(int id)
         {
@@ -343,7 +355,7 @@ namespace StudentHiveServer.Controllers
                 return StatusCode(500, new { message = "Hiba a jelentkezés elfogadása során!", details = ex.Message });
             }
         }
-        //PATCH: műszakra jelentkezés elutasítása: protected
+        //PATCH: műszakra jelentkezés elutasítása - protected
         [HttpPatch("shift-applications/{id}/decline")]
         public async Task<IActionResult> DeclineShiftApplication(int id)
         {
@@ -374,6 +386,12 @@ namespace StudentHiveServer.Controllers
         [HttpGet("applications")]
         public async Task<IActionResult> GetApplications([FromQuery] int agentId, [FromQuery] string? title = null, [FromQuery] int? status = null)
         {
+            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
+            if (userIdClaim == null)
+            {
+                return Unauthorized(new { message = "Felhasználó azonosítása sikertelen." });
+            }
+
             string query = @"SELECT 
                         a.*,
                         j.Title AS JobTitle,
@@ -423,10 +441,15 @@ namespace StudentHiveServer.Controllers
                 return StatusCode(500, new { message = "Hiba a jelentkezések betöltése során!", details = ex.Message });
             }
         }
-        //PATCH: jelentkezés elfogadása: protected
+        //PATCH: jelentkezés elfogadása - protected
         [HttpPatch("applications/{id}/accept")]
         public async Task<IActionResult> AcceptApplication(int id)
         {
+            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
+            if (userIdClaim == null)
+            {
+                return Unauthorized(new { message = "Felhasználó azonosítása sikertelen." });
+            }
             const string updateQuery = "UPDATE Applications SET Status = 1 WHERE Id = @Id";
             const string insertAssignmentQuery = "INSERT INTO JobAssignments (UserId, JobId) VALUES (@UserId, @JobId)";
 
@@ -480,7 +503,7 @@ namespace StudentHiveServer.Controllers
             var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
             if (userIdClaim == null)
             {
-                return Unauthorized(new { message = "User is not authenticated." });
+                return Unauthorized(new { message = "Felhasználó azonosítása sikertelen." });
             }
 
             var loggedInUserId = int.Parse(userIdClaim.Value);
@@ -528,6 +551,12 @@ namespace StudentHiveServer.Controllers
         [HttpPost("add-shift")]
         public async Task<IActionResult> AddShift([FromBody] ShiftRequest shiftRequest)
         {
+            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
+            if (userIdClaim == null)
+            {
+                return Unauthorized(new { message = "Felhasználó azonosítása sikertelen." });
+            }
+
             if (shiftRequest == null || shiftRequest.JobId <= 0 || shiftRequest.ShiftStart == default || shiftRequest.ShiftEnd == default)
             {
                 return BadRequest(new { message = "Érvénytelen adatok!" });
@@ -584,6 +613,12 @@ namespace StudentHiveServer.Controllers
         [HttpDelete("delete-shift/{id}")]
         public async Task<IActionResult> DeleteShift(int id)
         {
+            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
+            if (userIdClaim == null)
+            {
+                return Unauthorized(new { message = "Felhasználó azonosítása sikertelen." });
+            }
+
             const string getShiftQuery = "SELECT * FROM Shifts WHERE Id = @Id";
             const string getBookedUsersQuery = "SELECT StudentId FROM StudentShifts WHERE ShiftId = @ShiftId";
             const string deleteStudentShiftsQuery = "DELETE FROM StudentShifts WHERE ShiftId = @ShiftId";
@@ -647,6 +682,12 @@ namespace StudentHiveServer.Controllers
         [HttpPatch("applications/{id}/decline")]
         public async Task<IActionResult> DeclineApplication(int id)
         {
+            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
+            if (userIdClaim == null)
+            {
+                return Unauthorized(new { message = "Felhasználó azonosítása sikertelen." });
+            }
+
             const string query = "UPDATE Applications SET Status = 2 WHERE Id = @Id";
 
             try
@@ -672,25 +713,22 @@ namespace StudentHiveServer.Controllers
         [HttpPut("profilesettings")]
         public async Task<IActionResult> UpdateAgentSettings([FromBody] UpdateAgentSettingsRequest request)
         {
-            // Check if at least one field is provided for update (FirstName, LastName, Email, Password)
             if (string.IsNullOrEmpty(request.FirstName) && string.IsNullOrEmpty(request.LastName) &&
                 string.IsNullOrEmpty(request.Email) && string.IsNullOrEmpty(request.Password))
             {
-                return BadRequest(new { message = "Legalább egy mezőnek (first name, last name, email vagy password) meg kell változnia." });
+                return BadRequest(new { message = "Legalább egy mezőnek meg kell változnia." });
             }
 
-            // Retrieve the logged-in user's ID from the claim
             var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
             if (userIdClaim == null)
             {
-                return Unauthorized(new { message = "User is not authenticated." });
+                return Unauthorized(new { message = "Felhasználó nincs azonosítva." });
             }
 
             var loggedInUserId = userIdClaim.Value;
 
             try
             {
-                // Select user from the database using the logged-in user ID
                 const string selectQuery = "SELECT Id, Email, PasswordHash, FirstName, LastName FROM Users WHERE Id = @UserId";
                 var parameters = new[] { new MySqlParameter("@UserId", loggedInUserId) };
                 var result = await _dbHelper.ExecuteQueryAsync(selectQuery, parameters);
@@ -700,14 +738,13 @@ namespace StudentHiveServer.Controllers
                     return NotFound(new { message = "Felhasználó nem található!" });
                 }
 
-                // Update Email if provided
                 if (!string.IsNullOrEmpty(request.Email))
                 {
                     const string checkEmailQuery = "SELECT COUNT(1) FROM Users WHERE Email = @Email AND Id != @UserId";
                     var checkEmailParams = new[] {
-                new MySqlParameter("@Email", request.Email),
-                new MySqlParameter("@UserId", loggedInUserId)
-            };
+                    new MySqlParameter("@Email", request.Email),
+                    new MySqlParameter("@UserId", loggedInUserId)
+                };
                     var emailExists = await _dbHelper.ExecuteScalarAsync<int>(checkEmailQuery, checkEmailParams);
                     if (emailExists > 0)
                     {
@@ -716,43 +753,40 @@ namespace StudentHiveServer.Controllers
 
                     const string updateEmailQuery = "UPDATE Users SET Email = @Email WHERE Id = @UserId";
                     var emailParams = new[] {
-                new MySqlParameter("@Email", request.Email),
-                new MySqlParameter("@UserId", loggedInUserId)
-            };
+                        new MySqlParameter("@Email", request.Email),
+                        new MySqlParameter("@UserId", loggedInUserId)
+                    };
                     await _dbHelper.ExecuteNonQueryAsync(updateEmailQuery, emailParams);
                 }
 
-                // Update FirstName if provided
                 if (!string.IsNullOrEmpty(request.FirstName))
                 {
                     const string updateFirstNameQuery = "UPDATE Users SET FirstName = @FirstName WHERE Id = @UserId";
                     var firstNameParams = new[] {
-                new MySqlParameter("@FirstName", request.FirstName),
-                new MySqlParameter("@UserId", loggedInUserId)
-            };
+                        new MySqlParameter("@FirstName", request.FirstName),
+                        new MySqlParameter("@UserId", loggedInUserId)
+                    };
                     await _dbHelper.ExecuteNonQueryAsync(updateFirstNameQuery, firstNameParams);
                 }
 
-                // Update LastName if provided
                 if (!string.IsNullOrEmpty(request.LastName))
                 {
                     const string updateLastNameQuery = "UPDATE Users SET LastName = @LastName WHERE Id = @UserId";
                     var lastNameParams = new[] {
-                new MySqlParameter("@LastName", request.LastName),
-                new MySqlParameter("@UserId", loggedInUserId)
-            };
+                        new MySqlParameter("@LastName", request.LastName),
+                        new MySqlParameter("@UserId", loggedInUserId)
+                    };
                     await _dbHelper.ExecuteNonQueryAsync(updateLastNameQuery, lastNameParams);
                 }
 
-                // Update Password if provided
                 if (!string.IsNullOrEmpty(request.Password))
                 {
                     var hashedPassword = BCrypt.Net.BCrypt.HashPassword(request.Password);
                     const string updatePasswordQuery = "UPDATE Users SET PasswordHash = @PasswordHash WHERE Id = @UserId";
                     var passwordParams = new[] {
-                new MySqlParameter("@PasswordHash", hashedPassword),
-                new MySqlParameter("@UserId", loggedInUserId)
-            };
+                        new MySqlParameter("@PasswordHash", hashedPassword),
+                        new MySqlParameter("@UserId", loggedInUserId)
+                    };
                     await _dbHelper.ExecuteNonQueryAsync(updatePasswordQuery, passwordParams);
                 }
 

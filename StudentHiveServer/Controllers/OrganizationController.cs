@@ -643,6 +643,13 @@ namespace StudentHiveServer.Controllers
         [HttpPut("update-job/{jobId}")]
         public async Task<IActionResult> UpdateJob(int jobId, [FromBody] JobRequest request)
         {
+            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
+            var roleClaim = User.FindFirst(ClaimTypes.Role);
+
+            if (userIdClaim == null || roleClaim == null)
+            {
+                return Unauthorized(new { message = "Felhasználói hitelesítés szükséges." });
+            }
             if (request == null)
             {
                 return BadRequest("Invalid job data.");
