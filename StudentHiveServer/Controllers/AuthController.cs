@@ -86,7 +86,6 @@ namespace StudentHiveServer.Controllers
                 return false;
             }
 
-            // Validate the client ID and API key
             return clientId == "StudentHiveWpfClient" &&
                    apiKey == "e96e265f7322b748c3516dfba2f3e7da1337640d0e5d9cf873c13e13db30cc85"; 
         }
