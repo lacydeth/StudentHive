@@ -4,6 +4,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Tokens;
 using MySql.Data.MySqlClient;
+using StudentHiveServer.Utils;
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -37,9 +38,9 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 
 builder.Services.AddAuthorization();
 builder.Services.AddSwaggerGen();
-
+builder.Services.AddSingleton<DatabaseHelper>(sp =>
+    new DatabaseHelper(builder.Configuration.GetConnectionString("ApplicationConnection")));
 var app = builder.Build();
-
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 try
 {
@@ -84,7 +85,7 @@ try
                     }
                 }
             }
-            Console.WriteLine("Database tables created successfully.");
+            Console.WriteLine("Adatbázis sikeresen létrehozva.");
         }
     }
 }
