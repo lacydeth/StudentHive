@@ -816,7 +816,6 @@ namespace StudentHiveServer.Controllers
 
             try
             {
-                // Lekérdezzük az aktuális adatokat
                 const string selectQuery = @"
             SELECT o.Id, o.Name, o.Address, o.ContactEmail, o.ContactPhone 
             FROM Organizations o
@@ -831,14 +830,12 @@ namespace StudentHiveServer.Controllers
                     return NotFound(new { message = "Szervezet nem található!" });
                 }
 
-                // Az aktuális adatok beolvasása
                 var currentRow = currentData.Rows[0];
                 string currentName = currentRow["Name"]?.ToString() ?? "";
                 string currentAddress = currentRow["Address"]?.ToString() ?? "";
                 string currentEmail = currentRow["ContactEmail"]?.ToString() ?? "";
                 string currentPhone = currentRow["ContactPhone"]?.ToString() ?? "";
 
-                // Ellenőrizzük, hogy történt-e változás
                 bool hasChanges = false;
                 List<string> updateFields = new List<string>();
                 List<MySqlParameter> updateParams = new List<MySqlParameter>();
