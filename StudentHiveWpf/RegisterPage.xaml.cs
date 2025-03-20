@@ -51,8 +51,8 @@ namespace StudentHiveWpf
 
                 var registerRequest = new RegisterRequest
                 {
-                    FirstName = "Admin",
-                    LastName = "User",
+                    FirstName = FirstNameTextBox.Text,
+                    LastName = LastNameTextBox.Text,
                     Email = EmailTextBox.Text,
                     Password = PasswordBox.Password
                 };
