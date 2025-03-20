@@ -337,6 +337,42 @@ namespace StudentHiveServer.Controllers
             }
         }
 
+        [HttpGet("admin-details")]
+        public async Task<IActionResult> GetAdminDetails()
+        {
+            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
+            if (userIdClaim == null)
+            {
+                return Unauthorized(new { message = "Felhasználói azonosítás sikertelen." });
+            }
+
+            var loggedInUserId = int.Parse(userIdClaim.Value);
+
+            try
+            {
+                string query = @"
+             SELECT u.Email
+             FROM Users u
+             WHERE u.Id = @UserId";
+
+                var userParam = new MySqlParameter("@UserId", loggedInUserId);
+                var dataTable = await _dbHelper.ExecuteQueryAsync(query, new MySqlParameter[] { userParam });
+
+                var row = dataTable.Rows[0];
+
+                var organizaitondetails = new
+                {
+                    Email = row.Field<string>("Email"),
+                };
+
+                return Ok(organizaitondetails);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "Hiba történt az adatok lekérésekor.", error = ex.Message });
+            }
+        }
+
         private static string GenerateRandomPassword(int length = 10)
         {
             const string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
