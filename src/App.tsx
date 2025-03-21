@@ -12,7 +12,6 @@ import OrganizationDashboard from './features/OrganizationDashboard/Organization
 import AddAgents from './features/OrganizationDashboard/AddAgents/AddAgents';
 import CurrentAgents from './features/OrganizationDashboard/CurrentAgents/CurrentAgents';
 import SettingsAgents from './features/OrganizationDashboard/OrganizationSettings/OrganizationSettings';
-import AgentDashboard from './features/AgentDashboard/AgentDashboard';
 import NewOrg from './features/AdminDashboard/NewOrg/NewOrg';
 import ExistingOrg from './features/AdminDashboard/ExistingOrg/ExistingOrg';
 import NewJob from './features/OrganizationDashboard/NewJob/NewJob';
@@ -202,14 +201,6 @@ const App = () => {
             }
           />
           {/* Agent protected routes */}
-          <Route
-            path={routes.agentPage.path}
-            element={
-              <ProtectedRoute allowedRoles={["Agent"]}>
-                <AgentDashboard/>
-              </ProtectedRoute>
-            }
-          />
           <Route
             path={routes.studentApplications.path}
             element={

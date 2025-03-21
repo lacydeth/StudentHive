@@ -10,7 +10,6 @@ import { toast } from "react-toastify";
 const OrganizationSettings = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(window.innerWidth >= 1000);
 
-  // Állapotok az űrlap mezőkhöz
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
   const [confirmPassword, setConfirmPassword] = useState<string>("");
@@ -19,7 +18,6 @@ const OrganizationSettings = () => {
   const [contactEmail, setContactEmail] = useState<string>("");
   const [contactPhone, setContactPhone] = useState<string>("");
 
-  // API-ból adatok betöltése
   useEffect(() => {
 
     const fetchOrganizationDetails = async () => {
@@ -149,7 +147,7 @@ const OrganizationSettings = () => {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                 />
-                <img src="./mail.png" alt="email icon" />
+                <img src="/mail.png" alt="email icon" />
               </div>
               <div className={styles.inputBox}>
                 <input
@@ -158,7 +156,7 @@ const OrganizationSettings = () => {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                 />
-                <img src="./key.png" alt="password key icon" />
+                <img src="/key.png" alt="password key icon" />
               </div>
               <div className={styles.inputBox}>
                 <input
@@ -167,7 +165,7 @@ const OrganizationSettings = () => {
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
                 />
-                <img src="./key.png" alt="password key icon" />
+                <img src="/key.png" alt="password key icon" />
               </div>
             </div>
             <div className={styles.formWrapper}>
@@ -178,7 +176,7 @@ const OrganizationSettings = () => {
                   value={name}
                   onChange={(e) => setName(e.target.value)}
                 />
-                <img src="./mail.png" alt="email icon" />
+                <img src="/office-building.png" alt="company icon" />
               </div>
               <div className={styles.inputBox}>
                 <input
@@ -187,25 +185,25 @@ const OrganizationSettings = () => {
                   value={address}
                   onChange={(e) => setAddress(e.target.value)}
                 />
-                <img src="./key.png" alt="password key icon" />
+                <img src="/location.png" alt="location icon" />
               </div>
               <div className={styles.inputBox}>
                 <input
                   type="email"
-                  placeholder="Céges Email"
+                  placeholder="Céges e-mail"
                   value={contactEmail}
                   onChange={(e) => setContactEmail(e.target.value)}
                 />
-                <img src="./key.png" alt="password key icon" />
+                <img src="/key.png" alt="password key icon" />
               </div>
               <div className={styles.inputBox}>
                 <input
                   type="text"
-                  placeholder="Céges Telefonszám"
+                  placeholder="Céges telefonszám"
                   value={contactPhone}
                   onChange={(e) => setContactPhone(e.target.value)}
                 />
-                <img src="./key.png" alt="password key icon" />
+                <img src="/key.png" alt="password key icon" />
               </div>
             </div>
             <button type="submit" className={styles.saveBtn}>

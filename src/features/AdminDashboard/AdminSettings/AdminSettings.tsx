@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import Sidebar from "../../../components/Sidebar/Sidebar";
 import styles from "./AdminSettings.module.css";
 import DashboardTitle from "../../../components/DashboardTitle/DashboardTitle";
@@ -17,30 +17,6 @@ const AdminSettings = () => {
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
   const [confirmPassword, setConfirmPassword] = useState<string>("");
-
-  useEffect(() => {
-
-    const fetchAdminDetails = async () => {
-      const token = localStorage.getItem("token");
-      if (!token) {
-        toast.error("Token nem található.");
-        return;
-      }
-
-      try {
-        const response = await axios.get("https://localhost:7067/api/organization/organization-details", {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-
-        const data = response.data;
-        setEmail(data.email || "");
-      } catch (error: any) {
-        toast.error("Nem sikerült betölteni az adatokat!");
-      }
-    };
-
-    fetchAdminDetails();
-  }, []);
   
   const handleToggleSidebar = () => {
     setIsSidebarOpen(!isSidebarOpen);
