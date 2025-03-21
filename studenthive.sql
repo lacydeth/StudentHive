@@ -101,7 +101,7 @@ CREATE TABLE `JobReviews` (
   `CreatedAt` TIMESTAMP DEFAULT (CURRENT_TIMESTAMP)
 );
 
-CREATE TABLE `studentdetails` (
+CREATE TABLE `StudentDetails` (
   `Id` int(11) NOT NULL,
   `UserId` int(11) NOT NULL,
   `PhoneNumber` varchar(15) DEFAULT NULL,
