@@ -48,7 +48,7 @@ const ShiftPage = () => {
             .get(`https://localhost:7067/api/agent/manage-shifts/${id}`, {
                 headers: { Authorization: `Bearer ${localStorage.getItem("token")}`}})
             .then((response) => setShifts(response.data))
-            .catch((error) => console.error("Error fetching updated shifts:", error));
+            .catch((error) => console.error("Hiba a betöltés során:", error));
     }, [id]);
 
     const handleAddShift = async (e: React.FormEvent) => {
@@ -81,7 +81,7 @@ const ShiftPage = () => {
                     .get(`https://localhost:7067/api/agent/manage-shifts/${id}`, {
                         headers: { Authorization: `Bearer ${localStorage.getItem("token")}` }})
                     .then((response) => setShifts(response.data))
-                    .catch((error) => console.error("Error fetching updated shifts:", error));
+                    .catch((error) => console.error("Hiba a betöltés során:", error));
             }
         } catch (error: any) {
             if (error.response && error.response.data) {

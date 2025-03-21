@@ -68,23 +68,23 @@ const OrgViewModal = ({ organization }: OrgViewModalProps) => {
         <div className={styles.formWrapper}>
           <div className={styles.inputBox}>
             <input type="text" value={organization.id} required readOnly />
-            <img src="./id-card.png" alt="id card icon" />
+            <img src="/id-card.png" alt="id card icon" />
           </div>
           <div className={styles.inputBox}>
             <input type="text" placeholder="Szervezet neve" value={name} onChange={(e) => setName(e.target.value)} required />
-            <img src="./office-building.png" alt="organization name icon" />
+            <img src="/office-building.png" alt="organization name icon" />
           </div>
           <div className={styles.inputBox}>
             <input type="text" placeholder="Szervezet címe" value={address} onChange={(e) => setAddress(e.target.value)} required />
-            <img src="./location.png" alt="address icon" />
+            <img src="/location.png" alt="address icon" />
           </div>
           <div className={styles.inputBox}>
             <input type="email" placeholder="Email" value={contactEmail} onChange={(e) => setContactEmail(e.target.value)} required />
-            <img src="./mail.png" alt="email icon" />
+            <img src="/mail.png" alt="email icon" />
           </div>
           <div className={styles.inputBox}>
             <input type="tel" placeholder="Telefonszám" value={contactPhone} onChange={(e) => setContactPhone(e.target.value)} required />
-            <img src="./telephone.png" alt="phone icon" />
+            <img src="/telephone.png" alt="phone icon" />
           </div>
         </div>
         <div className={styles.footer}>

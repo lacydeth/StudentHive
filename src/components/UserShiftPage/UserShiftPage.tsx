@@ -31,7 +31,7 @@ const UserShiftPage = () => {
         );
         setShifts(response.data);
     } catch (error) {
-        console.error("Error fetching shifts:", error);
+        console.error("Hiba a betöltés során:", error);
         setShifts([]); 
     }
   };

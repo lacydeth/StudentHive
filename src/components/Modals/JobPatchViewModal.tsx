@@ -27,7 +27,7 @@ const JobPatchViewModal = ({ jobId }: JobPatchViewModalProps) => {
         });
         setAgents(response.data);
       } catch (error) {
-        console.error("Error fetching agents:", error);
+        console.error("Hiba a közvetítők betöltése során:", error);
       }
     };
 

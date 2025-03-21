@@ -47,7 +47,7 @@ const OrgPasswordModal = ({ organizationId }: OrgPasswordModalProps) => {
               onChange={(e) => setNewPassword(e.target.value)}
               required
             />
-            <img src="./key.png" alt="key icon" />
+            <img src="/key.png" alt="key icon" />
           </div>
           <div className={styles.inputBox}>
             <input
@@ -57,7 +57,7 @@ const OrgPasswordModal = ({ organizationId }: OrgPasswordModalProps) => {
               onChange={(e) => setConfirmPassword(e.target.value)}
               required
             />
-            <img src="./key.png" alt="key icon" />
+            <img src="/key.png" alt="key icon" />
           </div>
         </div>
         <div className={styles.footer}>

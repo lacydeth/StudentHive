@@ -56,7 +56,7 @@ const ShiftApplications = () => {
       });
       setRowData(response.data);
     } catch (error) {
-      console.error("Error fetching applications:", error);
+      console.error("Hiba a betöltés során:", error);
     }
   };
 
@@ -67,7 +67,7 @@ const ShiftApplications = () => {
       });
       setShiftStarts(response.data);
     } catch (error) {
-      console.error("Error fetching shift starts:", error);
+      console.error("Hiba a betöltés során:", error);
     }
   };
 
@@ -124,7 +124,7 @@ const ShiftApplications = () => {
           )
         );
       } catch (error) {
-        console.error("Error accepting application:", error);
+        console.error("Hiba az elfogadás során:", error);
       }
     });
   };
@@ -148,7 +148,7 @@ const ShiftApplications = () => {
           )
         );
       } catch (error) {
-        console.error("Error declining application:", error);
+        console.error("Hiba az elutasítás során:", error);
       }
     });
   };

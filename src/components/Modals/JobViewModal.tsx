@@ -109,7 +109,7 @@ const JobViewModal = ({ job }: JobViewModalProps) => {
               value={job.id}
               required readOnly
             />
-            <img src="./id-card.png" alt="id card icon" />
+            <img src="/id-card.png" alt="id card icon" />
           </div>
 
           <div className={styles.inputBox}>
@@ -134,7 +134,7 @@ const JobViewModal = ({ job }: JobViewModalProps) => {
               onChange={(e) => setTitle(e.target.value)}
               required
             />
-            <img src="./office-building.png" alt="job title icon" />
+            <img src="/office-building.png" alt="job title icon" />
           </div>
           
           <div className={styles.inputBox}>
@@ -145,7 +145,7 @@ const JobViewModal = ({ job }: JobViewModalProps) => {
               onChange={(e) => setAddress(e.target.value)}
               required
             />
-            <img src="./location.png" alt="address icon" />
+            <img src="/location.png" alt="address icon" />
           </div>
           
           <div className={styles.inputBox}>
@@ -156,7 +156,7 @@ const JobViewModal = ({ job }: JobViewModalProps) => {
               onChange={(e) => setHourlyRate(Number(e.target.value))}
               required
             />
-            <img src="./hourly-rate.png" alt="hourly rate icon" />
+            <img src="/hourly-rate.png" alt="hourly rate icon" />
           </div>
           
           <div className={styles.inputBox}>
@@ -167,7 +167,7 @@ const JobViewModal = ({ job }: JobViewModalProps) => {
               onChange={(e) => setCity(e.target.value)}
               required
             />
-            <img src="./location.png" alt="city icon" />
+            <img src="/location.png" alt="city icon" />
           </div>
           
           <div className={styles.inputBox}>

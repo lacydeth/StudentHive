@@ -53,7 +53,7 @@ const WorkPage = () => {
         setUserHasReviewed(hasReviewed);
       }
     } catch (error) {
-      console.error("Error fetching reviews:", error);
+      console.error("Hiba a betöltés során:", error);
     }
   };
 
@@ -61,7 +61,7 @@ const WorkPage = () => {
     axios
       .get(`https://localhost:7067/api/general/workcards/${id}`)
       .then((response) => setWork(response.data))
-      .catch((error) => console.error("Error fetching work details:", error));
+      .catch((error) => console.error("Hiba a betöltés során:", error));
     
     fetchReviews();
   }, [id]);
