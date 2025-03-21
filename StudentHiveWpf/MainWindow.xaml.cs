@@ -1,179 +1,126 @@
 ﻿using MaterialDesignThemes.Wpf;
 using StudentHiveWpf.Models;
 using StudentHiveWpf.Services;
+using StudentHiveWpf.Views;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
-using System.Windows.Media.Imaging;
-
 
 namespace StudentHiveWpf
 {
     public partial class MainWindow : Window
     {
-        private readonly ApiService _apiService;
+        public readonly ApiService _apiService;
 
         public MainWindow()
         {
             InitializeComponent();
             _apiService = new ApiService();
-            Loaded += MainWindow_Loaded;
+            Loaded += async (s, e) => await LoadDataAsync();
         }
 
-        private async void MainWindow_Loaded(object sender, RoutedEventArgs e)
-        {
-            await LoadDataAsync(); 
-        }
-
-        private async Task LoadDataAsync()
+        // ✅ Jogosultság ellenőrzése
+        public bool IsAdmin()
         {
             if (SessionManager.Role.ToLower() != "admin")
             {
                 MessageBox.Show("Nincs jogosultságod ehhez a művelethez!", "Hiba", MessageBoxButton.OK, MessageBoxImage.Warning);
-                return;
+                return false;
             }
+            return true;
+        }
+
+        // ✅ Adatok betöltése
+        public async Task LoadDataAsync()
+        {
+            if (!IsAdmin()) return;
 
             try
             {
-                List<User> users = await _apiService.GetAllUsersAsync();
-                UserListBox.ItemsSource = users;
+                UserListBox.ItemsSource = await _apiService.GetAllUsersAsync();
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Hiba történt: " + ex.Message);
+                ShowError($"Hiba történt: {ex.Message}");
             }
         }
 
-        private void btnClose_Click(object sender, RoutedEventArgs e)
+        // ✅ Felhasználó státuszának módosítása
+        public async Task ToggleUserStatusAsync()
         {
-            this.Close();
-        }
+            if (!IsAdmin()) return;
 
-        
+            if (UserListBox.SelectedItem is not User selectedUser) return;
 
-        private async void ToggleButton_Checked(object sender, RoutedEventArgs e)
-        {
-            if (SessionManager.Role.ToLower() != "admin")
+            try
             {
-                MessageBox.Show("Nincs jogosultságod ehhez a művelethez!", "Hiba", MessageBoxButton.OK, MessageBoxImage.Warning);
-                return;
+                await _apiService.ToggleUserStatusAsync(selectedUser.Id);
+                MessageBox.Show("A felhasználó státusza sikeresen frissítve!");
+                await LoadDataAsync();
             }
+            catch (Exception ex)
+            {
+                ShowError($"Hiba történt: {ex.Message}");
+            }
+        }
+
+        // ✅ Felhasználó szerkesztése
+        public async Task EditUserAsync()
+        {
+            if (!IsAdmin()) return;
 
             if (UserListBox.SelectedItem is User selectedUser)
             {
-                try
-                {
-                    await _apiService.ToggleUserStatusAsync(selectedUser.Id);
-                    MessageBox.Show($"A felhasználó státusza sikeresen frissítve!");
-                    await LoadDataAsync();
-                }
-                catch (Exception ex)
-                {
-                    MessageBox.Show("Hiba történt: " + ex.Message);
-                }
-            }
-        }
-
-        private async void ToggleButton_Unchecked(object sender, RoutedEventArgs e)
-        {
-            if (SessionManager.Role.ToLower() != "admin")
-            {
-                MessageBox.Show("Nincs jogosultságod ehhez a művelethez!", "Hiba", MessageBoxButton.OK, MessageBoxImage.Warning);
-                return;
-            }
-
-            if (UserListBox.SelectedItem is User selectedUser)
-            {
-                try
-                {
-                    await _apiService.ToggleUserStatusAsync(selectedUser.Id);
-                    MessageBox.Show($"A felhasználó státusza sikeresen frissítve!");
-                    await LoadDataAsync();
-                }
-                catch (Exception ex)
-                {
-                    MessageBox.Show("Hiba történt: " + ex.Message);
-                }
-            }
-        }
-        private async void btnedit_Click(object sender, RoutedEventArgs e)
-        {
-            if (SessionManager.Role.ToLower() != "admin")
-            {
-                MessageBox.Show("Nincs jogosultságod ehhez a művelethez!", "Hiba", MessageBoxButton.OK, MessageBoxImage.Warning);
-                return;
-            }
-
-            var selectedUser = UserListBox.SelectedItem as User;
-
-            if (selectedUser != null)
-            {
-                UserModifyPage modifyPage = new UserModifyPage(selectedUser);
-                modifyPage.ShowDialog(); 
-
+                new UserModifyPage(selectedUser).ShowDialog();
                 await LoadDataAsync();
             }
         }
 
-
-        private async void btnPassword_Click(object sender, RoutedEventArgs e)
+        // ✅ Jelszó módosítása
+        public async Task ResetUserPasswordAsync()
         {
-            if (SessionManager.Role.ToLower() != "admin")
+            if (!IsAdmin()) return;
+
+            if (UserListBox.SelectedItem is not User selectedUser)
             {
-                MessageBox.Show("Nincs jogosultságod ehhez a művelethez!", "Hiba", MessageBoxButton.OK, MessageBoxImage.Warning);
+                ShowError("Kérlek válassz egy felhasználót!");
                 return;
             }
 
-          
-            var selectedUser = UserListBox.SelectedItem as User;
-            if (selectedUser == null)
-            {
-                MessageBox.Show("Kérlek válassz egy felhasználót!", "Hiba", MessageBoxButton.OK, MessageBoxImage.Warning);
+            if (MessageBox.Show("Biztos meg akarod változtatni a jelszót?", "Megerősítés", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.No)
                 return;
-            }
 
-         
-            var result = MessageBox.Show("Biztos meg akarod változtatni a jelszót?", "Megerősítés", MessageBoxButton.YesNo, MessageBoxImage.Question);
-
-            if (result == MessageBoxResult.No)
-            {
-                return; 
-            }
-
-          
             string newPassword = _apiService.GenerateRandomPassword();
-            string confirmPassword = newPassword; 
-
-            if (string.IsNullOrEmpty(confirmPassword))
-            {
-                MessageBox.Show("Please confirm the new password.");
-                return;
-            }
-
-            if (newPassword != confirmPassword)
-            {
-                MessageBox.Show("Passwords do not match.");
-                return;
-            }
-
             try
             {
-                int userId = selectedUser.Id; 
-                string userEmail = selectedUser.Email;
-
-                await _apiService.ResetUserPasswordAsync(userId, newPassword, userEmail);
-
+                await _apiService.ResetUserPasswordAsync(selectedUser.Id, newPassword, selectedUser.Email);
                 MessageBox.Show("A jelszó sikeresen frissítve, és az új jelszót emailben elküldtük!", "Siker", MessageBoxButton.OK, MessageBoxImage.Information);
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Hiba történt a jelszó frissítésekor: {ex.Message}", "Hiba", MessageBoxButton.OK, MessageBoxImage.Error);
+                ShowError($"Hiba történt a jelszó frissítésekor: {ex.Message}");
             }
         }
 
+        // ✅ Egységes hibaüzenet metódus
+        public void ShowError(string message)
+        {
+            MessageBox.Show(message, "Hiba", MessageBoxButton.OK, MessageBoxImage.Error);
+        }
 
+        // 🔘 UI eseménykezelők, amelyek a szervezett metódusokat hívják meg
+        public async void ToggleButton_Checked(object sender, RoutedEventArgs e) => await ToggleUserStatusAsync();
+        public async void ToggleButton_Unchecked(object sender, RoutedEventArgs e) => await ToggleUserStatusAsync();
+        public async void btnedit_Click(object sender, RoutedEventArgs e) => await EditUserAsync();
+        public async void btnPassword_Click(object sender, RoutedEventArgs e) => await ResetUserPasswordAsync();
+        public void btnLogout_Click(object sender, RoutedEventArgs e)
+        {
+            new LoginPage().Show();
+            Close();
+        }
+        public void btnClose_Click(object sender, RoutedEventArgs e) => Close();
     }
 }

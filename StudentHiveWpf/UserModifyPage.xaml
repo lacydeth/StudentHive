@@ -10,9 +10,9 @@
         <StackPanel Orientation="Vertical" Width="300" HorizontalAlignment="Left" Margin="10">
             <TextBlock Text="Felhasználó Adatai" FontSize="16" FontWeight="Bold" Margin="0,0,0,10"/>
             <TextBlock Text="Vezekét név" FontSize="12" Margin="25,0,0,0"/>
-            <TextBox Name="FirstNameInput" Width="250" Margin="5"  IsEnabled="True"/>
+            <TextBox Name="LastNameInput" Width="250" Margin="5"  IsEnabled="True"/>
             <TextBlock Text="Kereszt név" FontSize="12" Margin="25,0,0,0"/>
-            <TextBox Name="LastNameInput" Width="250" Margin="5" IsEnabled="True"/>
+            <TextBox Name="FirstNameInput" Width="250" Margin="5" IsEnabled="True"/>
             <TextBlock Text="Email" FontSize="12" Margin="25,0,0,0"/>
             <TextBox Name="EmailInput" Width="250" Margin="5"  IsEnabled="True"/>
             <TextBlock Text="Azonisító" FontSize="12" Margin="25,0,0,0"/>
