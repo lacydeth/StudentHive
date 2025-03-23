@@ -1,0 +1,162 @@
+.content{
+    max-width: 1350px;
+    padding: 0 5px;
+    margin: auto;
+}
+.user {
+    display: flex;
+    gap: 15px;
+    align-items: center;
+    background: var(--white);
+    padding: 10px 15px;
+    border-radius: 8px;
+    box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
+    margin-right: 50px;
+}
+.profile {
+    width: 42px;
+}
+.user h2 {
+    font-weight: 400;
+    font-size: 1.2rem;
+}
+.navbar{
+    position: fixed;
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+    z-index: 999;
+    padding: 10px 0;
+    transition: all 0.3s ease;
+    background: none;
+    margin-top: 20px;
+}
+.navbar.sticky {
+    display: none;
+    transition: all 0.5s ease;
+}
+.navbar.sticky .menu-list li .btn:hover,.navbar.sticky .menu-list li .login-btn:hover{
+    color: var(--white)!important;
+}
+.navbar .content{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+.navbar .logo .btn img{
+    width: 40%;
+}
+.navbar i {
+    color: #000;
+    font-size: 22px;
+}
+.navbar .highlighted {
+    background-color: var(--darkGreen);
+    padding: 6px 17px;
+    border-radius: 8px;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    color: var(--white)!important;
+    transition: all 0.4s ease;
+}
+.navbar .menu-list{
+    display: inline-flex;
+    margin-left: 200px;
+}
+.menu-list li{
+    list-style: none;
+}
+.menu-list li .btn{
+    color: #000;
+    text-transform: uppercase;
+    font-size: 1.3rem;
+    width: 22px;
+    font-weight: 300;
+    margin-left: 65px;
+    text-decoration: none;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+.menu-list li .btn:hover{
+    color: var(--hoverGreen)!important;
+}
+.menu-list li .highlighted:hover {
+    background: none;
+    outline: 2px solid var(--darkGreen);
+    color: var(--black)!important;
+}
+.icon{
+    color: var(--white);
+    font-size: 20px;
+    cursor: pointer;
+    display: none;
+}
+.menu-list .cancel-btn{
+    position: absolute;
+    right: 30px;
+    top: 20px;
+}
+@media (max-width: 1230px) {
+    .content{
+      padding: 0 60px;
+    }
+}
+@media (max-width: 1100px) {
+    .content{
+      padding: 0 40px;
+    }
+}
+@media (max-width: 900px) {
+    .content{
+      padding: 0 30px;
+    }
+}
+@media (max-width: 980px) {
+    .navbar .menu-list {
+        margin-left: 0;
+    }
+    .navbar .logo .btn img{
+        width: 50%;
+        margin-right: 0;
+}
+    body.disabled{
+      overflow: hidden;
+}
+    .icon{
+      display: block;
+}
+    .icon.hide{
+      display: none;
+}
+.navbar .menu-list{
+      position: fixed;
+      height: 100%;
+      width: 100%;
+      left: -100%;
+      top: 0px;
+      display: block;
+      padding: 40px 0;
+      text-align: center;
+      transition: all 0.3s ease;
+      background-color: var(--smoothGreen);
+}
+.navbar.show .menu-list{
+      left: 0%;
+}
+.navbar .menu-list li{
+      margin-top: 45px;
+}
+.navbar .menu-list li .btn{
+      font-size: 23px;
+      margin-left: -100%;
+      transition: 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+.navbar.show .menu-list li .btn{
+      margin-left: 0px;
+    }
+}
+@media (max-width: 380px) {
+    .navbar .logo img{
+      width: 50%;
+    }
+} 

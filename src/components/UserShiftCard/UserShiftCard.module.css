@@ -1,0 +1,180 @@
+.shiftCard {
+    display: flex;
+    flex-direction: column;
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    overflow: hidden;
+    margin-bottom: 16px;
+    transition: transform 0.2s, box-shadow 0.2s;
+    border-top: 4px solid var(--smoothGreen);
+}
+
+.shiftCard:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.12);
+}
+
+.cardHeader {
+    padding: 16px 20px;
+    border-bottom: 1px solid #eee;
+}
+
+.cardHeader h3 {
+    margin: 0;
+    font-size: 1.2rem;
+    color: #333;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+}
+
+.cardHeader h3::before {
+    content: '';
+    display: inline-block;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    margin-right: 10px;
+    background-color: var(--smoothGreen);
+}
+
+.shiftDetails {
+    padding: 16px 20px;
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 12px;
+}
+
+.shiftDetails p {
+    margin: 0;
+    color: #555;
+    display: flex;
+    align-items: center;
+}
+
+.shiftDetails p b {
+    min-width: 90px;
+    color: #333;
+    
+}
+
+.timeInfo {
+    display: flex;
+    align-items: center;
+    font-size: 0.95rem;
+}
+
+.timeInfo img {
+    margin-right: 8px;
+    opacity: 0.7;
+    width: 18px;
+}
+
+.cardFooter {
+    padding: 16px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-top: 1px solid #eee;
+}
+
+.deleteButton {
+    background-color: #ef4444;
+    color: white;
+    border: none;
+    padding: 10px 16px;
+    border-radius: 8px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+.deleteButton img {
+    width: 22px;
+    opacity: 0.7;
+}
+.deleteButton:hover:not(:disabled) {
+    background-color: #dc2626;
+}
+
+.deleteButton:disabled {
+    background-color: #9ca3af;
+    cursor: not-allowed;
+}
+
+.deleteButton svg {
+    width: 16px;
+    height: 16px;
+}
+
+.statusPending {
+    display: inline-flex;
+    align-items: center;
+    background-color: #86868644;
+    color: gray;
+    padding: 6px 12px;
+    border-radius: 9999px;
+    font-size: 0.85rem;
+    font-weight: 500;
+}
+
+.statusApproved {
+    display: inline-flex;
+    align-items: center;
+    background-color: #d1fae5;
+    color: var(--smoothGreen);
+    padding: 6px 12px;
+    border-radius: 9999px;
+    font-size: 0.85rem;
+    font-weight: 500;
+}
+
+.statusRejected {
+    display: inline-flex;
+    align-items: center;
+    background-color: #fee2e2;
+    color: #ef4444;
+    padding: 6px 12px;
+    border-radius: 9999px;
+    font-size: 0.85rem;
+    font-weight: 500;
+}
+
+.statusPending::before,
+.statusApproved::before,
+.statusRejected::before {
+    content: '';
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    margin-right: 8px;
+}
+
+.statusPending::before {
+    background-color: gray;
+}
+
+.statusApproved::before {
+    background-color: var(--smoothGreen);
+}
+
+.statusRejected::before {
+    background-color: #ef4444;
+}
+
+@media (min-width: 768px) {
+    .shiftCard {
+        width: 400px;
+    }
+    .shiftDetails {
+        grid-template-columns: 1fr 1fr;
+    }
+    
+    .statusContainer {
+    grid-column: 1 / -1;
+    }
+}

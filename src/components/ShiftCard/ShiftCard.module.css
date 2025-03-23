@@ -1,0 +1,31 @@
+.card {
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    background: #fff;
+    padding: 15px 25px;
+    width: 270px;
+    border-radius: 8px;
+}
+.card h4 {
+    font-weight: 400;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    justify-content: center;
+    margin-bottom: 15px;
+}
+.card img {
+    width: 22px;
+}
+.card button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 0;
+    outline: 0;
+    background: rgba(255, 63, 63, 0.575);
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+}

@@ -1,0 +1,45 @@
+.container {
+    display: flex;
+    height: 100vh;
+    overflow: hidden;
+}
+.content {
+    transition: margin-left 0.3s ease;
+    width: 100%;
+    padding: 20px;
+}
+.sidebarOpen {
+    margin-left: 300px;
+}
+.sidebarClosed {
+    margin-left: 0;
+}
+.actionBtn {
+    border: none;
+    cursor: pointer;
+    background: none;
+}
+.actionBtn img {
+    width: 22px;
+}
+.inputBox select {
+    outline: 0;
+    border: 0;
+    border-radius: 8px;
+    padding: 10px 20px;
+    width: 250px;
+    height: 45px;
+    color: #0000007c;
+    margin-bottom: 15px;
+}
+.filters {
+    display: flex;
+    flex-direction: column;
+}
+
+@media screen and (min-width:1000px) {
+    .filters {
+        flex-direction: row;
+        gap: 15px;
+    }
+}

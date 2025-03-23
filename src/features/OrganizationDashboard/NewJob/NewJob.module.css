@@ -1,0 +1,141 @@
+.container {
+  display: flex;
+  height: 100vh;
+  overflow: visible;
+}
+.container .content.sidebarOpen {
+  overflow: hidden;
+}
+.content {
+  transition: margin-left 0.3s ease;
+  width: 100%;
+  padding: 20px;
+}
+.sidebarOpen {
+  margin-left: 300px;
+}
+
+.sidebarClosed {
+  margin-left: 0;
+}
+.newJobContent {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  min-height: 80vh;
+  text-align: center;
+  flex-direction: column;
+}
+.formWrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 25px;
+}
+.newJobForm {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 25px;
+}
+.row {
+  display: flex;
+  flex-direction: column;
+  gap: 25px;
+}
+.registerBtn {
+  background: var(--smoothGreen);
+  color: var(--white);
+  border-radius: 8px;
+  width: 280px;
+  height: 50px;
+  font-weight: 600;
+  border: 0;
+  outline: 0;
+  margin-bottom: 15px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+.registerBtn:hover {
+  background: var(--hoverGreen);
+}
+.inputBox {
+  position: relative;
+  width: 280px;
+}
+.inputBox input, .inputBox select {
+  border: none;
+  padding: 15px 20px;
+  background-color: #fff;
+  display: block;
+  width: 100%;
+  border-radius: 8px;
+}
+.inputBox input:focus, .inputBox select:focus {
+  outline: 2px solid #99BC85;
+}
+.inputBox img {
+  position: absolute;
+  top: 13px;
+  right: 15px;
+  width: 24px;
+}
+.faq {
+  cursor: pointer;
+}
+.textarea {
+  width: 100%;
+  padding: 15px 20px;
+  background-color: #fff;
+  border: none;
+  border-radius: 8px;
+  resize: vertical; 
+  min-height: 60px;
+}
+.textarea:focus {
+  outline: 2px solid #99BC85;
+}
+.faqElement {
+  .faqTitle {
+    cursor: pointer;
+    display: flex;
+    width: 280px;
+    padding: 15px 20px;
+    background-color: #fff;
+    border-radius: 8px;
+    justify-content: space-between;
+    align-items: center;
+    h2 {
+      font-size: 16px;
+      max-width: 80%;
+      font-weight: 400;
+      color: #757575;
+    }
+    img {
+      width: 24px;
+    }
+  }
+  .faqContent {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    margin-top: 15px;
+  }
+  .faqTitle.open {
+    border: 2px solid #99BC85;
+  }
+}
+
+@media screen and (min-width:820px) {
+  .container .content.sidebarOpen {
+    overflow: visible;
+  }
+  .formWrapper {
+      display: flex;
+      flex-direction: column;
+  }
+  .row {
+    flex-direction: row;
+  }
+}

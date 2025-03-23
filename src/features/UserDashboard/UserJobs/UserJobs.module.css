@@ -1,0 +1,155 @@
+.container {
+    width: 100%;
+    min-height: 100vh;
+    background: url("/blob-mobile.svg");
+    background-size: cover;
+    background-position: center;
+}
+.content {
+    padding-top: 30%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    min-height: 80vh;
+    flex-direction: column;
+    gap: 25px;
+}
+.jobTitle {
+    position: relative;
+    width: 90%;
+    max-width: 500px;
+    padding: 2em;
+    margin: 1em auto;
+}
+.content h1 {
+    position: relative;
+    font-weight: 300;
+    font-size: 40px;
+    color: #080808;
+    font-size: 26px;
+    font-weight: 700;
+    letter-spacing: 1px; 
+    text-transform: uppercase; 
+    width: 180px;
+    height: 60px; 
+    text-align: center; 
+    margin: auto; 
+    white-space: nowrap; 
+}
+.content h1:before {
+    background-color: var(--smoothGreen);
+    content: '';
+    display: block;
+    height: 3px;
+    width: 75px;
+    margin-bottom: 5px;
+}
+.content h1:after {
+    background-color: var(--smoothGreen);
+    content: '';
+    display: block;
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    height: 3px;
+    width: 75px;
+    margin-bottom: 15px;
+}
+.cardHolder {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+.pagination {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 20px 0;
+}
+
+.pagination button {
+    margin: 0 10px;
+    padding: 5px 10px;
+    background-color: var(--smoothGreen);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+.pagination button:disabled {
+    background-color: #ccc;
+    cursor: not-allowed;
+}
+
+.pagination span {
+    margin: 0 10px;
+}
+.underline {
+    color: var(--black);
+    text-decoration-thickness: 2px;
+    text-decoration-color: var(--smoothGreen);
+}
+.manageShifts {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+    background: #fff;
+    border-left: 4px solid var(--smoothGreen);
+    padding: 10px 15px;
+    border-radius: 8px;
+    width: 90vw;
+    height: 150px;
+    text-align: center;
+    margin-bottom: 25px;
+}
+.manageShifts .details {
+    max-width: 300px;
+}
+.details h2 {
+    font-size: 1.2rem;
+    color: #303030;
+}
+.details p {
+    color: #303030;
+}
+.manageShifts .shiftBtn {
+    background: var(--smoothGreen);
+    padding: 10px 15px;
+    border-radius: 8px;
+    color: #fff;
+    text-decoration: none;
+    transition: all 0.4s ease;
+    text-transform: uppercase;
+    font-weight: 500;
+}
+.shiftBtn:hover {
+    background: var(--hoverGreen);
+}
+@media screen and (min-width: 768px) {
+    .container {
+        background: url("/blob.svg");
+        background-size: cover;
+        background-position: center;
+    }
+    .content {
+        padding-top: 8%;
+    }
+    .cardHolder {
+        flex-direction: row;
+        flex-wrap: wrap;
+        justify-content: center;
+        align-items: center;
+    }
+    .manageShifts {
+        width: 40vw;
+        height: 120px;
+        flex-direction: row;
+        text-align: unset;
+    }
+    .manageShifts .details {
+        max-width: 500px;
+    }
+}

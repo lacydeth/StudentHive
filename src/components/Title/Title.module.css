@@ -1,0 +1,16 @@
+.title_component {
+    text-align: center;
+    color: var(--darkGreen);
+    font-size: 18px;
+    font-weight: 700;
+    text-transform: uppercase;
+    margin-bottom: 30px;
+
+    h2 {
+        font-size: 20px;
+        color: var(--black);
+        font-weight: 400;
+        margin-top: 5px;
+        text-transform: none;
+    }
+}

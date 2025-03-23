@@ -1,0 +1,176 @@
+.container {
+    width: 100%;
+    min-height: 100vh;
+    background: url("/stacked-waves-mobile.svg");
+    background-size: cover;
+    background-position: center;
+}
+.content {
+    padding-top: 30%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    min-height: 80vh;
+    flex-direction: column;
+    gap: 25px;
+}
+  
+.content h2, .shifts h3 {
+    font-size: 400;
+    letter-spacing: 1.5px;
+    margin-bottom: 5px;
+    font-size: 1.1rem;
+}
+.shifts h2 {
+    text-transform: uppercase;
+    background: #ffffff;
+    border-radius: 8px;
+    padding: 10px 15px;
+    text-align: center;
+    width: 80%;
+    box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
+    margin-bottom: 15px;
+}
+.calendar {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+}
+.calendar .calendarTitle {
+    text-transform: uppercase;
+    background: #ffffff;
+    border-radius: 8px;
+    padding: 10px 15px;
+    text-align: center;
+    width: 80%;
+    box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
+}
+.calendarTitle h2 {
+    font-size: 1.2rem;
+}
+.shifts {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    gap: 25px;
+}
+.shiftContainer {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+.shifts .shiftItem {
+    background: #fff;
+    border-radius: 12px;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    width: 280px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.shifts .shiftItem:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+}
+
+.shiftItem h1 {
+    font-size: 1.4rem;
+    font-weight: 600;
+    color: #333;
+}
+
+.shiftItem h3 {
+    font-size: 1.1rem;
+    font-weight: 500;
+    color: #555;
+}
+.shiftItem button img {
+    width: 22px;
+}
+.shiftItem h4 {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 1rem;
+    font-weight: 400;
+    color: #777;
+}
+
+.shiftItem button {
+    margin-top: 15px;
+    outline: 0;
+    border: 0;
+    border-radius: 8px;
+    background: var(--smoothGreen);
+    padding: 10px 20px;
+    color: #fff;
+    cursor: pointer;
+    transition: all 0.4s ease;
+    font-size: 1rem;
+    font-weight: 500;
+}
+
+.shiftItem button:hover {
+    background: var(--hoverGreen);
+}
+.pagination {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 20px;
+}
+
+.pagination button {
+    margin: 0 10px;
+    padding: 5px 10px;
+    background-color: var(--smoothGreen);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+.pagination button:disabled {
+    background-color: #ccc;
+    cursor: not-allowed;
+}
+
+.pagination span {
+    margin: 0 10px;
+}
+@media screen and (min-width: 768px) {
+    .container {
+        background: url("/stacked-waves.svg");
+        background-size: cover;
+        background-position: center;
+    }
+    .content {
+        padding-top: 10%;
+        flex-direction: row;
+        justify-content: space-evenly;
+    }
+    .shiftContainer {
+        flex-direction: row;
+    }
+    .calendar .calendarTitle {
+        width: 100%;
+    }
+    .shifts h2 {
+        width: 300px;
+    }
+}
+:global(.react-calendar) {
+    width: 350px;
+    max-width: 100%;
+    border-radius: 8px;
+    border: 1px solid #e0e0e0;
+  }

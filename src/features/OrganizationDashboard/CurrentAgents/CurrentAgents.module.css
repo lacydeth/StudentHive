@@ -1,0 +1,53 @@
+.container {
+  display: flex;
+  height: 100vh;
+  overflow: visible;
+}
+.container .content.sidebarOpen {
+  overflow: hidden;
+}
+.content {
+  transition: margin-left 0.3s ease;
+  width: 100%;
+  padding: 20px;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.sidebarOpen {
+  margin-left: 300px;
+}
+
+.sidebarClosed {
+  margin-left: 0;
+}
+
+.newOrgContent {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  min-height: 80vh;
+  text-align: center;
+  flex-direction: column;
+}
+
+.actionBtn {
+  border: none;
+  cursor: pointer;
+  background: none;
+}
+.actionBtn img {
+  width: 24px;
+}
+@media screen and (min-width:820px) {
+  .container .content.sidebarOpen {
+    overflow: visible;
+  }
+  .formWrapper {
+      display: flex;
+      gap: 15px;
+      flex-direction: row;
+  }
+}

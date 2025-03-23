@@ -1,0 +1,18 @@
+.current {
+    padding: 10px 15px;
+    h1 {
+        font-weight: 700;
+        font-size: 22px;
+    }
+    h3 {
+        font-size: 1rem;
+        color: #757575;
+        display: flex;
+        align-items: center;
+        gap: 5px;
+    }
+    img {
+      width: 16px;
+      margin-bottom: 1px;
+    }
+  }

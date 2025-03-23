@@ -1,0 +1,78 @@
+@import url('https://fonts.googleapis.com/css2?family=Overpass:ital,wght@0,100..900;1,100..900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Roboto+Condensed:ital,wght@0,100..900;1,100..900&display=swap');
+*{
+    margin: 0;
+    padding: 0;
+    font-size: 1rem;
+    box-sizing: border-box;
+    font-family: "Roboto Condensed", serif;
+}
+:root {
+    --black: #000000;
+    --white: #FFFFFF;
+    --smoothGreen: #99BC85;
+    --darkGreen: #556D48;
+    --bodyGray: #F4F4F4;
+    --hoverGreen: #4e6b4e;
+}
+html, body {
+    scroll-behavior: smooth;
+    height: 100%;
+    width: 100%;
+    background: var(--bodyGray);
+}
+.react-confirm-alert-button-group {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.react-confirm-alert-button-group button {
+    background: var(--smoothGreen);
+    color: #fff;
+} 
+.react-confirm-alert-overlay {
+    background: rgba(0, 0, 0, 0.2);
+    backdrop-filter: blur(5px);
+}
+.ag-row {
+    display: flex;
+    justify-content: center;
+}
+.ag-theme-alpine {
+    background-color: #f8f9fa;
+    font-family: Arial, sans-serif;
+    border-radius: 8px;
+}
+.ag-theme-alpine .ag-root-wrapper  {
+    border: none;
+    padding: 15px;
+}
+.ag-theme-alpine .ag-row {
+    border-bottom: none;
+    padding-top: 5px;
+}
+.ag-theme-alpine .ag-row:nth-child(even) {
+    background: var(--bodyGray);
+}
+.ag-cell-focus,.ag-cell-no-focus{
+    border:none !important;
+    outline: none !important;
+}
+.ag-row {
+    cursor: pointer;
+}
+.react-calendar__tile--active {
+    background: #99BC85 !important;
+    border-radius: 8px;
+    color: white !important;
+}
+.react-calendar__tile--active:enabled:hover,
+.react-calendar__tile--active:enabled:focus {
+    background: #99BC85 !important;
+}
+.react-calendar__tile--now {
+    background: #f0f0f0;
+} 
+.react-calendar__tile--now.react-calendar__tile--active {
+    background: #99BC85 !important;
+}
