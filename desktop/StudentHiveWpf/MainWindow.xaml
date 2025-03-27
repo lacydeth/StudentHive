@@ -14,26 +14,31 @@
     <Window.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
-                <ResourceDictionary Source="Styles/Togglebutton.xaml"/>
+                <ResourceDictionary Source="Styles/MainWindowStyle.xaml"/>
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </Window.Resources>
 
-
     <Border CornerRadius="12">
         <Border.Background>
             <ImageBrush 
-                    Stretch="None"/>
+                 Stretch="None"/>
         </Border.Background>
         <Border CornerRadius="10"                    
-        BorderThickness="4"
-        Opacity="0.95">
+     BorderThickness="4"
+     Opacity="0.95">
             <Border.BorderBrush>
                 <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
                     <GradientStop Color="#000000" Offset="0"/>
                     <GradientStop Color="#CFC9C9" Offset="1"/>
                 </LinearGradientBrush>
             </Border.BorderBrush>
+            <Border.Background>
+                <LinearGradientBrush StartPoint="0,1" EndPoint="1,0">
+                    <GradientStop Color="#556D48" Offset="0.8"/>
+                    <GradientStop Color="#99BC85" Offset="0"/>
+                </LinearGradientBrush>
+            </Border.Background>
             <Grid>
                 <Grid.RowDefinitions>
                     <RowDefinition Height="30"/>
@@ -47,21 +52,23 @@
                         <ColumnDefinition Width="5"/>
                     </Grid.ColumnDefinitions>
                     <TextBlock Text="Felhasználók Kezelése"
-                           Foreground="Black"
-                           FontSize="17"
-                           FontFamily="Montserrat"
-                           Grid.Column="0"
-                           VerticalAlignment="Center"
-                           Margin="10,0,0,0"/>
+                               Foreground="Black"
+                               FontSize="17"
+                               FontFamily="Montserrat"
+                               Grid.Column="0"
+                               VerticalAlignment="Center"
+                               Margin="10,0,0,0"/>
+
+                    <!-- Close Button - Using the Button Style from Resource Dictionary -->
                     <Button x:Name="btnClose"                          
-                        BorderThickness="0"
-                        Content="X"
-                        Foreground="White"
-                        FontSize="12"
-                        FontFamily="Montserrat"
-                        Cursor="Hand"
-                        Grid.Column="2" Click="btnClose_Click"
-                        >
+    BorderThickness="0"
+    Content="X"
+    Foreground="White"
+    FontSize="12"
+    FontFamily="Montserrat"
+    Cursor="Hand"
+    Grid.Column="2" Click="btnClose_Click"
+    >
                         <Button.Style>
                             <Style TargetType="Button">
                                 <Setter Property="Background" Value="#556D48"/>
@@ -75,20 +82,20 @@
                         <Button.Template>
                             <ControlTemplate TargetType="Button">
                                 <Border Width="18" Height="18"
-                                    CornerRadius="9"
-                                    Background="{TemplateBinding Background}">
+                CornerRadius="9"
+                Background="{TemplateBinding Background}">
                                     <ContentPresenter VerticalAlignment="Center"
-                                                  HorizontalAlignment="Center"/>
+                              HorizontalAlignment="Center"/>
                                 </Border>
                             </ControlTemplate>
                         </Button.Template>
                     </Button>
 
                     <Button x:Name="btnLogout"                          
-                            BorderThickness="0"
-                            Cursor="Hand"
-                            Grid.Column="2" Click="btnLogout_Click"
-                            Margin="-50,0,0,0">         
+         BorderThickness="0"
+         Cursor="Hand"
+         Grid.Column="2" Click="btnLogout_Click"
+         Margin="-50,0,0,0">
                         <Button.Style>
                             <Style TargetType="Button">
                                 <Setter Property="Background" Value="#556D48"/>
@@ -103,51 +110,60 @@
                         <Button.Template>
                             <ControlTemplate TargetType="Button">
                                 <Border Width="20" Height="20"
-                    CornerRadius="15"
-                    Background="{TemplateBinding Background}">
+ CornerRadius="15"
+ Background="{TemplateBinding Background}">
                                     <Image Source="icons/logout.png"
-                       Width="12" Height="12"
-                       VerticalAlignment="Center"
-                       HorizontalAlignment="Center"/>
+    Width="12" Height="12"
+    VerticalAlignment="Center"
+    HorizontalAlignment="Center"/>
                                 </Border>
                             </ControlTemplate>
                         </Button.Template>
                     </Button>
-
                 </Grid>
-                    <StackPanel Grid.Row="1">
-                        <DataGrid x:Name="UserListBox" Background="Transparent" AutoGenerateColumns="False"
-          IsReadOnly="True" SelectionMode="Single">
-                            <DataGrid.Columns>
-                                <DataGridTextColumn Header="ID" Binding="{Binding Id}" Width="54"/>
-                                <DataGridTextColumn Header="Vezetéknév" Binding="{Binding LastName}" Width="200"/>
-                                <DataGridTextColumn Header="Keresztnév" Binding="{Binding FirstName}" Width="200"/>
-                                <DataGridTextColumn Header="IsActive" Binding="{Binding IsActive}" Width="300"/>
-                                <DataGridTextColumn Header="Email" Binding="{Binding Email}" Width="300"/>
-                                <DataGridTextColumn Header="CreatedAt" Binding="{Binding CreatedAt}" Width="300"/>
 
-                                <DataGridTemplateColumn Header="Műveletek" Width="110">
-                                    <DataGridTemplateColumn.CellTemplate>
-                                        <DataTemplate>
-                                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-                                                <Button ToolTip="Módosítás" Width="30" Height="30" Margin="2" Click="btnedit_Click">
-                                                    <Image Source="/icons/view.png" Stretch="Uniform"/>
-                                                </Button>
-                                                <ToggleButton ToolTip="Státusz váltás" Width="40" Height="20" Margin="2"
-                                                                IsChecked="{Binding IsActive}"
-                                                                Checked="ToggleButton_Checked" Unchecked="ToggleButton_Unchecked"/>
-                                                <Button ToolTip="Jelszó változtatás" Width="30" Height="30" Margin="2" Click="btnPassword_Click">
-                                                    <Image Source="/icons/keyblack.png" Stretch="Uniform"/>
-                                                </Button>
-                                            </StackPanel>
-                                        </DataTemplate>
-                                    </DataGridTemplateColumn.CellTemplate>
-                                </DataGridTemplateColumn>
-                            </DataGrid.Columns>
-                        </DataGrid>
-                    </StackPanel>
+                <StackPanel Grid.Row="1">
+                    <!-- DataGrid - Using the DataGrid Style from Resource Dictionary -->
+                    <DataGrid x:Name="UserListBox" 
+                              AutoGenerateColumns="False"
+                              IsReadOnly="True" 
+                              SelectionMode="Single">
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="ID" Binding="{Binding Id}" Width="54"/>
+                            <DataGridTextColumn Header="Vezetéknév" Binding="{Binding LastName}" Width="200"/>
+                            <DataGridTextColumn Header="Keresztnév" Binding="{Binding FirstName}" Width="200"/>
+                            <DataGridTextColumn Header="IsActive" Binding="{Binding IsActive}" Width="300"/>
+                            <DataGridTextColumn Header="Email" Binding="{Binding Email}" Width="300"/>
+                            <DataGridTextColumn Header="CreatedAt" Binding="{Binding CreatedAt}" Width="300"/>
+
+                            <DataGridTemplateColumn Header="Műveletek" Width="110">
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                                            <Button x:Name="CustomEditButton" Style="{StaticResource CustomEditButton}" ToolTip="Módosítás" Width="30" Height="30" Margin="2" Click="btnedit_Click">
+                                                <Image Source="/icons/view.png" Stretch="Uniform"/>
+                                            </Button>
+
+                                            <!-- ToggleButton - Using the ToggleButton Style from Resource Dictionary -->
+                                            <ToggleButton ToolTip="Státusz váltás" 
+                                                         Width="40" 
+                                                         Height="20" 
+                                                         Margin="2"
+                                                         IsChecked="{Binding IsActive}"
+                                                         Checked="ToggleButton_Checked" 
+                                                         Unchecked="ToggleButton_Unchecked"/>
+
+                                            <Button x:Name="CustomPasswordButton" Style="{StaticResource CustomPasswordButton}" ToolTip="Jelszó változtatás" Width="30" Height="30" Margin="2" Click="btnPassword_Click">
+                                                <Image Source="/icons/keyblack.png" Stretch="Uniform"/>
+                                            </Button>
+                                        </StackPanel>
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
+                        </DataGrid.Columns>
+                    </DataGrid>
+                </StackPanel>
             </Grid>
         </Border>
-
     </Border>
 </Window>
