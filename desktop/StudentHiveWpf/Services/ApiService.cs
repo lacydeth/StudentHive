@@ -16,7 +16,11 @@ namespace StudentHiveWpf.Services
     public class ApiService
     {
         private readonly HttpClient _httpClient;
-
+        public ApiService(IHttpClientFactory httpClientFactory)
+        {
+            _httpClient = httpClientFactory.CreateClient();
+            _httpClient.BaseAddress = new Uri("https://localhost:7067/api/general/");
+        }
         public ApiService()
         {
             _httpClient = new HttpClient();
