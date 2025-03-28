@@ -1,7 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
-    <!-- Existing ToggleButton Style (Kept from the original) -->
     <Style TargetType="{x:Type ToggleButton}">
         <Setter Property="Background" Value="Red"/>
         <Setter Property="Template">
@@ -42,7 +41,6 @@
         </Setter>
     </Style>
 
-    <!-- DataGrid Style -->
     <Style TargetType="{x:Type DataGrid}">
         <Setter Property="Background" Value="#F4F4F4"/>
         <Setter Property="BorderBrush" Value="#556D48"/>

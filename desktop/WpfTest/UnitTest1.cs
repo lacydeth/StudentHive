@@ -116,16 +116,13 @@ namespace StudentHiveWpf.Tests
                 )
                 .ReturnsAsync(responseMessage);
 
-            // Simuláljuk a felhasználó létrehozását
             var createUserContent = new StringContent(JsonConvert.SerializeObject(createUserRequest), Encoding.UTF8, "application/json");
             var createUserResponse = await _httpClient.PostAsync($"{_baseApiUrl}register", createUserContent);
 
             createUserResponse.EnsureSuccessStatusCode();
 
-            // Act
             var response = await _httpClient.GetAsync($"{_baseApiUrl}alluser");
 
-            // Assert
             response.EnsureSuccessStatusCode();
 
             var jsonResponseString = await response.Content.ReadAsStringAsync();
@@ -138,7 +135,6 @@ namespace StudentHiveWpf.Tests
         [Fact]
         public async Task ToggleUserStatusAsync_ShouldReturnSuccess_WhenUserExists()
         {
-            // Arrange
             int userId = 1;
             var responseMessage = new HttpResponseMessage
             {
@@ -156,17 +152,14 @@ namespace StudentHiveWpf.Tests
                 )
                 .ReturnsAsync(responseMessage);
 
-            // Act
             var response = await _httpClient.PatchAsync($"{_baseApiUrl}update-user-status/{userId}", null);
 
-            // Assert
             response.EnsureSuccessStatusCode();
         }
 
         [Fact]
         public async Task ToggleUserStatusAsync_ShouldReturnNotFound_WhenUserDoesNotExist()
         {
-            // Arrange
             int userId = 9999;
             var responseMessage = new HttpResponseMessage
             {
@@ -184,17 +177,14 @@ namespace StudentHiveWpf.Tests
                 )
                 .ReturnsAsync(responseMessage);
 
-            // Act
             var response = await _httpClient.PatchAsync($"{_baseApiUrl}update-user-status/{userId}", null);
 
-            // Assert
             Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
         }
 
         [Fact]
         public async Task UpdateUserPasswordAsync_ShouldReturnSuccess_WhenPasswordUpdated()
         {
-            // Arrange
             int userId = 1;
             var newPassword = "newSecurePassword123";
             var requestBody = new { NewPassword = newPassword };
@@ -217,10 +207,8 @@ namespace StudentHiveWpf.Tests
                 )
                 .ReturnsAsync(responseMessage);
 
-            // Act
             var response = await _httpClient.PatchAsync($"{_baseApiUrl}update-user-password/{userId}", content);
 
-            // Assert
             response.EnsureSuccessStatusCode();
         }
 
@@ -228,8 +216,7 @@ namespace StudentHiveWpf.Tests
         [Fact]
         public async Task UpdateUserPasswordAsync_ShouldReturnNotFound_WhenUserDoesNotExist()
         {
-            // Arrange
-            int nonExistentUserId = 99999; // Feltételezzük, hogy ez az ID nem létezik
+            int nonExistentUserId = 99999; 
             var newPassword = "NewSecurePassword123!";
             var requestBody = new { NewPassword = newPassword };
             var content = new StringContent(JsonConvert.SerializeObject(requestBody), Encoding.UTF8, "application/json");
@@ -251,10 +238,8 @@ namespace StudentHiveWpf.Tests
                 )
                 .ReturnsAsync(responseMessage);
 
-            // Act
             var response = await _httpClient.PatchAsync($"{_baseApiUrl}update-user-password/{nonExistentUserId}", content);
 
-            // Assert: Az API-nak vissza kell adnia a 404-es hibakódot
             Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
         }
 
@@ -262,8 +247,7 @@ namespace StudentHiveWpf.Tests
         [Fact]
         public async Task ToggleUserStatusAsync_ShouldReturnResponseWithinExpectedTime()
         {
-            // Arrange
-            int existingUserId = 1; // Feltételezzük, hogy ez az ID létezik
+            int existingUserId = 1; 
             var responseMessage = new HttpResponseMessage
             {
                 StatusCode = HttpStatusCode.OK
@@ -280,15 +264,12 @@ namespace StudentHiveWpf.Tests
                 )
                 .ReturnsAsync(responseMessage);
 
-            // Act - Mérjük a válaszidőt
             var startTime = DateTime.Now;
             var response = await _httpClient.PatchAsync($"{_baseApiUrl}update-user-status/{existingUserId}", null);
             var endTime = DateTime.Now;
 
-            // Számítsuk ki a válaszidőt másodpercekben
             var responseTime = (endTime - startTime).TotalSeconds;
 
-            // Assert
             Assert.True(responseTime < 1, $"A válaszidő túl hosszú: {responseTime} másodperc.");
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
         }
@@ -297,7 +278,6 @@ namespace StudentHiveWpf.Tests
         [Fact]
         public async Task UpdateUserProfileAsync_ShouldReturnSuccess_WhenProfileUpdated()
         {
-            // Arrange
             int userId = 1;
             string firstName = "John";
             string lastName = "Doe";
@@ -310,7 +290,6 @@ namespace StudentHiveWpf.Tests
                 StatusCode = HttpStatusCode.OK
             };
 
-            // Mock the SendAsync method to return a success response for the given URL and HTTP method (PATCH)
             _httpMessageHandlerMock
                 .Protected()
                 .Setup<Task<HttpResponseMessage>>(
@@ -322,10 +301,7 @@ namespace StudentHiveWpf.Tests
                 )
                 .ReturnsAsync(responseMessage);
 
-            // Act
             var response = await _httpClient.PatchAsync($"{_baseApiUrl}update-user-profile/{userId}", content);
-
-            // Assert
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
         }
 
@@ -335,7 +311,6 @@ namespace StudentHiveWpf.Tests
         [InlineData(2, "Jane", "Smith", "jane.smith@example.com")]
         public async Task UpdateUserProfileAsync_ShouldReturnSuccess_ForDifferentUsers(int userId, string firstName, string lastName, string email)
         {
-            // Arrange
             var requestBody = new { FirstName = firstName, LastName = lastName, Email = email };
             var content = new StringContent(JsonConvert.SerializeObject(requestBody), System.Text.Encoding.UTF8, "application/json");
 
@@ -344,7 +319,6 @@ namespace StudentHiveWpf.Tests
                 StatusCode = HttpStatusCode.OK
             };
 
-            // Mock the SendAsync method to return a success response for each user
             _httpMessageHandlerMock
                 .Protected()
                 .Setup<Task<HttpResponseMessage>>(
@@ -356,10 +330,8 @@ namespace StudentHiveWpf.Tests
                 )
                 .ReturnsAsync(responseMessage);
 
-            // Act
             var response = await _httpClient.PatchAsync($"{_baseApiUrl}update-user-profile/{userId}", content);
 
-            // Assert
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
         }
 
@@ -367,8 +339,7 @@ namespace StudentHiveWpf.Tests
         [Fact]
         public async Task UpdateUserProfileAsync_ShouldReturnNotFound_WhenUserDoesNotExist()
         {
-            // Arrange
-            int nonExistentUserId = 99999; // Feltételezzük, hogy ez az ID nem létezik
+            int nonExistentUserId = 99999; 
             string firstName = "Ghost";
             string lastName = "User";
             string email = "ghost.user@example.com";
@@ -381,7 +352,6 @@ namespace StudentHiveWpf.Tests
                 StatusCode = HttpStatusCode.NotFound
             };
 
-            // Mock the SendAsync method to return a NotFound response for the non-existent user
             _httpMessageHandlerMock
                 .Protected()
                 .Setup<Task<HttpResponseMessage>>(
@@ -393,10 +363,8 @@ namespace StudentHiveWpf.Tests
                 )
                 .ReturnsAsync(responseMessage);
 
-            // Act
             var response = await _httpClient.PatchAsync($"{_baseApiUrl}update-user-profile/{nonExistentUserId}", content);
 
-            // Assert
             Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
         }
 
