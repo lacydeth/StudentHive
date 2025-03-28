@@ -20,7 +20,7 @@ namespace StudentHiveWpf
             InitializeComponent();
             _httpClient = new HttpClient();
             _httpClient.DefaultRequestHeaders.Add("X-Client-Id", "StudentHiveWpfClient");
-            _httpClient.DefaultRequestHeaders.Add("X-Api-Key", "e96e265f7322b748c3516dfba2f3e7da1337640d0e5d9cf873c13e13db30cc85"); // Replace with a secure API key
+            _httpClient.DefaultRequestHeaders.Add("X-Api-Key", "e96e265f7322b748c3516dfba2f3e7da1337640d0e5d9cf873c13e13db30cc85"); 
         }
 
         private void btnClose_Click(object sender, RoutedEventArgs e)

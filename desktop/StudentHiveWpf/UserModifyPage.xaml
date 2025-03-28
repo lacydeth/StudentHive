@@ -12,7 +12,6 @@
         WindowStyle="None">
 
     <Window.Resources>
-        <!-- Define colors -->
         <Color x:Key="BlackColor">#000000</Color>
         <Color x:Key="WhiteColor">#FFFFFF</Color>
         <Color x:Key="SmoothGreen">#99BC85</Color>
@@ -20,7 +19,6 @@
         <Color x:Key="BodyGray">#F4F4F4</Color>
         <Color x:Key="HoverGreen">#4e6b4e</Color>
 
-        <!-- Define Brushes -->
         <SolidColorBrush x:Key="BlackBrush" Color="{StaticResource BlackColor}"/>
         <SolidColorBrush x:Key="WhiteBrush" Color="{StaticResource WhiteColor}"/>
         <SolidColorBrush x:Key="SmoothGreenBrush" Color="{StaticResource SmoothGreen}"/>
@@ -28,7 +26,6 @@
         <SolidColorBrush x:Key="BodyGrayBrush" Color="{StaticResource BodyGray}"/>
         <SolidColorBrush x:Key="HoverGreenBrush" Color="{StaticResource HoverGreen}"/>
 
-        <!-- Define Button Style -->
         <Style x:Key="ButtonStyle" TargetType="Button">
             <Setter Property="Background" Value="{StaticResource DarkGreenBrush}"/>
             <Setter Property="Foreground" Value="{StaticResource WhiteBrush}"/>
@@ -44,7 +41,6 @@
             </Style.Triggers>
         </Style>
 
-        <!-- Define TextBox Style -->
         <Style x:Key="TextBoxStyle" TargetType="TextBox">
             <Setter Property="Background" Value="{StaticResource WhiteBrush}"/>
             <Setter Property="Foreground" Value="{StaticResource BlackBrush}"/>

@@ -111,7 +111,6 @@ namespace StudentHiveWpf
             MessageBox.Show(message, "Hiba", MessageBoxButton.OK, MessageBoxImage.Error);
         }
 
-        // 🔘 UI eseménykezelők, amelyek a szervezett metódusokat hívják meg
         public async void ToggleButton_Checked(object sender, RoutedEventArgs e) => await ToggleUserStatusAsync();
         public async void ToggleButton_Unchecked(object sender, RoutedEventArgs e) => await ToggleUserStatusAsync();
         public async void btnedit_Click(object sender, RoutedEventArgs e) => await EditUserAsync();
