@@ -2,6 +2,31 @@
 
 # StudentHive - Telepítési és indítási útmutató
 
+A **StudentHive** egy többplatformos alkalmazás, amely webes és asztali környezetben is működik. Ez a dokumentáció végigvezet a telepítési és indítási folyamaton.
+
+---
+
+## Repository Struktúra
+
+A repository a következő fő mappákat és fájlokat tartalmazza:
+
+```
+StudentHive/
+│── backend/          # ASP.NET backend
+│── desktop/          # WPF alapú asztali alkalmazás
+│── frontend/         # React + Vite frontend
+│── README.md         # Ez a dokumentáció
+│── STUDENTHIVE Dokumentáció.docx  # Részletes dokumentáció
+│── studenthive.sql   # Adatbázis dump fájl
+```
+
+- **backend/**: Az ASP.NET backend forráskódja.
+- **desktop/**: Az asztali alkalmazás forráskódja (WPF és C#).
+- **frontend/**: A React alapú frontend forráskódja.
+- **README.md**: Ez a fájl tartalmazza a telepítési és indítási információkat.
+- **STUDENTHIVE Dokumentáció.docx**: Részletesebb dokumentáció a projektről.
+- **studenthive.sql**: Az adatbázis sémájának és alapadatainak exportja.
+
 ## Alapvető szoftverek telepítése
 
 ### Node.js telepítése
