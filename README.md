@@ -17,7 +17,9 @@ StudentHive/
 │── frontend/         # React + Vite frontend
 │── README.md         # Ez a dokumentáció
 │── STUDENTHIVE Dokumentáció.docx  # Részletes dokumentáció
-│── studenthive.sql   # Adatbázis dump fájl
+│── studenthive.sql   # Üres adatbázis
+│── studenthive-imports.sql # Teszteléshez szükséges adatok
+│── studenthive-complete.sql # Teljes adatbázis táblákkal és tesztadatokkal
 ```
 
 - **backend/**: Az ASP.NET backend forráskódja.
@@ -26,6 +28,8 @@ StudentHive/
 - **README.md**: Ez a fájl tartalmazza a telepítési és indítási információkat.
 - **STUDENTHIVE Dokumentáció.docx**: Részletesebb dokumentáció a projektről.
 - **studenthive.sql**: Az adatbázis sémájának és alapadatainak exportja.
+- **studenthive-imports.sql**: Az adatbázis tesztadatainak exportja.
+- **studenthive-complete.sql**: Az adatbázis sémájának és tesztadatainak exportja.
 
 ## Alapvető szoftverek telepítése
 
@@ -192,7 +196,7 @@ Ha Visual Studio-t használsz:
 2. A szerver elindul a https://localhost:7067 címen, és megjelenik egy terminál.
 
 Amennyiben a XAMPP fut a backend automatikusan létrehozza az üres adatbázist, ennek a sikerességéről üzenetben tájékoztat (Az adatbázis sikeresen létrehozva). Továbba elindul a Swagger is, megjelenítve az összes API route-ot.
-
+A teszteléshez szükséges adatok a `studenthive-imports` fájlban találhatóak. A tartalmát a phpmyadmin panelban a studenthive adatbázist kiválasztva az SQL fül alatt lehet beilleszteni. Ha ez sikerült a futtatás gombra kell kattintani és az adatok fel is töltődnek. Emellett megtalálható a `studenthive-complete` fájl is amiben a táblákkal együtt a tesztadatok is megtalálhatóak, ha nem hozná létre a backend az adatbázist! Az adatbázisnak a nevének `studenthive` kell legyen!
 ## WPF projekt megnyitása
 Amennyiben a XAMPP sikeresen elindult következhet a desktop indítása. A projekt a desktop/ mappában található.
 
@@ -211,3 +215,16 @@ Ha Visual Studio-t használsz:
 1. Kattints a Zöld Indítás gombra (F5), vagy válaszd ki a Debug → Start Debugging opciót.
 2. A program elindul és megjelenik egy bejelentkezési ablak.
 
+ ## Teszteléshez szükséges bejelentkezési adatok
+ Ha sikeresen beimportáltad a tesztadatokat az adatbázisba, akkor ezeket a profilokat tudod használni a teszteléshez. Fontos! A műszakok, ha a jelenlegi dátumnál régebbi nem fognak megjelenni a közvetítőnél és a     diák se fogja tudni értelem szerűen bevállalni a már múltbéli műszakot, ezért szükség lehet új műszak felvételéhez a teszteléshez. Az e-mail küldési funkcióhoz tempmail használata ajánlott.
+ ### Admin profil
+ Email:  admin@ex.com Jelszó: Asd12345
+ ### Szövetkezeti profil
+ Email: melodiak@ex.com Jelszó: Asd12345
+ Email: joker@ex.com Jelszó: Asd12345
+ ### Közvetítői profil
+ Email: fogarasi@ex.com Jelszó: Asd12345
+ Email: toth@ex.com Jelszó: Asd12345
+ ### Diák profil
+ Email: user@ex.com Jelszó: Asd12345
+ Email: user2@ex.com Jelszó: Asd12345
