@@ -1,3 +1,5 @@
+
+
 # StudentHive - Telepítési és indítási útmutató
 
 ## Alapvető szoftverek telepítése
@@ -178,3 +180,9 @@ Ha Visual Studio 2022-t használsz:
 Másik opció:
 1. A lehúzott repositoryban a desktop mappa megnyitása.
 2. StudentHiveWpf.sln fájl megnyitásával elindul a projekt.
+
+### WPF futtatása
+Ha Visual Studio-t használsz:
+1. Kattints a Zöld Indítás gombra (F5), vagy válaszd ki a Debug → Start Debugging opciót.
+2. A program elindul és megjelenik egy bejelentkezési ablak.
+
