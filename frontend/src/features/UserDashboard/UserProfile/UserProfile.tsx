@@ -198,8 +198,8 @@ const UserProfile = () => {
         isValid = false;
       }
 
-      if (bankAccountNumber !== "" && !/^\d{8}$/.test(bankAccountNumber)) {
-        toast.error("A bankszámlaszámnak pontosan 8 számjegyből kell állnia.");
+      if (bankAccountNumber !== "" && !/^\d{24}$/.test(bankAccountNumber)) {
+        toast.error("A bankszámlaszámnak pontosan 24 számjegyből kell állnia.");
         isValid = false;
       }
 
@@ -462,7 +462,7 @@ const UserProfile = () => {
               type="text" 
               value={bankAccountNumber} 
               onChange={(e) => setBankAccountNumber(e.target.value)} 
-              placeholder="12345678-12345678-12345678"
+              placeholder="123456781234567812345678"
             />
           </div>
         </div>
