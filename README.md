@@ -17,6 +17,7 @@ StudentHive/
 │── frontend/         # React + Vite frontend
 │── README.md         # Ez a dokumentáció
 │── STUDENTHIVE Dokumentáció.docx  # Részletes dokumentáció
+│── STUDENTHIVE Dokumentáció.pdf # Részletes dokumentáció pdf formátummal
 │── studenthive.sql   # Üres adatbázis
 │── studenthive-imports.sql # Teszteléshez szükséges adatok
 │── studenthive-complete.sql # Teljes adatbázis táblákkal és tesztadatokkal
@@ -27,6 +28,7 @@ StudentHive/
 - **frontend/**: A React alapú frontend forráskódja.
 - **README.md**: Ez a fájl tartalmazza a telepítési és indítási információkat.
 - **STUDENTHIVE Dokumentáció.docx**: Részletesebb dokumentáció a projektről.
+- **STUDENTHIVE Dokumentáció.pdf**: Részletesebb dokumentáció a projektről pdf formátummal.
 - **studenthive.sql**: Az adatbázis sémájának és alapadatainak exportja.
 - **studenthive-imports.sql**: Az adatbázis tesztadatainak exportja.
 - **studenthive-complete.sql**: Az adatbázis sémájának és tesztadatainak exportja.
@@ -218,13 +220,13 @@ Ha Visual Studio-t használsz:
  ## Teszteléshez szükséges bejelentkezési adatok
  Ha sikeresen beimportáltad a tesztadatokat az adatbázisba, akkor ezeket a profilokat tudod használni a teszteléshez. Fontos! A műszakok, ha a jelenlegi dátumnál régebbi nem fognak megjelenni a közvetítőnél és a     diák se fogja tudni értelem szerűen bevállalni a már múltbéli műszakot, ezért szükség lehet új műszak felvételéhez a teszteléshez. Az e-mail küldési funkcióhoz tempmail használata ajánlott.
  ### Admin profil
- Email:  admin@ex.com Jelszó: Asd12345
+   1. Email:  admin@ex.com Jelszó: Asd12345
  ### Szövetkezeti profil
- Email: melodiak@ex.com Jelszó: Asd12345
- Email: joker@ex.com Jelszó: Asd12345
+   1. Email: melodiak@ex.com Jelszó: Asd12345
+   2. Email: joker@ex.com Jelszó: Asd12345
  ### Közvetítői profil
- Email: fogarasi@ex.com Jelszó: Asd12345
- Email: toth@ex.com Jelszó: Asd12345
+   1. Email: fogarasi@ex.com Jelszó: Asd12345
+   2. Email: toth@ex.com Jelszó: Asd12345
  ### Diák profil
- Email: user@ex.com Jelszó: Asd12345
- Email: user2@ex.com Jelszó: Asd12345
+   1. Email: user@ex.com Jelszó: Asd12345
+   2. Email: user2@ex.com Jelszó: Asd12345
