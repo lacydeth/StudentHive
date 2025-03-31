@@ -1,6 +1,9 @@
 .container {
     display: flex;
     height: 100vh;
+    overflow: visible;
+  }
+.container .content.sidebarOpen {
     overflow: hidden;
 }
 .content {
